@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Profile
+
+
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)

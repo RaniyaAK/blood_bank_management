@@ -20,21 +20,51 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data['username']
+#             password = form.cleaned_data['password']
+#             user = authenticate(request, username=username, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 return redirect('admin_dashboard' if user.is_superuser else 'admin_dashboard')
+#             else:
+#                 return render(request, 'login.html', {'form': form, 'error': 'Invalid credentials'})
+#     else:
+#         form = LoginForm()
+#     return render(request, 'login.html', {'form': form})
+
+# --- Login ---
 def user_login(request):
+    form = LoginForm(request.POST or None)
+    error_message = None
+
     if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('admin_dashboard' if user.is_superuser else 'admin_dashboard')
-            else:
-                return render(request, 'login.html', {'form': form, 'error': 'Invalid credentials'})
-    else:
-        form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            # Redirect based on role
+            if user.profile.role == 'admin':
+                return redirect('admin_dashboard')
+            elif user.profile.role == 'hospital':
+                return redirect('hospital_dashboard')
+            elif user.profile.role == 'donour':
+                return redirect('donour_dashboard')
+            elif user.profile.role == 'recipient':
+                return redirect('recipient_dashboard')
+        else:
+            error_message = "Incorrect username or password."
+
+    return render(request, 'login.html', {
+        'form': form,
+        'error_message': error_message
+    })
 
 # --- Dashboards ---
 @login_required
@@ -44,8 +74,8 @@ def admin_dashboard(request):
 def donour_dashboard(request):
     return render(request, 'donour_dashboard.html')
 
-def patient_dashboard(request):
-    return render(request, 'patient_dashboard.html')
+def recipient_dashboard(request):
+    return render(request, 'recipient_dashboard.html')
 
 def hospital_dashboard(request):
     return render(request, 'hospital_dashboard.html')

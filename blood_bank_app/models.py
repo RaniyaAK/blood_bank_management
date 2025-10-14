@@ -10,8 +10,8 @@ class Profile(models.Model):
         ('admin', 'Admin'),
         ('hospital', 'Hospital'),
         ('donour', 'Donour'),
-        ('patient', 'Patient'),
+        ('recipient', 'recipient'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES,default='--Choose Role--')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES,default='recipient')
     def __str__(self):
         return f"{self.user} ({self.role})"

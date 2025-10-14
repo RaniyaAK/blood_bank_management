@@ -15,7 +15,7 @@
         <p class="error-text">{{ error_message }}</p>
     {% endif %}
 
-    <form action="{% url 'login' %}" method="post" novalidate>
+    <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
         {{form.as_p}}
 
