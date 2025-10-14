@@ -50,6 +50,10 @@ def patient_dashboard(request):
 def hospital_dashboard(request):
     return render(request, 'hospital_dashboard.html')
 
+
+def home(request):
+    return render(request, 'home.html')
+
 def user_logout(request):
     logout(request)
     return redirect('login')
