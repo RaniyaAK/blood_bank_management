@@ -4,115 +4,28 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="login-page-container">
-    <div class="login-register-box">  
-        <h1>Login</h1>
+<div class="login-register-box container">  
+    <h1>Login</h1>
 
-        {% if error %}
-            <p class="error-text">{{ error }}</p>
-        {% endif %}
+    {% if error %}
+        <p class="error-text">{{ error }}</p>
+    {% endif %}
 
-        {% if error_message %}
-            <p class="error-text">{{ error_message }}</p>
-        {% endif %}
+    {% if error_message %}
+        <p class="error-text">{{ error_message }}</p>
+    {% endif %}
 
-        <form action="{% url 'login' %}" method="post" novalidate>
-            {% csrf_token %}
+    <form action="{% url 'login' %}" method="post" novalidate>
+        {% csrf_token %}
+        {{form.as_p}}
 
-            <div class="input-group">
-                <label for="id_username">Username:</label>
-                {{ form.username }}
-            </div>
+        <div>
+            <button type="submit" class="login-register-btn">Login</button>
+        </div>
+    </form>
 
-          
-            <div class="input-group">
-                <label for="id_password">Password:</label>
-                {{ form.password }}
-            </div>
-
-            <div style="text-align: center; margin-top: 15px;">
-                <button type="submit" class="login-register-btn">Login</button>
-            </div>
-        </form>
-
-        <span class="login-register-link">
-            Don't have an account? <a href="{% url 'register' %}">Sign up</a>
-        </span>
-    </div>
-
-   
-    <div class="admin-box">
-        <h3>Admin Login Details</h3>
-        <p><strong>Username:</strong> Raniya</p>
-        <p><strong>Password:</strong> heyyy123</p>
-    </div>
+    <span class="login-register-link">
+        Don't have an account? <a href="{% url 'register' %}">Sign up</a>
+    </span>
 </div>
-
-<style>
-
-.login-page-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 90vh;
-}
-
-
-.login-register-box {
-    background: #fff;
-    padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    width: 400px;
-    text-align: center;
-}
-
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    margin-bottom: 15px;
-}
-
-
-.input-group label {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-}
-
-
-.admin-box {
-    margin-top: 20px;
-    background-color: #f5f5f5;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 15px 20px;
-    text-align: left;
-    width: 350px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.admin-box h3 {
-    margin-top: 0;
-    color:  #6b8e23;
-    text-align: center;
-}
-
-.admin-box p {
-    margin: 5px 0;
-    font-size: 15px;
-}
-</style>
-
 {% endblock %}

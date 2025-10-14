@@ -13,29 +13,10 @@
 
     <form method="POST">
         {% csrf_token %}
+        {{form.as_p}}
 
-        <p>
-            <label for="id_username">Username:</label>
-            <input type="text" name="username" id="id_username" required>
-        </p>
-
-        <p>
-            <label for="id_email">Email:</label>
-            <input type="email" name="email" id="id_email" required>
-        </p>
-
-        <p>
-            <label for="id_password">Password:</label>
-            <input type="password" name="password" id="id_password" required>
-        </p>
-
-        <p>
-            <label for="id_confirm_password">Confirm Password:</label>
-            <input type="password" name="confirm_password" id="id_confirm_password" required>
-        </p>
-
-        <div style="text-align: center;">
-            <button type="submit" class="login-register-btn">Sign up</button>
+        <div>
+            <button type="submit" class="login-register-btn">Register</button>
         </div>
     </form>
 
@@ -43,7 +24,5 @@
         Already have an account? <a href="{% url 'login' %}">Login</a>
     </span>
 </div>
-
-
-
 {% endblock %}
+

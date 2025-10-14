@@ -29,12 +29,26 @@ def user_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('admin_dashboard' if user.is_superuser else 'contacts')
+                return redirect('admin_dashboard' if user.is_superuser else 'admin_dashboard')
             else:
                 return render(request, 'login.html', {'form': form, 'error': 'Invalid credentials'})
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
+
+# --- Dashboards ---
+@login_required
+def admin_dashboard(request):
+    return render(request, 'admin_dashboard.html')
+
+def donour_dashboard(request):
+    return render(request, 'donour_dashboard.html')
+
+def patient_dashboard(request):
+    return render(request, 'patient_dashboard.html')
+
+def hospital_dashboard(request):
+    return render(request, 'hospital_dashboard.html')
 
 def user_logout(request):
     logout(request)

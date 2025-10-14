@@ -1,0 +1,56 @@
+{% extends 'master.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <h1>Welcome,hospital!</h1>
+    <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+</div>
+
+<!-- <style>
+
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* horizontal center */
+    align-items: center;     /* vertical center */
+    background-color: #f0f0f0; /* optional page background */
+    font-family: Arial, sans-serif;
+}
+
+/* Content */
+.dashboard-content {
+    text-align: center;
+}
+
+/* Title */
+.dashboard-content h1 {
+   
+    margin-bottom: 50px;
+    font-size: 36px;
+}
+
+/* Paragraph */
+.dashboard-content p {
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+/* Logout button */
+.logout-btn {
+    padding: 12px 25px;
+    background-color: rgb(190, 19, 190);
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.logout-btn:hover {
+    background-color: rgb(220, 50, 220);
+}
+</style> -->
+{% endblock %}
