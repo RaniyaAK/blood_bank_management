@@ -9,8 +9,10 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
 
     path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
-    path('dashboard/recipient/', views.recipient_dashboard, name='recipient_dashboard'),
-    path('dashboard/donour/', views.donour_dashboard, name='donour_dashboard'),
+
     path('dashboard/hospital/', views.hospital_dashboard, name='hospital_dashboard'),
+    path('dashboard/donor/', views.donor_dashboard, name='donor_dashboard'),
+    path('dashboard/recipient/', views.recipient_dashboard, name='recipient_dashboard'),
+    path('dashboard/blood_stock/', views.blood_stock_dashboard, name='blood_stock_dashboard'),
 
 ]

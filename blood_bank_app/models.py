@@ -9,8 +9,8 @@ class Profile(models.Model):
     ROLE_CHOICES = (
         ('admin', 'Admin'),
         ('hospital', 'Hospital'),
-        ('donour', 'Donour'),
-        ('recipient', 'recipient'),
+        ('donor', 'Donor'),
+        ('recipient', 'Recipient'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES,default='recipient')
     def __str__(self):
