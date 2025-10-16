@@ -10,9 +10,18 @@ urlpatterns = [
 
     path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
 
-    path('dashboard/hospital/', views.hospital_dashboard, name='hospital_dashboard'),
-    path('dashboard/donor/', views.donor_dashboard, name='donor_dashboard'),
-    path('dashboard/recipient/', views.recipient_dashboard, name='recipient_dashboard'),
+    path('dashboard/hospital/', views.hospital, name='hospital'),
+    path('dashboard/hospital/info', views.hospital_dashboard, name='hospital_dashboard'),
+
+    path('dashboard/donor/', views.donor, name='donor'),
+    path('dashboard/donor/info', views.donor_dashboard, name='donor_dashboard'),
+
+    path('dashboard/recipient/', views.recipient, name='recipient'),
+    path('dashboard/recipient/info', views.recipient_dashboard, name='recipient_dashboard'),
+
     path('dashboard/blood_stock/', views.blood_stock_dashboard, name='blood_stock_dashboard'),
+    path('dashboard/add_blood/', views.add_blood, name='add_blood'),
+    
+
 
 ]

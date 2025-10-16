@@ -31,6 +31,49 @@
 </div>
 
 
+<div class="main-content">
+
+    <h1>Blood</h1>
+
+    <a href="{% url 'add_blood' %}" class="add-blood-btn">+ Add Blood</a>
+
+
+    {% if x %}
+
+    <div class="section">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in x %}
+                <tr>
+                    <td>{{ contact.name }}</td>
+                    <td>{{ contact.phone }}</td>
+                    <td>{{ contact.email }}</td>
+                    <td>
+                        <a href="{% url 'edit' blood.id %}" class="edit-btn">Edit</a>
+                        <a href="{% url 'delete' blood.id %}" class="delete-btn">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    {% else %}
+    <p style="text-align:center; color:#555;">Not added yet.</p>
+    {% endif %}
+
+</div>
+
+
 <script>
 
 function toggleProfile() {
@@ -313,4 +356,5 @@ body, html {
     background-color: rgb(220, 50, 220);
 }
 </style> -->
+
 {% endblock %}

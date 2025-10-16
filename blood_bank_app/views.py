@@ -48,12 +48,12 @@ def user_login(request):
 
     if request.method == 'POST':
         if form.is_valid():
-            print("✅ Form is valid")
+           
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
 
             user = authenticate(request, username=username, password=password)
-            print("🧩 Authenticated user:", user)
+    
 
             if user is not None:
                 login(request, user)
@@ -71,18 +71,16 @@ def user_login(request):
                 elif user.profile.role == 'admin':
                     return redirect('admin_dashboard')
                 elif user.profile.role == 'hospital':
-                    return redirect('hospital_dashboard')
+                    return redirect('hospital')
                 elif user.profile.role == 'donor':
-                    return redirect('donor_dashboard')
+                    return redirect('donor')
                 elif user.profile.role == 'recipient':
-                    return redirect('recipient_dashboard')
+                    return redirect('recipient')
                 else:
                     return redirect('home')
             else:
-                print("❌ Authentication failed for:", username)
                 error_message = "Incorrect username or password."
         else:
-            print("❌ FORM ERRORS:", form.errors)
             error_message = "Please enter valid credentials."
 
     return render(request, 'login.html', {'form': form, 'error_message': error_message})
@@ -90,25 +88,60 @@ def user_login(request):
     
 
 # --- Dashboards ---
-@login_required
+
 def home(request):
     return render(request, 'home.html')
 
+
+@login_required
 def admin_dashboard(request):
     return render(request, 'admin_dashboard.html')
 
+
+@login_required
+def donor(request):
+    return render(request, 'donor.html')
+
+@login_required
 def donor_dashboard(request):
     return render(request, 'donor_dashboard.html')
 
+
+@login_required
+def recipient(request):
+    return render(request, 'recipient.html')
+
+
+@login_required
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html')
 
+
+@login_required
+def hospital(request):
+    return render(request, 'hospital.html')
+
+
+@login_required
 def hospital_dashboard(request):
     return render(request, 'hospital_dashboard.html')
 
+
+@login_required
 def blood_stock_dashboard(request):
     return render(request, 'blood_stock_dashboard.html')
 
+@login_required
+def add_blood(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        Profile.objects.create(user=request.user,name=name, phone=phone, email=email)
+        return redirect('blood_stock_dashboard')
+    return render(request, 'add_blood.html')
+
+@login_required
 def user_logout(request):
     logout(request)
     return redirect('login')
