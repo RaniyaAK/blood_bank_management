@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Profile
+from .models import BloodStock
 
 
 class UserForm(forms.ModelForm):
@@ -23,3 +24,12 @@ class UserForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
+
+class BloodStockForm(forms.ModelForm):
+    class Meta:
+        model = BloodStock
+        fields = ['bloodgroup', 'unit']
+        widgets = {
+            'bloodgroup': forms.Select(attrs={'class': 'form-control'}),
+            'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }

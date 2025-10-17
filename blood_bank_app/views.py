@@ -4,6 +4,11 @@ from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, UserForm
 from .models import Profile
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import BloodStockForm
+from .models import BloodStock
 
 # Create your views here.
 
@@ -68,8 +73,6 @@ def user_login(request):
                 # Redirect based on role
                 if user.is_superuser:
                     return redirect('admin_dashboard')
-                elif user.profile.role == 'admin':
-                    return redirect('admin_dashboard')
                 elif user.profile.role == 'hospital':
                     return redirect('hospital')
                 elif user.profile.role == 'donor':
@@ -127,19 +130,45 @@ def hospital_dashboard(request):
     return render(request, 'hospital_dashboard.html')
 
 
+
 @login_required
 def blood_stock_dashboard(request):
-    return render(request, 'blood_stock_dashboard.html')
+    # Get all blood stock records, newest first
+    blood_stock = BloodStock.objects.all().order_by('-added_at')
+
+    return render(request, 'blood_stock_dashboard.html', {
+        'blood_stock': blood_stock
+    })
+
+
+@login_required
+def blood_stock_dashboard(request):
+    # Get all blood stock records, newest first
+    blood_stock = BloodStock.objects.all().order_by('-added_at')
+
+    return render(request, 'blood_stock_dashboard.html', {
+        'blood_stock': blood_stock
+    })
+
 
 @login_required
 def add_blood(request):
-    if request.method == "POST":
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email')
-        Profile.objects.create(user=request.user,name=name, phone=phone, email=email)
-        return redirect('blood_stock_dashboard')
-    return render(request, 'add_blood.html')
+    message = None  # success message
+
+    if request.method == 'POST':
+        form = BloodStockForm(request.POST)
+        if form.is_valid():
+            form.save()
+            message = "Blood added successfully!"
+            form = BloodStockForm()  # reset the form after save
+    else:
+        form = BloodStockForm()
+
+    return render(request, 'add_blood.html', {
+        'form': form,
+        'message': message
+    })
+
 
 @login_required
 def user_logout(request):

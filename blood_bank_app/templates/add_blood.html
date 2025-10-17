@@ -1,6 +1,6 @@
 {% extends 'master.html' %}
 
-{% block title %} blood stock dashboard {% endblock %}
+{% block title %} Blood Stock Dashboard {% endblock %}
 
 {% block content %}
 
@@ -20,51 +20,56 @@
     <a href="{% url 'hospital_dashboard' %}">Hospitals</a>
     <a href="{% url 'donor_dashboard' %}">Donors</a>
     <a href="{% url 'recipient_dashboard' %}">Recipient</a>
-    <a href="{% url 'blood_stock_dashboard' %}">Blood</a>
-   
+    <a href="{% url 'blood_stock_dashboard' %}">Blood Stock</a>
 </div>
-
 
 <div class="topbar">
     Admin Dashboard
 </div>
 
 <!-- Main content -->
-<div class="add-contact-card">
-    <h1>Add Blood</h1>
-    <form action="{% url 'add_blood' %}" method="post">
-        {% csrf_token %}
+<div class="main-content">
+    <div class="add-contact-card">
+        <h1>Add Blood</h1>
 
-        <div class="content container">
-            <label for="bloodgroup">Blood Group</label>
-            <select name="bloodgroup" id="bloodgroup" required>
-                <option value="" disabled selected hidden>Select Blood Group</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-            </select>
-        </div>
+        <!-- Success message -->
+        {% if message %}
+            <p style="color:green; text-align:center;">{{ message }}</p>
+        {% endif %}
 
-        <div class="content container">
-            <label for="unit">Unit</label>
-            <input type="number" name="unit" id="unit" placeholder="Unit" required>
-        </div>
+        <!-- Form -->
+        <form action="{% url 'add_blood' %}" method="post">
+            {% csrf_token %}
 
-        <div class="buttons container">
-            <button type="reset" class="cancel_btn">Cancel</button>
-            <button type="submit" class="save_btn">Save</button>
-        </div>
-    </form>
+            <div class="content container">
+                <label for="bloodgroup">Blood Group</label>
+                <select name="bloodgroup" id="bloodgroup" required>
+                    <option value="" disabled selected hidden>Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+            </div>
+
+            <div class="content container">
+                <label for="unit">Unit</label>
+                <input type="number" name="unit" id="unit" placeholder="Unit" required>
+            </div>
+
+            <div class="buttons container">
+                <button type="reset" class="cancel_btn">Cancel</button>
+                <button type="submit" class="save_btn">Save</button>
+            </div>
+        </form>
+    </div>
 </div>
 
-
 <script>
-
 function toggleProfile() {
     var dropdown = document.getElementById("profileDropdown");
     dropdown.classList.toggle("show");
@@ -80,7 +85,7 @@ window.onclick = function(event) {
 </script>
 
 <style>
-
+/* Body & Layout */
 body, html {
     margin: 0;
     padding: 0;
@@ -88,10 +93,10 @@ body, html {
     background: #FAFAFA;
 }
 
-
+/* Sidebar */
 .sidebar {
     width: 220px;
-    background-color:  #8B0000;
+    background-color: #8B0000;
     color: white;
     position: fixed;
     top: 0;
@@ -101,7 +106,24 @@ body, html {
     z-index: 50;
 }
 
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px 25px;
+    margin: 8px 0;
+    border-radius: 6px;
+    transition: 0.2s;
+    font-weight: 500;
+    font-size: 15px;
+}
 
+.sidebar a:hover {
+    background-color: #00897B;
+    padding-left: 30px;
+}
+
+/* Profile */
 .profile-container {
     display: flex;
     flex-direction: column;
@@ -115,7 +137,7 @@ body, html {
     height: 50px;
     border-radius: 50%;
     background-color: #FAFAFA;
-    color:  #8B0000;
+    color: #8B0000;
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
@@ -123,7 +145,6 @@ body, html {
     justify-content: center;
     align-items: center;
 }
-
 
 .profile-dropdown {
     max-height: 0;
@@ -158,12 +179,12 @@ body, html {
     display: block;
     padding: 10px 15px;
     text-decoration: none;
-    border-top: 1px solid #ddd;
+    color: #2f3640;
 }
 
-
+/* Logout Link */
 .logout-link {
-    color: #8B0000; 
+    color: #8B0000;
     padding: 8px 16px;
     text-decoration: none;
     border-radius: 8px;
@@ -171,38 +192,20 @@ body, html {
     transition: all 0.3s ease;
     white-space: nowrap;
 }
+
 .logout-link:hover {
     transform: scale(1.07);
     background-color: #eee4e4;
 }
 
-
-.sidebar a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 12px 25px;
-    margin: 8px 0;
-    border-radius: 6px;
-    transition: 0.2s;
-    text-align: left;
-    font-weight: 500;
-    font-size: 15px;
-}
-
-.sidebar a:hover {
-    background-color:#00897B;
-    padding-left: 30px;
-}
-
-
+/* Topbar */
 .topbar {
     position: fixed;
-    left: 220px; 
+    left: 220px;
     right: 0;
     top: 0;
     height: 60px;
-    background-color:  #8B0000; 
+    background-color: #8B0000;
     color: #fff;
     display: flex;
     align-items: center;
@@ -213,88 +216,91 @@ body, html {
     z-index: 90;
 }
 
-
+/* Main content alignment */
 .main-content {
     margin-left: 220px;
-    padding: 80px 40px 20px 40px; 
-}
-
-
-.cards {
+    padding: 100px 40px 40px 40px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-    margin-bottom: 40px;
+    justify-content: center;
 }
 
-.card {
+/* Add Blood card */
+.add-contact-card {
     background: white;
     border-radius: 12px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    padding: 25px 40px;
-    text-align: center;
-    width: 220px;
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: scale(1.05);
-}
-
-.card h2 {
-    margin: 0;
-    font-size: 2em;
-    color: #8B0000;
-}
-
-.card p {
-    margin: 8px 0 0;
-    color: #555;
-    font-weight: 500;
-}
-
-
-.section {
-    margin-top: 40px;
-    background: white;
-    border-radius: 10px;
-    padding: 20px 30px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-.section h2 {
-    color: #2f3640;
-    margin-bottom: 15px;
-    border-bottom: 3px solid #40739e;
-    display: inline-block;
-    padding-bottom: 5px;
-}
-
-table {
+    padding: 35px 45px;
+    max-width: 470px;
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
+/* Form elements inside Add Blood card */
+.add-contact-card .content {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 22px;
+}
+
+.add-contact-card label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.add-contact-card input,
+.add-contact-card select {
+    padding: 13px;
+    border-radius: 8px;
+    border: 1px solid #aaa;
     font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border 0.3s, box-shadow 0.3s;
 }
 
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
+.add-contact-card input:focus,
+.add-contact-card select:focus {
+    border-color: #ab0909;
+    box-shadow: 0 0 5px rgba(171, 9, 9, 0.3);
 }
 
-tr:hover {
-    background-color: #eef4ff;
-}
-.profile-dropdown a {
-    color:#2f3640;
+/* Buttons layout */
+.buttons.container {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 28px;
 }
 
+.cancel_btn,
+.save_btn {
+    padding: 13px 26px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    min-width: 105px;
+    transition: all 0.3s ease;
+}
+
+.cancel_btn {
+    background-color: #ccc;
+    color: #333;
+}
+
+.cancel_btn:hover {
+    background-color: #b3b3b3;
+}
+
+.save_btn {
+    background-color: #ab0909;
+    color: white;
+}
+
+.save_btn:hover {
+    background-color: #8B0000;
+}
 </style>
 
 {% endblock %}

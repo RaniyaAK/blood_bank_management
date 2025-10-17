@@ -22,7 +22,7 @@
     <a href="{% url 'hospital_dashboard' %}">Hospitals</a>
     <a href="{% url 'donor_dashboard' %}">Donors</a>
     <a href="{% url 'recipient_dashboard' %}">Recipient</a>
-    <a href="{% url 'blood_stock_dashboard' %}">Blood</a>
+    <a href="{% url 'blood_stock_dashboard' %}">Blood stock</a>
    
 </div>
 
@@ -31,27 +31,32 @@
     Admin Dashboard
 </div>
 
-<!-- 
+
 <div class="main-content">
     <div class="cards">
 
         <div class="card">
             <h2>{{ users_count_with_admin }}</h2>
-            <p>Total Users</p>
+            <p>Total donors</p>
         </div>
      
         <div class="card">
             <h2>{{ contacts_count }}</h2>
-            <p>Total Contacts</p>
+            <p>Total Blood in units</p>
         </div>
      
         <div class="card">
             <h2>{{ users_count }}</h2>
-            <p>Non Admin Users</p>
+            <p>Total Recipients</p>
         </div>
+<!-- 
+        <div class="card">
+            <h2>{{ users_count }}</h2>
+            <p>Total Hospitals</p>
+        </div> -->
     </div>
 
-</div> -->
+</div>
 
 
 <script>

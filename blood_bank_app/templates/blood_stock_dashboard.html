@@ -21,7 +21,7 @@
     <a href="{% url 'hospital_dashboard' %}">Hospitals</a>
     <a href="{% url 'donor_dashboard' %}">Donors</a>
     <a href="{% url 'recipient_dashboard' %}">Recipient</a>
-    <a href="{% url 'blood_stock_dashboard' %}">Blood</a>
+    <a href="{% url 'blood_stock_dashboard' %}">Blood Stock</a>
    
 </div>
 
@@ -30,47 +30,43 @@
     Admin Dashboard
 </div>
 
-
 <div class="main-content">
-
-    <h1>Blood</h1>
+    <h1>Blood Stock</h1>
 
     <a href="{% url 'add_blood' %}" class="add-blood-btn">+ Add Blood</a>
 
+    <!-- Display messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green; font-weight: bold; text-align:center;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
 
-    {% if x %}
-
+    {% if blood_stock %}
     <div class="section">
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Actions</th>
+                    <th>Blood Group</th>
+                    <th>Units</th>
+                    <th>Added At</th>
+                    <!-- Optional actions -->
                 </tr>
             </thead>
             <tbody>
-                {% for contact in x %}
+                {% for blood in blood_stock %}
                 <tr>
-                    <td>{{ contact.name }}</td>
-                    <td>{{ contact.phone }}</td>
-                    <td>{{ contact.email }}</td>
-                    <td>
-                        <a href="{% url 'edit' blood.id %}" class="edit-btn">Edit</a>
-                        <a href="{% url 'delete' blood.id %}" class="delete-btn">Delete</a>
-                    </td>
+                    <td>{{ blood.bloodgroup }}</td>
+                    <td>{{ blood.unit }}</td>
+                    <td>{{ blood.added_at|date:"Y-m-d H:i" }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
-
     {% else %}
-    <p style="text-align:center; color:#555;">Not added yet.</p>
+        <p>No blood added yet.</p>
     {% endif %}
-
 </div>
 
 
@@ -92,7 +88,7 @@ window.onclick = function(event) {
 
 
 <style>
-
+/* Body & Font */
 body, html {
     margin: 0;
     padding: 0;
@@ -100,10 +96,10 @@ body, html {
     background: #FAFAFA;
 }
 
-
+/* Sidebar */
 .sidebar {
     width: 220px;
-    background-color:  #8B0000;
+    background-color: #8B0000;
     color: white;
     position: fixed;
     top: 0;
@@ -113,7 +109,24 @@ body, html {
     z-index: 50;
 }
 
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px 25px;
+    margin: 8px 0;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 15px;
+    transition: 0.2s;
+}
 
+.sidebar a:hover {
+    background-color: #00897B;
+    padding-left: 30px;
+}
+
+/* Profile container */
 .profile-container {
     display: flex;
     flex-direction: column;
@@ -127,7 +140,7 @@ body, html {
     height: 50px;
     border-radius: 50%;
     background-color: #FAFAFA;
-    color:  #8B0000;
+    color: #8B0000;
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
@@ -135,7 +148,6 @@ body, html {
     justify-content: center;
     align-items: center;
 }
-
 
 .profile-dropdown {
     max-height: 0;
@@ -171,11 +183,11 @@ body, html {
     padding: 10px 15px;
     text-decoration: none;
     border-top: 1px solid #ddd;
+    color: #2f3640;
 }
 
-
 .logout-link {
-    color: #8B0000; 
+    color: #8B0000;
     padding: 8px 16px;
     text-decoration: none;
     border-radius: 8px;
@@ -183,38 +195,20 @@ body, html {
     transition: all 0.3s ease;
     white-space: nowrap;
 }
+
 .logout-link:hover {
     transform: scale(1.07);
     background-color: #eee4e4;
 }
 
-
-.sidebar a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 12px 25px;
-    margin: 8px 0;
-    border-radius: 6px;
-    transition: 0.2s;
-    text-align: left;
-    font-weight: 500;
-    font-size: 15px;
-}
-
-.sidebar a:hover {
-    background-color:#00897B;
-    padding-left: 30px;
-}
-
-
+/* Topbar */
 .topbar {
     position: fixed;
-    left: 220px; 
+    left: 220px;
     right: 0;
     top: 0;
     height: 60px;
-    background-color:  #8B0000; 
+    background-color: #8B0000;
     color: #fff;
     display: flex;
     align-items: center;
@@ -225,61 +219,51 @@ body, html {
     z-index: 90;
 }
 
-
+/* Main content */
 .main-content {
-    margin-left: 220px;
-    padding: 80px 40px 20px 40px; 
-}
-
-
-.cards {
+    margin-left: 220px; /* space for sidebar */
+    padding: 140px 40px 40px 40px; /* increased top padding to clear topbar */
     display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-    margin-bottom: 40px;
+    flex-direction: column;
+    align-items: center; /* center content horizontally */
+    box-sizing: border-box;
+    min-height: calc(100vh - 140px);
 }
 
-.card {
+/* Page heading */
+.main-content h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 28px;
+    color: #8B0000;
+    text-align: center;
+}
+
+/* Add Blood Button */
+.add-blood-btn {
+    display: inline-block;
+    margin-bottom: 25px;
+    background-color: #ab0909;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.add-blood-btn:hover {
+    background-color: #8B0000;
+}
+
+/* Table section */
+.section {
+    width: 100%;
+    max-width: 900px;
     background: white;
     border-radius: 12px;
+    padding: 25px 35px; /* slightly bigger box */
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    padding: 25px 40px;
-    text-align: center;
-    width: 220px;
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: scale(1.05);
-}
-
-.card h2 {
-    margin: 0;
-    font-size: 2em;
-    color: #8B0000;
-}
-
-.card p {
-    margin: 8px 0 0;
-    color: #555;
-    font-weight: 500;
-}
-
-
-.section {
-    margin-top: 40px;
-    background: white;
-    border-radius: 10px;
-    padding: 20px 30px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-.section h2 {
-    color: #2f3640;
-    margin-bottom: 15px;
-    border-bottom: 3px solid #40739e;
-    display: inline-block;
-    padding-bottom: 5px;
 }
 
 table {
@@ -295,7 +279,6 @@ th, td {
     font-size: 15px;
 }
 
-
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
@@ -303,8 +286,13 @@ tr:nth-child(even) {
 tr:hover {
     background-color: #eef4ff;
 }
-.profile-dropdown a {
-    color:#2f3640;
+
+/* Success message */
+p.message {
+    text-align: center;
+    color: green;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
 </style>
@@ -357,4 +345,12 @@ body, html {
 }
 </style> -->
 
+
+ <style>
+ p{
+ text-align:center;
+ color:#555
+}
+
+ </style>
 {% endblock %}

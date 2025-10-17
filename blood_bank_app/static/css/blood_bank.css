@@ -1,12 +1,22 @@
 
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh; 
     margin: 0;
     background-color:#FAFAFA; 
 }
+
+.add-contact-card h1 {
+    margin-top: 0;
+    margin-bottom: 20px; 
+    font-size: 28px;
+    text-align: center;
+    color: #8B0000;
+}
+
 
 .login-register-box.container {
     width: 100%;         
@@ -80,8 +90,9 @@ input:focus, select:focus {
 }
 
 .login-register-link a {
-    color:#333333;
+    color:#8B0000;
     text-decoration: none;
+    font-weight: bold;
 }
 
 .login-register-link a:hover {
@@ -89,8 +100,8 @@ input:focus, select:focus {
 }
 input:focus, select:focus {
     outline: none;
-    border-color: #C62828; /* Deep Red */
-    box-shadow: 0 0 8px rgba(198, 40, 40, 0.4); /* matching soft glow */
+    border-color: #C62828; 
+    box-shadow: 0 0 8px rgba(198, 40, 40, 0.4); 
     transition: all 0.3s ease-in-out;
 }
 
@@ -107,6 +118,30 @@ input {
     margin-top: 15px;
     font-size: 16px;
 }
+.admin-box {
+    margin-top: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px 20px;
+    text-align: left;
+    width: 350px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.admin-box h3 {
+    margin-top: 0;
+    color:  rgb(46, 40, 40);
+    text-align: center;
+}
+
+.admin-box p {
+    margin: 5px 0;
+    font-size: 15px;
+}
+
+
+
 
 
 
