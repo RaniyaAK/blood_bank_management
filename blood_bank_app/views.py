@@ -142,16 +142,6 @@ def blood_stock_dashboard(request):
 
 
 @login_required
-def blood_stock_dashboard(request):
-    # Get all blood stock records, newest first
-    blood_stock = BloodStock.objects.all().order_by('-added_at')
-
-    return render(request, 'blood_stock_dashboard.html', {
-        'blood_stock': blood_stock
-    })
-
-
-@login_required
 def add_blood(request):
     message = None  # success message
 
@@ -168,6 +158,41 @@ def add_blood(request):
         'form': form,
         'message': message
     })
+
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            # Redirect to reset password page with email as parameter
+            return redirect('reset_password', email=user.email)
+        except User.DoesNotExist:
+            messages.error(request, 'No account found with that email address.')
+    return render(request, 'forgot_password.html')
+
+
+def reset_password(request, email):
+    success = False  # to control message display
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+        else:
+            try:
+                user = User.objects.get(email=email)
+                user.set_password(password)
+                user.save()
+                success = True
+                messages.success(request, 'Password reset successful! You can now log in.')
+            except User.DoesNotExist:
+                messages.error(request, 'Invalid user.')
+
+    return render(request, 'reset_password.html', {'email': email, 'success': success})
+
 
 
 @login_required

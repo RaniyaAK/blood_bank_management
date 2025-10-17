@@ -22,6 +22,8 @@ urlpatterns = [
     path('dashboard/blood_stock/', views.blood_stock_dashboard, name='blood_stock_dashboard'),
     path('dashboard/add_blood/', views.add_blood, name='add_blood'),
     
+    path('forgot_password', views.forgot_password, name='forgot_password'),
+    path('reset_password/<str:email>/', views.reset_password, name='reset_password'),
 
 
 ]
