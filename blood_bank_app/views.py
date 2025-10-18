@@ -17,6 +17,8 @@ def register(request):
     error_message = None
 
     if request.method == 'POST':
+        first_name = request.POST.get("first_name",'').strip()
+        last_name = request.POST.get("last_name",'').strip()
         username = request.POST.get('username', '').strip()
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
@@ -27,7 +29,6 @@ def register(request):
         if User.objects.filter(username=username).exists():
             error_message = "Username already exists."
 
-        # Step 1: Check if email exists
         if User.objects.filter(email=email).exists():
             error_message = "Email already exists."    
 
@@ -37,7 +38,7 @@ def register(request):
 
         # Step 3: Save user if no errors
         else:
-            user = User.objects.create_user(username=username, email=email, password=password)
+            user = User.objects.create_user(first_name=first_name, last_name=last_name,username=username, email=email, password=password)
             Profile.objects.create(user=user, role=role)
             return redirect('login')
 

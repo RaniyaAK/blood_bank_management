@@ -5,12 +5,14 @@ from .models import BloodStock
 
 
 class UserForm(forms.ModelForm):
+    first_name = forms.CharField(widget=forms.TextInput)
+    last_name = forms.CharField(widget=forms.TextInput)
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     role = forms.ChoiceField(choices=Profile.ROLE_CHOICES)
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['first_name','last_name','username', 'email', 'password']
         help_texts = {
             'username': None, 
         }
@@ -21,6 +23,7 @@ class UserForm(forms.ModelForm):
         if password != confirm_password:
             raise forms.ValidationError("Passwords do not match")
         return cleaned_data
+    
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
