@@ -30,3 +30,32 @@ class BloodStock(models.Model):
 
     def __str__(self):
         return f"{self.bloodgroup} - {self.unit} units"
+    
+
+
+class DonorDetails(models.Model):
+    name = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10)
+    dob = models.DateField()
+    phonenumber = models.CharField(max_length=15)
+    address = models.TextField()
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    bloodgroup = models.CharField(max_length=5)
+    photo = models.ImageField(upload_to='donor_photos/')
+
+    def __str__(self):
+        return self.name
+    
+class RecipientDetails(models.Model):
+    name = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10)
+    dob = models.DateField()
+    phonenumber = models.CharField(max_length=15)
+    address = models.TextField()
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    bloodgroup = models.CharField(max_length=5)
+    photo = models.ImageField(upload_to='donor_photos/')
+
+    def __str__(self):
+        return self.name
+

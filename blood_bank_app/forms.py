@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile
-from .models import BloodStock
+from .models import Profile, BloodStock, DonorDetails, RecipientDetails
 
 
 class UserForm(forms.ModelForm):
@@ -10,12 +9,12 @@ class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     role = forms.ChoiceField(choices=Profile.ROLE_CHOICES)
+
     class Meta:
         model = User
-        fields = ['first_name','last_name','username', 'email', 'password']
-        help_texts = {
-            'username': None, 
-        }
+        fields = ['first_name', 'last_name', 'username', 'email', 'password']
+        help_texts = {'username': None}
+
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
@@ -23,10 +22,12 @@ class UserForm(forms.ModelForm):
         if password != confirm_password:
             raise forms.ValidationError("Passwords do not match")
         return cleaned_data
-    
+
+
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
+
 
 class BloodStockForm(forms.ModelForm):
     class Meta:
@@ -35,4 +36,23 @@ class BloodStockForm(forms.ModelForm):
         widgets = {
             'bloodgroup': forms.Select(attrs={'class': 'form-control'}),
             'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }
+
+
+class DonorDetailsForm(forms.ModelForm):
+    class Meta:
+        model = DonorDetails
+        fields = ['name', 'gender', 'address', 'phonenumber', 'dob', 'bloodgroup', 'weight', 'photo']
+        widgets = {
+            'dob': forms.DateInput(attrs={'type': 'date'}), 
+            'address': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+class RecipientDetailsForm(forms.ModelForm):
+    class Meta:
+        model = RecipientDetails
+        fields = ['name', 'gender', 'address', 'phonenumber', 'dob', 'bloodgroup', 'weight', 'photo']
+        widgets = {
+            'dob': forms.DateInput(attrs={'type': 'date'}),  
         }

@@ -77,9 +77,9 @@ def user_login(request):
                 elif user.profile.role == 'hospital':
                     return redirect('hospital')
                 elif user.profile.role == 'donor':
-                    return redirect('donor')
+                    return redirect('donor_details_form')
                 elif user.profile.role == 'recipient':
-                    return redirect('recipient')
+                    return redirect('recipient_details_form')
                 else:
                     return redirect('home')
             else:
@@ -103,8 +103,8 @@ def admin_dashboard(request):
 
 
 @login_required
-def donor(request):
-    return render(request, 'donor.html')
+def donor_details_form(request):
+    return render(request, 'donor_details_form.html')
 
 @login_required
 def donor_dashboard(request):
@@ -112,8 +112,8 @@ def donor_dashboard(request):
 
 
 @login_required
-def recipient(request):
-    return render(request, 'recipient.html')
+def recipient_details_form(request):
+    return render(request, 'recipient_details_form.html')
 
 
 @login_required
@@ -194,6 +194,30 @@ def reset_password(request, email):
 
     return render(request, 'reset_password.html', {'email': email, 'success': success})
 
+
+
+# ✅ Create new donor
+def donor_create(request):
+    if request.method == 'POST':
+        form = DonorDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('donor_list')  # or wherever you want to go
+    else:
+        form = DonorDetailsForm()
+    return render(request, 'donor_details_form.html', {'form': form})
+
+
+def donor_edit(request, donor_id):
+    donor = get_object_or_404(DonorDetails, id=donor_id)
+    if request.method == 'POST':
+        form = DonorDetailsForm(request.POST, request.FILES, instance=donor)
+        if form.is_valid():
+            form.save()
+            return redirect('donor_list')  
+    else:
+        form = DonorDetailsForm(instance=donor)
+    return render(request, 'edit_donor.html', {'form': form, 'donor': donor})
 
 
 @login_required

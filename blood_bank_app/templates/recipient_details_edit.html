@@ -1,0 +1,97 @@
+{% extends 'master.html' %}
+
+{% block title %}Edit Donor{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <h1>Edit Recipient Details</h1>
+    <a href="{% url 'recipient_detail' recipient.id %}" class="back-btn">← Back to Profile</a>
+
+    <div class="donor-form-container">
+        <h2>Update Recipient Information</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            {% if donor.photo %}
+            <div class="photo-preview">
+                <p>Current Photo:</p>
+                <img src="{{ recipient.photo.url }}" alt="{{ donor.name }} Photo">
+            </div>
+            {% endif %}
+
+            <button type="submit">Update Recipient</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.dashboard-content { 
+     text-align: center;
+     margin-top: 20px; 
+    }
+.back-btn { 
+     display: inline-block; 
+     margin-bottom: 20px;
+     color: white;
+     font-weight: bold;
+     padding: 8px 16px;
+     border-radius: 6px; 
+     background-color: #b30000; 
+     text-decoration: none; 
+    }
+.back-btn:hover {
+     background-color: #990000;
+     }
+.donor-form-container {
+     background-color: #fff;
+     max-width: 500px; 
+     margin: 0 auto 50px;
+     padding: 30px 40px;
+     border-radius: 12px;
+     box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+     text-align: left; 
+    }
+.donor-form-container h2 {
+     color: #b30000;
+     text-align: center;
+     margin-bottom: 25px; 
+    }
+input, select, textarea {
+     width: 100%;
+     padding: 10px;
+     margin-bottom: 15px;
+     font-size: 14px; 
+     border: 1px solid #ccc;
+     border-radius: 6px;
+     }
+textarea {
+     resize: none; 
+     height: 80px; 
+}
+button {
+     width: 100%; 
+     padding: 12px;
+     background-color: #b30000;
+     color: white;
+     border: none;
+     border-radius: 6px;
+     cursor: pointer; 
+     font-size: 16px; 
+    }
+button:hover { 
+     background-color: #990000;
+ }
+.photo-preview { 
+     text-align: center; 
+     margin-bottom: 15px;
+ }
+.photo-preview img {
+     width: 120px;
+     height: 120px;
+     border-radius: 10px;
+     border: 2px solid #ccc; 
+     }
+</style>
+{% endblock %}
