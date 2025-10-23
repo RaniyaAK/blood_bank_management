@@ -153,7 +153,24 @@ def add_blood(request):
 
 @login_required
 def donor_details_form(request):
-    return render(request, 'donor_details_form.html')
+     # Check if this recipient already has a profile
+    donor = DonorDetails.objects.filter(user=request.user).first()
+    if donor:
+        # Already filled, go to recipient dashboard
+        return redirect('donor')
+
+    if request.method == 'POST':
+        form = DonorDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            donor = form.save(commit=False)  # don’t save yet
+            donor.user = request.user       # link to logged-in user
+            donor.save()                    # now save
+            return redirect('donor')        # Redirect to dashboard/profile
+    else:
+        form = DonorDetailsForm()
+
+    return render(request, 'donor_details_form.html', {'form': form})
+
 
 
 @login_required
@@ -192,6 +209,8 @@ def hospital_details_form(request):
 @login_required
 def hospital(request):
     return render(request, 'hospital.html')
+
+
 @login_required
 def recipient(request):
     """Recipient dashboard"""
@@ -201,6 +220,16 @@ def recipient(request):
         recipient_profile = None
 
     return render(request, 'recipient.html', {'recipient': recipient_profile})
+
+
+def donor(request):
+    """Donor dashboard"""
+    try:
+        donor_profile = DonorDetails.objects.get(user=request.user)
+    except DonorDetails.DoesNotExist:
+        donor_profile = None
+
+    return render(request, 'donor.html', {'donor': donor_profile})
 
 
 # edit
@@ -220,6 +249,21 @@ def recipient_details_edit(request):
 
     return render(request, 'recipient_details_edit.html', {'form': form, 'recipient': recipient})
 
+
+@login_required
+def donor_details_edit(request):
+    """Edit profile"""
+    donor = get_object_or_404(DonorDetails, user=request.user)
+
+    if request.method == 'POST':
+        form = DonorDetailsForm(request.POST, request.FILES, instance=donor)
+        if form.is_valid():
+            form.save()
+            return redirect('donor')
+    else:
+        form = DonorDetailsForm(instance=donor)
+
+    return render(request, 'donor_details_edit.html', {'form': form, 'donor': donor})
 
 
 # passwords
@@ -281,6 +325,9 @@ def donor_edit(request, donor_id):
     else:
         form = DonorDetailsForm(instance=donor)
     return render(request, 'edit_donor.html', {'form': form, 'donor': donor})
+
+
+
 
 
 @login_required

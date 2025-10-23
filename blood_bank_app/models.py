@@ -34,6 +34,7 @@ class BloodStock(models.Model):
 
 
 class DonorDetails(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
     gender = models.CharField(max_length=10)
     dob = models.DateField()
@@ -55,7 +56,7 @@ class RecipientDetails(models.Model):
     address = models.TextField()
     weight = models.DecimalField(max_digits=5, decimal_places=2)
     bloodgroup = models.CharField(max_length=5)
-    photo = models.ImageField(upload_to='donor_photos/')
+    photo = models.ImageField(upload_to='recipient_photos/')
 
     def __str__(self):
         return self.name
