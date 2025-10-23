@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile, BloodStock, DonorDetails, RecipientDetails
+from .models import Profile, BloodStock, DonorDetails, RecipientDetails,HospitalDetails
 
 
 class UserForm(forms.ModelForm):
@@ -53,6 +53,15 @@ class RecipientDetailsForm(forms.ModelForm):
     class Meta:
         model = RecipientDetails
         fields = ['name', 'gender', 'address', 'phonenumber', 'dob', 'bloodgroup', 'weight', 'photo']
+        widgets = {
+            'dob': forms.DateInput(attrs={'type': 'date'}),  
+        }
+
+
+class HospitalDetailsForm(forms.ModelForm):
+    class Meta:
+        model = HospitalDetails
+        fields = ['name', 'location', 'phonenumber', 'since', 'photo']
         widgets = {
             'dob': forms.DateInput(attrs={'type': 'date'}),  
         }

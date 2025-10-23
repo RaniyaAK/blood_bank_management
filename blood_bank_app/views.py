@@ -10,13 +10,17 @@ from django.contrib import messages
 from .forms import BloodStockForm
 from .models import BloodStock
 from datetime import datetime
-from .models import DonorDetails, RecipientDetails, Profile, BloodStock
+from .models import DonorDetails, RecipientDetails, Profile, BloodStock,HospitalDetails
 from .forms import RecipientDetailsForm
 from .forms import DonorDetailsForm
+from .forms import HospitalDetailsForm
 
 
 
 # Create your views here.
+
+def home(request):
+    return render(request, 'home.html')
 
 def register(request):
     form = UserForm(request.POST or None)
@@ -95,12 +99,45 @@ def user_login(request):
 
     return render(request, 'login.html', {'form': form, 'error_message': error_message})
 
-    
+
+
+
+# pages
+
+@login_required
+def hospital(request):
+    """Hospital dashboard"""
+    try:
+        hospital_profile = HospitalDetails.objects.get(user=request.user)
+    except HospitalDetails.DoesNotExist:
+        hospital_profile = None
+
+    return render(request, 'hospital.html', {'hospital': hospital_profile})
+
+
+@login_required
+def recipient(request):
+    """Recipient dashboard"""
+    try:
+        recipient_profile = RecipientDetails.objects.get(user=request.user)
+    except RecipientDetails.DoesNotExist:
+        recipient_profile = None
+
+    return render(request, 'recipient.html', {'recipient': recipient_profile})
+
+
+def donor(request):
+    """Donor dashboard"""
+    try:
+        donor_profile = DonorDetails.objects.get(user=request.user)
+    except DonorDetails.DoesNotExist:
+        donor_profile = None
+
+    return render(request, 'donor.html', {'donor': donor_profile})
+
+
 
 # --- Dashboards ---
-
-def home(request):
-    return render(request, 'home.html')
 
 @login_required
 def admin_dashboard(request):
@@ -204,32 +241,7 @@ def hospital_details_form(request):
         'years': years
     })
 
-# pages
 
-@login_required
-def hospital(request):
-    return render(request, 'hospital.html')
-
-
-@login_required
-def recipient(request):
-    """Recipient dashboard"""
-    try:
-        recipient_profile = RecipientDetails.objects.get(user=request.user)
-    except RecipientDetails.DoesNotExist:
-        recipient_profile = None
-
-    return render(request, 'recipient.html', {'recipient': recipient_profile})
-
-
-def donor(request):
-    """Donor dashboard"""
-    try:
-        donor_profile = DonorDetails.objects.get(user=request.user)
-    except DonorDetails.DoesNotExist:
-        donor_profile = None
-
-    return render(request, 'donor.html', {'donor': donor_profile})
 
 
 # edit
@@ -328,7 +340,7 @@ def donor_edit(request, donor_id):
 
 
 
-
+# logout
 
 @login_required
 def user_logout(request):

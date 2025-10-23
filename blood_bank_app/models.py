@@ -60,4 +60,16 @@ class RecipientDetails(models.Model):
 
     def __str__(self):
         return self.name
+    
+    
+class HospitalDetails(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=100)
+    since = models.DateField()
+    phonenumber = models.CharField(max_length=15)
+    location = models.TextField()
+    photo = models.ImageField(upload_to='recipient_photos/')
+
+    def __str__(self):
+        return self.name
 
