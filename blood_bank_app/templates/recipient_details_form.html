@@ -1,6 +1,6 @@
 {% extends 'master.html' %}
 
-{% block title %}Donor{% endblock %}
+{% block title %}Recipient Registration{% endblock %}
 
 {% block content %}
 <div class="dashboard-content">
@@ -10,45 +10,7 @@
 
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-
-            <label for="gender">Gender</label>
-            <select id="gender" name="gender" required>
-                <option value="">Select Gender</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-            </select>
-
-            <label for="dob">Date of Birth</label>
-            <input type="date" id="dob" name="dob" required>
-
-            <label for="address">Address</label>
-            <textarea id="address" name="address" placeholder="Enter full address" required></textarea>
-
-            <label for="ph">Phone Number</label>
-            <input type="tel" id="ph" name="ph" placeholder="Enter phone number" required>
-
-            <label for="bloodgroup">Blood Group</label>
-            <select id="bloodgroup" name="bloodgroup" required>
-                <option value="">Select Blood Group</option>
-                <option>A+</option>
-                <option>A-</option>
-                <option>B+</option>
-                <option>B-</option>
-                <option>O+</option>
-                <option>O-</option>
-                <option>AB+</option>
-                <option>AB-</option>
-            </select>
-
-            <label for="weight">Weight (kg)</label>
-            <input type="number" id="weight" name="weight" placeholder="Enter your weight" required>
-            
-            <label for="photo">Upload Photo</label>
-            <input type="file" id="photo" name="photo" accept="image/*" required>
+            {{ form.as_p }}
 
             <button type="submit">Submit</button>
         </form>
@@ -59,21 +21,6 @@
 .dashboard-content {
     text-align: center;
     margin-top: 20px;
-}
-
-.logout-btn {
-    background-color: #b30000;
-    color: white;
-    padding: 8px 16px;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 14px;
-    float: right;
-    margin-right: 30px;
-}
-
-.logout-btn:hover {
-    background-color: #990000;
 }
 
 .recipient-form-container {

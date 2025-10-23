@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -12,12 +14,17 @@ urlpatterns = [
 
     path('dashboard/hospital/', views.hospital, name='hospital'),
     path('dashboard/hospital/info', views.hospital_dashboard, name='hospital_dashboard'),
+    path('dashboard/hospital_details_form', views.hospital_details_form, name='hospital_details_form'),
 
     path('dashboard/donor_details_form/', views.donor_details_form, name='donor_details_form'),
     path('dashboard/donor/info', views.donor_dashboard, name='donor_dashboard'),
 
     path('dashboard/recipient_details_form/', views.recipient_details_form, name='recipient_details_form'),
     path('dashboard/recipient/info', views.recipient_dashboard, name='recipient_dashboard'),
+
+    path('dashboard/recipient/', views.recipient, name='recipient'),
+    path('dashboard/recipient/edit/', views.recipient_details_edit, name='recipient_edit'),
+
 
     path('dashboard/blood_stock/', views.blood_stock_dashboard, name='blood_stock_dashboard'),
     path('dashboard/add_blood/', views.add_blood, name='add_blood'),
@@ -30,3 +37,7 @@ urlpatterns = [
 
 
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

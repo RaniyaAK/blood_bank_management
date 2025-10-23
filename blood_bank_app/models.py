@@ -47,6 +47,7 @@ class DonorDetails(models.Model):
         return self.name
     
 class RecipientDetails(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
     gender = models.CharField(max_length=10)
     dob = models.DateField()

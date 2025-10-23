@@ -9,6 +9,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import BloodStockForm
 from .models import BloodStock
+from datetime import datetime
+from .models import DonorDetails, RecipientDetails, Profile, BloodStock
+from .forms import RecipientDetailsForm
+from .forms import DonorDetailsForm
+
+
 
 # Create your views here.
 
@@ -75,7 +81,7 @@ def user_login(request):
                 if user.is_superuser:
                     return redirect('admin_dashboard')
                 elif user.profile.role == 'hospital':
-                    return redirect('hospital')
+                    return redirect('hospital_details_form')
                 elif user.profile.role == 'donor':
                     return redirect('donor_details_form')
                 elif user.profile.role == 'recipient':
@@ -96,24 +102,13 @@ def user_login(request):
 def home(request):
     return render(request, 'home.html')
 
-
 @login_required
 def admin_dashboard(request):
     return render(request, 'admin_dashboard.html')
 
-
-@login_required
-def donor_details_form(request):
-    return render(request, 'donor_details_form.html')
-
 @login_required
 def donor_dashboard(request):
     return render(request, 'donor_dashboard.html')
-
-
-@login_required
-def recipient_details_form(request):
-    return render(request, 'recipient_details_form.html')
 
 
 @login_required
@@ -122,14 +117,8 @@ def recipient_dashboard(request):
 
 
 @login_required
-def hospital(request):
-    return render(request, 'hospital.html')
-
-
-@login_required
 def hospital_dashboard(request):
     return render(request, 'hospital_dashboard.html')
-
 
 
 @login_required
@@ -140,7 +129,6 @@ def blood_stock_dashboard(request):
     return render(request, 'blood_stock_dashboard.html', {
         'blood_stock': blood_stock
     })
-
 
 @login_required
 def add_blood(request):
@@ -160,6 +148,81 @@ def add_blood(request):
         'message': message
     })
 
+
+# detailsform
+
+@login_required
+def donor_details_form(request):
+    return render(request, 'donor_details_form.html')
+
+
+@login_required
+def recipient_details_form(request):
+    # Check if this recipient already has a profile
+    recipient = RecipientDetails.objects.filter(user=request.user).first()
+    if recipient:
+        # Already filled, go to recipient dashboard
+        return redirect('recipient')
+
+    if request.method == 'POST':
+        form = RecipientDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipient = form.save(commit=False)  # don’t save yet
+            recipient.user = request.user       # link to logged-in user
+            recipient.save()                    # now save
+            return redirect('recipient')        # Redirect to dashboard/profile
+    else:
+        form = RecipientDetailsForm()
+
+    return render(request, 'recipient_details_form.html', {'form': form})
+
+
+
+@login_required
+def hospital_details_form(request):
+    from datetime import datetime
+    years = range(datetime.now().year, 1900, -1) 
+
+    return render(request, 'hospital_details_form.html', {
+        'years': years
+    })
+
+# pages
+
+@login_required
+def hospital(request):
+    return render(request, 'hospital.html')
+@login_required
+def recipient(request):
+    """Recipient dashboard"""
+    try:
+        recipient_profile = RecipientDetails.objects.get(user=request.user)
+    except RecipientDetails.DoesNotExist:
+        recipient_profile = None
+
+    return render(request, 'recipient.html', {'recipient': recipient_profile})
+
+
+# edit
+
+@login_required
+def recipient_details_edit(request):
+    """Edit profile"""
+    recipient = get_object_or_404(RecipientDetails, user=request.user)
+
+    if request.method == 'POST':
+        form = RecipientDetailsForm(request.POST, request.FILES, instance=recipient)
+        if form.is_valid():
+            form.save()
+            return redirect('recipient')
+    else:
+        form = RecipientDetailsForm(instance=recipient)
+
+    return render(request, 'recipient_details_edit.html', {'form': form, 'recipient': recipient})
+
+
+
+# passwords
 
 def forgot_password(request):
     if request.method == 'POST':

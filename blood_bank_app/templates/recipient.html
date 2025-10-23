@@ -1,0 +1,44 @@
+{% extends 'master.html' %}
+
+{% block title %}Recipient Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <h1>Recipient Dashboard</h1>
+
+    {% if recipient %}
+        <div class="recipient-profile">
+            <a href="{% url 'recipient_edit' %}">
+                <img src="{{ recipient.photo.url }}" alt="{{ recipient.name }}" class="profile-pic">
+            </a>
+        </div>
+    {% else %}
+        <p>You have not submitted your recipient details yet.</p>
+    {% endif %}
+</div>
+
+<style>
+.dashboard-content {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.recipient-profile {
+    display: inline-block;
+}
+
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%; /* makes it circular */
+    object-fit: cover;
+    border: 3px solid #b30000;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.profile-pic:hover {
+    transform: scale(1.1); /* slight zoom on hover */
+}
+</style>
+{% endblock %}
