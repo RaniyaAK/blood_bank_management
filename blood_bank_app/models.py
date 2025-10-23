@@ -68,7 +68,7 @@ class HospitalDetails(models.Model):
     since = models.DateField()
     phonenumber = models.CharField(max_length=15)
     location = models.TextField()
-    photo = models.ImageField(upload_to='recipient_photos/')
+    photo = models.ImageField(upload_to='hospital_photos/')
 
     def __str__(self):
         return self.name
