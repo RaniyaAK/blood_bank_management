@@ -1,39 +1,29 @@
 {% extends 'master.html' %}
 
-{% block title %}Donor{% endblock %}
+{% block title %}Hospital Registration{% endblock %}
 
 {% block content %}
 <div class="dashboard-content">
 
-    <div class="recipient-form-container">
+    <div class="hospital-form-container">
         <h2>Hospital Registration Form</h2>
 
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <label for="hospital_name">Hospital Name</label>
-            <input type="text" id="hospital_name" name="hospital_name" placeholder="Enter hospital name" required>
-                        
-            <label for="hospital_code">Hospital Code</label>
-            <input type="text" id="hospital_code" name="hospital_code" placeholder="Enter hospital code" required>
+            {% for field in form %}
+                <div class="form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
 
-           <label for="since">Since</label>
-           <select id="since" name="since" required>
-              <option value="">Select Year</option>
-              {% for y in years %}
-                 <option value="{{ y }}">{{ y }}</option>
-              {% endfor %}
-           </select>
-
-
-            <label for="address">Location</label>
-            <textarea id="location" name="location" placeholder="Enter full address" required></textarea>
-
-            <label for="ph">Contact Number</label>
-            <input type="tel" id="ph" name="ph" placeholder="Enter contact number" required>
-
-
-
+            {% for error in form.non_field_errors %}
+                <div class="error-message">{{ error }}</div>
+            {% endfor %}
 
             <button type="submit">Submit</button>
         </form>
@@ -42,54 +32,47 @@
 
 <style>
 .dashboard-content {
-    text-align: center;
-    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: 80vh;
+    background-color: #f5f5f5;
 }
 
-.logout-btn {
-    background-color: #b30000;
-    color: white;
-    padding: 8px 16px;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 14px;
-    float: right;
-    margin-right: 30px;
-}
-
-.logout-btn:hover {
-    background-color: #990000;
-}
-
-.recipient-form-container {
+.hospital-form-container {
     background-color: #fff;
     max-width: 450px;
-    margin: 40px auto;
-    padding: 25px 40px;
+    width: 100%;
+    padding: 30px 40px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: left;
 }
 
-.recipient-form-container h2 {
+.hospital-form-container h2 {
     color: #b30000;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.form-field {
+    margin-bottom: 15px;
 }
 
 label {
     font-weight: bold;
     display: block;
     margin-bottom: 5px;
-    text-align: left;
 }
 
 input, select, textarea {
     width: 100%;
     padding: 10px;
-    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 14px;
+    box-sizing: border-box;
 }
 
 textarea {
@@ -99,17 +82,25 @@ textarea {
 
 button {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background-color: #b30000;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
+    margin-top: 10px;
+    transition: 0.2s;
 }
 
 button:hover {
     background-color: #990000;
+}
+
+.error-message {
+    color: red;
+    font-size: 13px;
+    margin-top: 3px;
 }
 </style>
 {% endblock %}

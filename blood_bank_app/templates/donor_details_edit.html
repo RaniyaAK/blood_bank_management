@@ -12,7 +12,7 @@
         <div class="photo-wrapper">
             <div class="photo-inner">
                 {% if donor.photo %}
-                    <img id="profileImage" src="{{ donor.photo.url }}" alt="{{ recipient.name }} Photo">
+                    <img id="profileImage" src="{{ donor.photo.url }}" alt="{{ donor.name }} Photo">
                 {% else %}
                     <img id="profileImage" src="{% static 'default_profile.png' %}" alt="Profile Photo">
                 {% endif %}
@@ -29,12 +29,17 @@
                     <div class="form-field">
                         {{ field.label_tag }}
                         {{ field }}
-                        {% if field.errors %}
-                            <div class="field-errors">{{ field.errors }}</div>
-                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="field-errors">{{ error }}</div>
+                        {% endfor %}
                     </div>
                 {% endif %}
             {% endfor %}
+
+            {% for error in form.non_field_errors %}
+                <div class="field-errors">{{ error }}</div>
+            {% endfor %}
+
             <button type="submit">Save Changes</button>
         </form>
     </div>
@@ -47,7 +52,6 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* Wrapper centers horizontally but allows vertical scroll */
 .center-wrapper {
     display: flex;
     justify-content: center;
@@ -55,7 +59,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Box containing photo + form */
 .edit-box {
     background-color: #fff;
     border-radius: 12px;
@@ -66,7 +69,6 @@ body {
     text-align: center;
 }
 
-/* Profile photo */
 .photo-wrapper {
     display: flex;
     justify-content: center;
@@ -87,7 +89,6 @@ body {
     display: block;
 }
 
-/* Pencil icon */
 .edit-photo-icon {
     position: absolute;
     bottom: 0;
@@ -105,7 +106,6 @@ body {
     background-color: rgba(153,0,0,0.9);
 }
 
-/* Form fields */
 .form-field {
     margin-bottom: 18px;
     text-align: left;
@@ -145,7 +145,6 @@ textarea {
     margin-top: 3px;
 }
 
-/* Submit button */
 button {
     width: 100%;
     padding: 14px;
@@ -164,7 +163,6 @@ button:hover {
     background-color: #990000;
 }
 
-/* Responsive */
 @media (max-width: 480px) {
     .photo-inner img {
         width: 120px;

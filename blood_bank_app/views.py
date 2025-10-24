@@ -4,8 +4,6 @@ from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, UserForm
 from .models import Profile
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import BloodStockForm
 from .models import BloodStock
@@ -231,15 +229,25 @@ def recipient_details_form(request):
     return render(request, 'recipient_details_form.html', {'form': form})
 
 
-
 @login_required
 def hospital_details_form(request):
-    from datetime import datetime
-    years = range(datetime.now().year, 1900, -1) 
+    try:
+        hospital = HospitalDetails.objects.get(user=request.user)
+        return redirect('hospital')  # Already exists, go to dashboard
+    except HospitalDetails.DoesNotExist:
+        pass
 
-    return render(request, 'hospital_details_form.html', {
-        'years': years
-    })
+    if request.method == 'POST':
+        form = HospitalDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            hospital = form.save(commit=False)
+            hospital.user = request.user
+            hospital.save()
+            return redirect('hospital')
+    else:
+        form = HospitalDetailsForm()
+
+    return render(request, 'hospital_details_form.html', {'form': form})
 
 
 
@@ -276,6 +284,23 @@ def donor_details_edit(request):
         form = DonorDetailsForm(instance=donor)
 
     return render(request, 'donor_details_edit.html', {'form': form, 'donor': donor})
+
+
+
+@login_required
+def hospital_details_edit(request):
+    """Edit profile"""
+    hospital = get_object_or_404(HospitalDetails, user=request.user)
+
+    if request.method == 'POST':
+        form = HospitalDetailsForm(request.POST, request.FILES, instance=hospital)
+        if form.is_valid():
+            form.save()
+            return redirect('hospital')
+    else:
+        form = HospitalDetailsForm(instance=hospital)
+
+    return render(request, 'hospital_details_edit.html', {'form': form, 'hospital': hospital})
 
 
 # passwords
@@ -320,8 +345,10 @@ def donor_create(request):
     if request.method == 'POST':
         form = DonorDetailsForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect('donor_list')  # or wherever you want to go
+            donor = form.save(commit=False)
+            donor.user = request.user
+            donor.save()
+            return redirect('donor') 
     else:
         form = DonorDetailsForm()
     return render(request, 'donor_details_form.html', {'form': form})
@@ -333,7 +360,7 @@ def donor_edit(request, donor_id):
         form = DonorDetailsForm(request.POST, request.FILES, instance=donor)
         if form.is_valid():
             form.save()
-            return redirect('donor_list')  
+            return redirect('donor')  
     else:
         form = DonorDetailsForm(instance=donor)
     return render(request, 'edit_donor.html', {'form': form, 'donor': donor})

@@ -1,8 +1,19 @@
-
+from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
+# Phone validators
+hospital_phone_validator = RegexValidator(
+    regex=r'^(\+\d{1,3})?(\d{7}|\d{10})$',
+    message="Enter a valid phone number"
+)
+
+donor_recipient_phone_validator = RegexValidator(
+    regex=r'^(\+\d{1,3})?\d{10}$',
+    message="Enter a valid phone number."
+)
+
+# ----------------------------
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -12,10 +23,11 @@ class Profile(models.Model):
         ('donor', 'Donor'),
         ('recipient', 'Recipient'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES,default='recipient')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='recipient')
+
     def __str__(self):
         return f"{self.user} ({self.role})"
-    
+
 class BloodStock(models.Model):
     BLOOD_GROUP_CHOICES = [
         ('A+', 'A+'), ('A-', 'A-'),
@@ -30,15 +42,26 @@ class BloodStock(models.Model):
 
     def __str__(self):
         return f"{self.bloodgroup} - {self.unit} units"
-    
+# HospitalDetails
+class HospitalDetails(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=50)
+    since = models.DateField()
+    phonenumber = models.CharField(max_length=15, validators=[hospital_phone_validator])
+    location = models.TextField()
+    photo = models.ImageField(upload_to='hospital_photos/')
 
+    def __str__(self):
+        return self.name
 
+# DonorDetails
 class DonorDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
     gender = models.CharField(max_length=10)
     dob = models.DateField()
-    phonenumber = models.CharField(max_length=15)
+    phonenumber = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
     address = models.TextField()
     weight = models.DecimalField(max_digits=5, decimal_places=2)
     bloodgroup = models.CharField(max_length=5)
@@ -46,13 +69,14 @@ class DonorDetails(models.Model):
 
     def __str__(self):
         return self.name
-    
+
+# RecipientDetails
 class RecipientDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
     gender = models.CharField(max_length=10)
     dob = models.DateField()
-    phonenumber = models.CharField(max_length=15)
+    phonenumber = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
     address = models.TextField()
     weight = models.DecimalField(max_digits=5, decimal_places=2)
     bloodgroup = models.CharField(max_length=5)
@@ -60,16 +84,3 @@ class RecipientDetails(models.Model):
 
     def __str__(self):
         return self.name
-    
-    
-class HospitalDetails(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100)
-    since = models.DateField()
-    phonenumber = models.CharField(max_length=15)
-    location = models.TextField()
-    photo = models.ImageField(upload_to='hospital_photos/')
-
-    def __str__(self):
-        return self.name
-

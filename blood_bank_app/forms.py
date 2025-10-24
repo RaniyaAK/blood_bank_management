@@ -45,7 +45,6 @@ class DonorDetailsForm(forms.ModelForm):
         fields = ['name', 'gender', 'address', 'phonenumber', 'dob', 'bloodgroup', 'weight', 'photo']
         widgets = {
             'dob': forms.DateInput(attrs={'type': 'date'}), 
-            'address': forms.Textarea(attrs={'rows': 3}),
         }
 
 
@@ -61,7 +60,9 @@ class RecipientDetailsForm(forms.ModelForm):
 class HospitalDetailsForm(forms.ModelForm):
     class Meta:
         model = HospitalDetails
-        fields = ['name', 'location', 'phonenumber', 'since', 'photo']
-        widgets = {
-            'dob': forms.DateInput(attrs={'type': 'date'}),  
+        fields = ['name','code', 'location', 'phonenumber', 'since']
+        labels = {
+            'code': 'Hospital Code', 
         }
+        widgets = {
+            'since': forms.DateInput(attrs={'type': 'date'}),        }

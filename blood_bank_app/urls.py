@@ -14,7 +14,7 @@ urlpatterns = [
 
     path('dashboard/hospital/', views.hospital, name='hospital'),
     path('dashboard/hospital_details_form/', views.hospital_details_form, name='hospital_details_form'),
-    path('dashboard/hospital/edit/', views.donor_details_edit, name='donor_edit'),
+    path('dashboard/hospital/edit/', views.hospital_details_edit, name='hospital_edit'),
     path('dashboard/hospital/info/', views.hospital_dashboard, name='hospital_dashboard'),
 
     path('dashboard/donor/', views.donor, name='donor'),

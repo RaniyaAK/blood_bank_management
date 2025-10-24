@@ -1,12 +1,12 @@
 {% extends 'master.html' %}
 
-{% block title %}Recipient Dashboard{% endblock %}
+{% block title %}Hospital Dashboard{% endblock %}
 
 {% block content %}
 <div class="dashboard-content">
     <h1>hospital Dashboard</h1>
 
-    {% if recipient %}
+    {% if hospital %}
         <div class="recipient-profile">
             <a href="{% url 'hospital_edit' %}">
                 <img src="{{ hospital.photo.url }}" alt="{{ hospital.name }}" class="profile-pic">
