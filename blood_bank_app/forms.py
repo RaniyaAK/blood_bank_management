@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile, BloodStock, DonorDetails, RecipientDetails,HospitalDetails
+from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
 
 
 class UserForm(forms.ModelForm):
@@ -44,7 +44,13 @@ class DonorDetailsForm(forms.ModelForm):
         model = DonorDetails
         fields = ['name', 'gender', 'address', 'phonenumber', 'dob', 'bloodgroup', 'weight', 'photo']
         widgets = {
-            'dob': forms.DateInput(attrs={'type': 'date'}), 
+            'dob': forms.DateInput(attrs={'type': 'date'}),
+            'weight': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Weight in kg'}),
+            'address': forms.Textarea(attrs={'rows': 3}),
+        }
+        labels = {
+            'weight': 'Weight (kg)',
+            'phonenumber': 'Phone Number'
         }
 
 
@@ -53,16 +59,25 @@ class RecipientDetailsForm(forms.ModelForm):
         model = RecipientDetails
         fields = ['name', 'gender', 'address', 'phonenumber', 'dob', 'bloodgroup', 'weight', 'photo']
         widgets = {
-            'dob': forms.DateInput(attrs={'type': 'date'}),  
+            'dob': forms.DateInput(attrs={'type': 'date'}),
+            'weight': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Weight in kg'}),
+            'address': forms.Textarea(attrs={'rows': 3}),
+        }
+        labels = {
+            'weight': 'Weight (kg)',
+            'phonenumber': 'Phone Number'
         }
 
 
 class HospitalDetailsForm(forms.ModelForm):
     class Meta:
         model = HospitalDetails
-        fields = ['name','code', 'location', 'phonenumber', 'since']
+        fields = ['name', 'code', 'location', 'phonenumber', 'since', 'photo']
         labels = {
-            'code': 'Hospital Code', 
+            'code': 'Hospital Code',
+            'phonenumber': 'Contact Number'
         }
         widgets = {
-            'since': forms.DateInput(attrs={'type': 'date'}),        }
+            'since': forms.DateInput(attrs={'type': 'date'}),
+            'location': forms.Textarea(attrs={'rows': 3}),
+        }

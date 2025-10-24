@@ -28,6 +28,7 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user} ({self.role})"
 
+
 class BloodStock(models.Model):
     BLOOD_GROUP_CHOICES = [
         ('A+', 'A+'), ('A-', 'A-'),
@@ -42,7 +43,8 @@ class BloodStock(models.Model):
 
     def __str__(self):
         return f"{self.bloodgroup} - {self.unit} units"
-# HospitalDetails
+
+
 class HospitalDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
@@ -55,7 +57,7 @@ class HospitalDetails(models.Model):
     def __str__(self):
         return self.name
 
-# DonorDetails
+
 class DonorDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
@@ -70,7 +72,7 @@ class DonorDetails(models.Model):
     def __str__(self):
         return self.name
 
-# RecipientDetails
+
 class RecipientDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)

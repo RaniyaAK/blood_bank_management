@@ -1,12 +1,12 @@
 {% extends 'master.html' %}
 
-{% block title %}Recipient Dashboard{% endblock %}
+{% block title %}Donor Dashboard{% endblock %}
 
 {% block content %}
 <div class="dashboard-content">
     <h1>Donor Dashboard</h1>
 
-    {% if recipient %}
+    {% if donor %}
         <div class="donor-profile">
             <a href="{% url 'donor_edit' %}">
                 <img src="{{ donor.photo.url }}" alt="{{ donor.name }}" class="profile-pic">
