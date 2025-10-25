@@ -20,8 +20,8 @@
     <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
     <a href="{% url 'hospital_dashboard' %}"><i class="fa-solid fa-hospital"></i> Hospitals</a>
     <a href="{% url 'donor_dashboard' %}"><i class="fa-solid fa-hand-holding-medical"></i> Donors</a>
-    <a href="{% url 'recipient_dashboard' %}"><i class="fa-solid fa-user"></i> Recipient</a>
-    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood</a>
+    <a href="{% url 'recipient_dashboard' %}"><i class="fa-solid fa-user"></i> Recipients</a>
+    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
    
 </div>
 
@@ -266,51 +266,6 @@ tr:hover {
 
 </style>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- 
-<style>
-
-body, html {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: center; /* horizontal center */
-    align-items: center;     /* vertical center */
-    background-color: #f0f0f0; /* optional page background */
-    font-family: Arial, sans-serif;
-}
-
-/* Content */
-.dashboard-content {
-    text-align: center;
-}
-
-/* Title */
-.dashboard-content h1 {
-   
-    margin-bottom: 50px;
-    font-size: 36px;
-}
-
-/* Paragraph */
-.dashboard-content p {
-    font-size: 20px;
-    margin-bottom: 30px;
-}
-
-/* Logout button */
-.logout-btn {
-    padding: 12px 25px;
-    background-color: rgb(190, 19, 190);
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    border-radius: 6px;
-    transition: background-color 0.3s ease-in-out;
-}
-
-.logout-btn:hover {
-    background-color: rgb(220, 50, 220);
-}
-</style> -->
 {% endblock %}
