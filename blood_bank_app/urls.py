@@ -15,17 +15,18 @@ urlpatterns = [
     path('dashboard/hospital/', views.hospital, name='hospital'),
     path('dashboard/hospital_details_form/', views.hospital_details_form, name='hospital_details_form'),
     path('dashboard/hospital/edit/', views.hospital_details_edit, name='hospital_edit'),
-    path('dashboard/hospital/info/', views.hospital_dashboard, name='hospital_dashboard'),
 
-    path('dashboard/donor/', views.donor, name='donor'),
-    path('dashboard/donor_details_form/', views.donor_details_form, name='donor_details_form'),
-    path('dashboard/donor/edit/', views.donor_details_edit, name='donor_edit'),
-    path('dashboard/donor/info', views.donor_dashboard, name='donor_dashboard'),
+    path('donor/', views.donor, name='donor'),
+    path('donor_registration_form/', views.donor_details_form, name='donor_details_form'),
+    path('donor/edit/', views.donor_details_edit, name='donor_edit'),
+    path('donor/notifications/', views.donor_notifications, name='donor_notifications'),
+    path('donor/donation_history/', views.donation_history, name='donation_history'),
+    path('donor/eligibility_test/', views.donor_eligibility_test, name='donor_eligibility_test'),
+    path('donor/request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
 
     path('dashboard/recipient/', views.recipient, name='recipient'),
     path('dashboard/recipient_details_form/', views.recipient_details_form, name='recipient_details_form'),
     path('dashboard/recipient/edit/', views.recipient_details_edit, name='recipient_edit'),
-    path('dashboard/recipient/info/', views.recipient_dashboard, name='recipient_dashboard'),
 
 
     path('dashboard/blood_stock/', views.blood_stock_dashboard, name='blood_stock_dashboard'),
@@ -36,6 +37,9 @@ urlpatterns = [
 
     path('donor/add/', views.donor_create, name='donor_add'),
     path('donor/edit/<int:donor_id>/', views.donor_edit, name='donor_edit'),
+
+    
+
 
 
 ]

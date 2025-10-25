@@ -373,3 +373,26 @@ def donor_edit(request, donor_id):
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+
+# users_donor_dashboard
+
+@login_required
+def donor_notifications(request):
+    # temporary sample data (no database needed yet)
+    sample_notifications = [
+        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
+        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
+        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
+    ]
+    
+    return render(request, "donor/notifications.html", {"notifications": sample_notifications})
+
+def donation_history(request):
+    return render(request, 'donor/donation_history.html')
+
+def donor_eligibility_test(request):
+    return render(request, 'donor/donor_eligibility_test.html')
+
+def donor_request_appointment(request):
+    return render(request, 'donor/donor_request_appointment.html')
