@@ -1,44 +1,191 @@
 {% extends 'master.html' %}
+{% load static %}
 
 {% block title %}Recipient Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-content">
-    <h1>Recipient Dashboard</h1>
+<div class="recipient-dashboard">
 
-    {% if recipient %}
-        <div class="recipient-profile">
+    <!-- Top Navigation -->
+    <div class="top-bar">
+        <h1>Welcome, {{ recipient.name|default:user.username }}!</h1>
+        <div class="icon-container">
+            <a href="{% url 'recipient_notifications' %}" class="icon-btn">
+                <i class="fa fa-bell"></i>
+            </a>
             <a href="{% url 'recipient_edit' %}">
-                <img src="{{ recipient.photo.url }}" alt="{{ recipient.name }}" class="profile-pic">
+                {% if recipient.photo %}
+                    <img src="{{ recipient.photo.url }}" alt="{{ recipient.name }}" class="profile-img">
+                {% else %}
+                    <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
+                {% endif %}
             </a>
         </div>
-    {% else %}
-        <p>You have not submitted your recipient details yet.</p>
-    {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-area">
+        <div class="recipient-actions">
+
+            <!-- Search Blood Availability -->
+            <a href="{% url 'blood_stock_dashboard' %}" class="action-card red">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Search Blood Availability</span>
+            </a>
+
+            <!-- Request Blood -->
+            <a href="{% url 'recipient_blood_request_form' %}" class="action-card light">
+                <i class="fa-solid fa-droplet"></i>
+                <span>Request Blood</span>
+            </a>
+
+            <!-- Blood Received History -->
+            <a href="{% url 'received_history' %}" class="action-card dark">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Blood Received History</span>
+            </a>
+
+        </div>
+    </div>
 </div>
 
+<!-- ============= STYLES ============= -->
 <style>
-.dashboard-content {
-    text-align: center;
-    margin-top: 50px;
+body {
+    margin: 0;
+    background: linear-gradient(180deg, #fff5f5 0%, #ffeaea 100%);
+    font-family: "Poppins", sans-serif;
+    color: #333;
 }
 
-.recipient-profile {
-    display: inline-block;
+.recipient-dashboard {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px;
 }
 
-.profile-pic {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%; /* makes it circular */
+/* Top Bar */
+.top-bar {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+}
+
+.top-bar h1 {
+    font-size: 28px;
+    color: #b30000;
+    font-weight: 600;
+    margin: 0;
+}
+
+.icon-container {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.icon-btn {
+    font-size: 22px;
+    color: #444;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.icon-btn:hover {
+    color: #b30000;
+}
+
+/* Profile Image */
+.profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #b30000;
     object-fit: cover;
-    border: 3px solid #b30000;
-    cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.3s;
 }
 
-.profile-pic:hover {
-    transform: scale(1.1); /* slight zoom on hover */
+.profile-img:hover {
+    transform: scale(1.1);
+}
+
+/* Content Grid */
+.content-area {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.recipient-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    width: 100%;
+}
+
+.action-card {
+    text-decoration: none;
+    background-color: white;
+    border-radius: 14px;
+    padding: 40px 20px;
+    text-align: center;
+    font-weight: 500;
+    color: white;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-card i {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.action-card span {
+    font-size: 18px;
+    letter-spacing: 0.5px;
+}
+
+/* Color Schemes */
+.action-card.red {
+    background: linear-gradient(135deg, #b30000, #e60000);
+}
+
+.action-card.light {
+    background: linear-gradient(135deg, #f1f1f1, #ddd);
+    color: #333;
+}
+
+.action-card.dark {
+    background: linear-gradient(135deg, #444, #222);
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .top-bar h1 {
+        font-size: 24px;
+    }
 }
 </style>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}

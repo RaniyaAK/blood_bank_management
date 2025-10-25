@@ -12,10 +12,10 @@ from .models import DonorDetails, RecipientDetails, Profile, BloodStock,Hospital
 from .forms import RecipientDetailsForm
 from .forms import DonorDetailsForm
 from .forms import HospitalDetailsForm
+from django.contrib.auth.models import User
+from django.db.models import Sum
 
 
-
-# Create your views here.
 
 def home(request):
     return render(request, 'home.html')
@@ -33,18 +33,17 @@ def register(request):
         confirm_password = request.POST.get('confirm_password', '')
         role = request.POST.get('role', '')
 
-        # Step 1: Check if username exists
+       
         if User.objects.filter(username=username).exists():
             error_message = "Username already exists."
 
         if User.objects.filter(email=email).exists():
             error_message = "Email already exists."    
 
-        # Step 2: Check if passwords match
+
         elif password != confirm_password:
             error_message = "Passwords do not match."
 
-        # Step 3: Save user if no errors
         else:
             user = User.objects.create_user(first_name=first_name, last_name=last_name,username=username, email=email, password=password)
             Profile.objects.create(user=user, role=role)
@@ -79,7 +78,6 @@ def user_login(request):
                 )
                 role = profile.role
 
-                # Redirect based on role
                 if user.is_superuser:
                     return redirect('admin_dashboard')
                 elif user.profile.role == 'hospital':
@@ -139,7 +137,17 @@ def donor(request):
 
 @login_required
 def admin_dashboard(request):
-    return render(request, 'admin_dashboard.html')
+    donors_count = DonorDetails.objects.count()
+    recipients_count = RecipientDetails.objects.count()
+    blood_units_count = BloodStock.objects.aggregate(total_units=Sum('unit'))['total_units'] or 0
+
+    context = {
+        'donors_count': donors_count,
+        'recipients_count': recipients_count,
+        'blood_units_count': blood_units_count,
+    }
+    return render(request, 'admin_dashboard.html', context)
+
 
 @login_required
 def donor_dashboard(request):
@@ -233,7 +241,7 @@ def recipient_details_form(request):
 def hospital_details_form(request):
     try:
         hospital = HospitalDetails.objects.get(user=request.user)
-        return redirect('hospital')  # Already exists, go to dashboard
+        return redirect('hospital')  
     except HospitalDetails.DoesNotExist:
         pass
 
@@ -396,3 +404,22 @@ def donor_eligibility_test(request):
 
 def donor_request_appointment(request):
     return render(request, 'donor/donor_request_appointment.html')
+
+
+# users recipient dashboard
+
+@login_required
+def recipient_notifications(request):
+    sample_notifications = [
+        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
+        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
+        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
+    ]
+    
+    return render(request, "recipient/recipient_notifications.html", {"notifications": sample_notifications})
+
+def recipient_blood_request_form(request):
+    return render(request,'recipient/recipient_blood_request_form.html')
+
+def received_history(request):
+    return render(request, 'recipient/received_history.html')
