@@ -1,9 +1,9 @@
 {% extends 'master.html' %}
+{% load static %}
 
-{% block title %} blood stock dashboard {% endblock %}
+{% block title %}Hospital Dashboard{% endblock %}
 
 {% block content %}
-
 
 <div class="sidebar">
     <div class="profile-container">
@@ -21,18 +21,54 @@
     <a href="{% url 'hospital_dashboard' %}"><i class="fa-solid fa-hospital"></i> Hospitals</a>
     <a href="{% url 'donor_dashboard' %}"><i class="fa-solid fa-hand-holding-medical"></i> Donors</a>
     <a href="{% url 'recipient_dashboard' %}"><i class="fa-solid fa-user"></i> Recipients</a>
-    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i>Blood stock</a>
-   
+    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
 </div>
-
 
 <div class="topbar">
-    Admin Dashboard
+    Hospital Dashboard
 </div>
 
+<div class="main-content">
+
+    <div class="cards">
+        <div class="card red">
+            <i class="fa-solid fa-hospital icon"></i>
+            <h2>{{ hospital_count }}</h2>
+            <p>Total Registered Hospitals</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>All Hospitals</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Hospital Name</th>
+                    <th>Address</th>
+                    <th>Contact</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hospital in hospitals %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ hospital.name }}</td>
+                    <td>{{ hospital.address }}</td>
+                    <td>{{ hospital.contact }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No hospitals registered yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
 
 <script>
-
 function toggleProfile() {
     var dropdown = document.getElementById("profileDropdown");
     dropdown.classList.toggle("show");
@@ -47,9 +83,7 @@ window.onclick = function(event) {
 };
 </script>
 
-
 <style>
-
 body, html {
     margin: 0;
     padding: 0;
@@ -57,212 +91,40 @@ body, html {
     background: #FAFAFA;
 }
 
+/* Sidebar */
+.sidebar { width: 220px; background-color: #8B0000; color: white; position: fixed; top: 0; bottom: 0; left: 0; padding-top: 20px; z-index: 50; }
+.profile-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; position: relative; }
+.profile-icon { width: 50px; height: 50px; border-radius: 50%; background-color: #FAFAFA; color: #8B0000; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+.profile-dropdown { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background: white; color: #2f3640; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); min-width: 180px; z-index: 100; text-align: center; padding-bottom: 10px; }
+.profile-dropdown.show { max-height: 500px; opacity: 1; }
+.profile-dropdown p { margin: 10px 15px; font-weight: 500; }
+.profile-dropdown a { display: block; padding: 10px 15px; text-decoration: none; border-top: 1px solid #ddd; color: #333; }
+.logout-link { color: #333; padding: 8px 16px; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; white-space: nowrap; }
+.logout-link:hover { transform: scale(1.07); background-color: #eee4e4; color: #8B0000; }
 
-.sidebar {
-    width: 220px;
-    background-color:  #8B0000;
-    color: white;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    padding-top: 20px;
-    z-index: 50;
-}
+.sidebar a { display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; padding: 12px 25px; margin: 8px 0; border-radius: 6px; transition: 0.2s; font-weight: 500; font-size: 15px; }
+.sidebar a:hover { background-color: #00897B; padding-left: 30px; }
 
+/* Topbar */
+.topbar { position: fixed; left: 220px; right: 0; top: 0; height: 60px; background-color: #8B0000; color: #fff; display: flex; align-items: center; padding-left: 30px; font-size: 1.5em; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 90; }
 
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-    position: relative;
-}
+/* Main content */
+.main-content { margin-left: 220px; padding: 80px 40px 20px 40px; }
 
-.profile-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #FAFAFA;
-    color:  #8B0000;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/* Cards (all red) */
+.cards { display: flex; flex-wrap: wrap; gap: 25px; margin-bottom: 40px; }
+.card { background: linear-gradient(135deg, #8B0000, #b30000); border-radius: 12px; padding: 25px 40px; text-align: center; width: 220px; transition: transform 0.2s; }
+.card:hover { transform: scale(1.05); }
+.card .icon { font-size: 36px; margin-bottom: 15px; color: #fff; }
+.card h2, .card p { color: #fff; margin: 0; font-weight: 500; }
 
-
-.profile-dropdown {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    color: #2f3640;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    min-width: 180px;
-    z-index: 100;
-    text-align: center;
-    padding-bottom: 10px;
-}
-
-.profile-dropdown.show {
-    max-height: 500px;
-    opacity: 1;
-}
-
-.profile-dropdown p {
-    margin: 10px 15px;
-    font-weight: 500;
-}
-
-.profile-dropdown a {
-    display: block;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-top: 1px solid #ddd;
-}
-
-
-.logout-link {
-    color: #8B0000; 
-    padding: 8px 16px;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-.logout-link:hover {
-    transform: scale(1.07);
-    background-color: #eee4e4;
-}
-
-
-.sidebar a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 12px 25px;
-    margin: 8px 0;
-    border-radius: 6px;
-    transition: 0.2s;
-    text-align: left;
-    font-weight: 500;
-    font-size: 15px;
-}
-
-.sidebar a:hover {
-    background-color:#00897B;
-    padding-left: 30px;
-}
-
-
-.topbar {
-    position: fixed;
-    left: 220px; 
-    right: 0;
-    top: 0;
-    height: 60px;
-    background-color:  #8B0000; 
-    color: #fff;
-    display: flex;
-    align-items: center;
-    padding-left: 30px;
-    font-size: 1.5em;
-    font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 90;
-}
-
-
-.main-content {
-    margin-left: 220px;
-    padding: 80px 40px 20px 40px; 
-}
-
-
-.cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-    margin-bottom: 40px;
-}
-
-.card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    padding: 25px 40px;
-    text-align: center;
-    width: 220px;
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: scale(1.05);
-}
-
-.card h2 {
-    margin: 0;
-    font-size: 2em;
-    color: #8B0000;
-}
-
-.card p {
-    margin: 8px 0 0;
-    color: #555;
-    font-weight: 500;
-}
-
-
-.section {
-    margin-top: 40px;
-    background: white;
-    border-radius: 10px;
-    padding: 20px 30px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-.section h2 {
-    color: #2f3640;
-    margin-bottom: 15px;
-    border-bottom: 3px solid #40739e;
-    display: inline-block;
-    padding-bottom: 5px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-    font-size: 15px;
-}
-
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #eef4ff;
-}
-.profile-dropdown a {
-    color:#2f3640;
-}
+/* Section Table */
+.section { margin-top: 40px; background: white; border-radius: 10px; padding: 20px 30px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+.section h2 { color: #2f3640; margin-bottom: 15px; border-bottom: 3px solid #40739e; display: inline-block; padding-bottom: 5px; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 15px; }
+tr:nth-child(even) { background-color: #f9f9f9; }
+tr:hover { background-color: #eef4ff; }
 
 </style>
 

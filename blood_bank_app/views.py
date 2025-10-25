@@ -149,14 +149,38 @@ def admin_dashboard(request):
     return render(request, 'admin_dashboard.html', context)
 
 
+
 @login_required
 def donor_dashboard(request):
-    return render(request, 'donor_dashboard.html')
-
+    donors = DonorDetails.objects.all()
+    return render(request, 'donor_dashboard.html', {'donors': donors})
 
 @login_required
 def recipient_dashboard(request):
-    return render(request, 'recipient_dashboard.html')
+    recipient = RecipientDetails.objects.all()
+    return render(request, 'recipient_dashboard.html', {'recipient': recipient})
+
+
+# @login_required
+# def recipient_dashboard(request):
+#     # Get all recipients
+#     recipients = RecipientDetails.objects.all()  # fetch all recipients
+
+#     return render(request, 'recipient_dashboard.html', {
+#         'recipients': recipients
+#     })
+
+
+# @login_required
+# def hospital_dashboard(request):
+#     hospitals = HospitalDetails.objects.all()  # get all registered hospitals
+#     hospital_count = hospitals.count()  # total hospitals
+
+#     return render(request, 'hospital_dashboard.html', {
+#         'hospitals': hospitals,
+#         'hospital_count': hospital_count
+#     })
+
 
 
 @login_required
