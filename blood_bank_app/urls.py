@@ -26,6 +26,10 @@ urlpatterns = [
     path('donor/donation_history/', views.donation_history, name='donation_history'),
     path('donor/eligibility_test/', views.donor_eligibility_test, name='donor_eligibility_test'),
     path('donor/request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
+    path('eligibility_result/', views.eligibility_result, name='eligibility_result'),
+    path('donor_request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
+
+
 
     path('recipient/', views.recipient, name='recipient'),
     path('recipient_registration_form/', views.recipient_details_form, name='recipient_details_form'),
@@ -33,6 +37,7 @@ urlpatterns = [
     path('recipient/notifications/', views.recipient_notifications, name='recipient_notifications'),
     path('recipient/recipient_blood_request_form/', views.recipient_blood_request_form, name='recipient_blood_request_form'),
     path('recipient/received_history/', views.received_history, name='received_history'),
+    path('recipient/search_blood/', views.search_blood, name='search_blood'),
 
 
     path('dashboard/blood_stock/', views.blood_stock_dashboard, name='blood_stock_dashboard'),

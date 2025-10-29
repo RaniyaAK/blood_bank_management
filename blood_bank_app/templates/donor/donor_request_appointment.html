@@ -1,0 +1,39 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block title %}Donor Request Appointment{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow border-0" style="max-width: 700px; margin: auto;">
+        <div class="card-header bg-danger text-white text-center">
+            <h4>Blood Donation Appointment Request</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_preferred_date" class="form-label">Preferred Date</label>
+                    {{ form.preferred_date }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_preferred_time" class="form-label">Preferred Time</label>
+                    {{ form.preferred_time }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_hospital" class="form-label">Hospital</label>
+                    {{ form.hospital }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_additional_notes" class="form-label">Additional Notes</label>
+                    {{ form.additional_notes }}
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-danger px-4">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,6 +2,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import User
 
+
 # Phone validators
 hospital_phone_validator = RegexValidator(
     regex=r'^(\+\d{1,3})?(\d{7}|\d{10})$',
@@ -13,7 +14,6 @@ donor_recipient_phone_validator = RegexValidator(
     message="Enter a valid phone number."
 )
 
-# ----------------------------
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -86,3 +86,16 @@ class RecipientDetails(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class DonorRequestAppointment(models.Model):
+    donor = models.ForeignKey(User, on_delete=models.CASCADE)
+    preferred_date = models.DateField()
+    preferred_time = models.TimeField()
+    hospital = models.CharField(max_length=150)
+    additional_notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.donor.username} - {self.preferred_date} {self.preferred_time}"
+

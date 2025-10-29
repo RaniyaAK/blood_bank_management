@@ -8,18 +8,24 @@
 
     <!-- Top Navigation -->
     <div class="top-bar">
-        <h1>Welcome, {{ recipient.name|default:user.username }}!</h1>
+        <div class="logo-title">
+            <h1>Recipient Dashboard</h1>
+        </div>
+
         <div class="icon-container">
-            <a href="{% url 'recipient_notifications' %}" class="icon-btn">
+            <a href="{% url 'recipient_notifications' %}" class="icon-btn" title="Notifications">
                 <i class="fa fa-bell"></i>
             </a>
-            <a href="{% url 'recipient_edit' %}">
+
+            <a href="{% url 'recipient_edit' %}" title="Profile">
                 {% if recipient.photo %}
                     <img src="{{ recipient.photo.url }}" alt="{{ recipient.name }}" class="profile-img">
                 {% else %}
                     <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
                 {% endif %}
             </a>
+
+            <a href="{% url 'logout' %}" class="logout-btn" title="Logout">Logout</a>
         </div>
     </div>
 
@@ -28,7 +34,7 @@
         <div class="recipient-actions">
 
             <!-- Search Blood Availability -->
-            <a href="{% url 'blood_stock_dashboard' %}" class="action-card red">
+            <a href="{% url 'search_blood' %}" class="action-card red">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <span>Search Blood Availability</span>
             </a>
@@ -76,17 +82,18 @@ body {
     margin-bottom: 60px;
 }
 
-.top-bar h1 {
-    font-size: 28px;
+.logo-title h1 {
+    font-size: 26px;
     color: #b30000;
     font-weight: 600;
     margin: 0;
+    letter-spacing: 0.5px;
 }
 
 .icon-container {
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 20px;
 }
 
 .icon-btn {
@@ -102,8 +109,8 @@ body {
 
 /* Profile Image */
 .profile-img {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     border: 2px solid #b30000;
     object-fit: cover;
@@ -112,6 +119,23 @@ body {
 
 .profile-img:hover {
     transform: scale(1.1);
+}
+
+/* Logout Button */
+.logout-btn {
+    background: #b30000;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.logout-btn:hover {
+    background: #e60000;
+    transform: translateY(-2px);
 }
 
 /* Content Grid */
@@ -180,8 +204,8 @@ body {
         flex-direction: column;
         gap: 20px;
     }
-    .top-bar h1 {
-        font-size: 24px;
+    .logo-title h1 {
+        font-size: 22px;
     }
 }
 </style>

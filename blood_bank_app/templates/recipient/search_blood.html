@@ -1,0 +1,144 @@
+{% extends 'master.html' %}
+{% block title %}Search Blood Availability{% endblock %}
+
+{% block content %}
+
+<div class="main-content">
+    <h1>Search Blood Availability</h1>
+
+    <!-- Search box -->
+    <div class="search-box">
+        <form method="GET" action="">
+            <input type="text" name="q" placeholder="Search by blood group (e.g. A+, O-, B+)" value="{{ query|default:'' }}">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- Results -->
+    {% if blood_stock %}
+    <div class="section">
+        <table>
+            <thead>
+                <tr>
+                    <th>Blood Group</th>
+                    <th>Units Available</th>
+                    <th>Hospital Name</th>
+                    <th>Added Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for blood in blood_stock %}
+                <tr>
+                    <td>{{ blood.bloodgroup }}</td>
+                    <td>{{ blood.unit }}</td>
+                    <td>{{ blood.hospital_name|default:"-" }}</td>
+                    <td>{{ blood.added_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No matching blood found.</p>
+    {% endif %}
+</div>
+
+<style>
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #FAFAFA;
+}
+
+.main-content {
+    margin-left: 220px;
+    padding: 140px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Title */
+.main-content h1 {
+    color: #8B0000;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+/* Search Box */
+.search-box {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 25px;
+}
+
+.search-box form {
+    display: flex;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px 0 0 8px;
+    outline: none;
+    font-size: 15px;
+}
+
+.search-box input:focus {
+    border-color: #8B0000;
+}
+
+.search-box button {
+    background-color: #8B0000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.search-box button:hover {
+    background-color: #a51a1a;
+}
+
+/* Table */
+.section {
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    border-radius: 12px;
+    padding: 25px 35px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    font-size: 15px;
+}
+
+th {
+    background-color: #8B0000;
+    color: white;
+}
+
+tr:nth-child(even) { background-color: #f9f9f9; }
+tr:hover { background-color: #eef4ff; }
+
+p {
+    color: #555;
+    text-align: center;
+}
+</style>
+
+{% endblock %}

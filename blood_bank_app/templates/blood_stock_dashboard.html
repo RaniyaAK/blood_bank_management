@@ -5,35 +5,10 @@
 {% block content %}
 
 
-<div class="sidebar">
-    <div class="profile-container">
-        <div class="profile-icon" onclick="toggleProfile()">
-            {{ request.user.username|slice:":1"|upper }}
-        </div>
-        <div class="profile-dropdown" id="profileDropdown">
-            <p><strong>{{ request.user.username }}</strong></p>
-            <p>{{ request.user.email }}</p>
-            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
-        </div>
-    </div>
-
-    <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-    <a href="{% url 'hospital_dashboard' %}"><i class="fa-solid fa-hospital"></i> Hospitals</a>
-    <a href="{% url 'donor_dashboard' %}"><i class="fa-solid fa-hand-holding-medical"></i> Donors</a>
-    <a href="{% url 'recipient_dashboard' %}"><i class="fa-solid fa-user"></i> Recipients</a>
-    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
-   
-</div>
-
-
-<div class="topbar">
-    Admin Dashboard
-</div>
 
 <div class="main-content">
     <h1>Blood Stock</h1>
 
-    <a href="{% url 'add_blood' %}" class="add-blood-btn">+ Add Blood</a>
 
     <!-- Display messages -->
     {% if messages %}

@@ -1,0 +1,49 @@
+{% extends 'master.html' %}
+{% block title %}Eligibility Result{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <h1>Blood Donor Eligibility Result</h1>
+
+    {% if result %}
+    <div class="result-box {% if 'Not Eligible' in result %}fail{% else %}pass{% endif %}">
+        <p>{{ result }}</p>
+    </div>
+    {% else %}
+    <p>No result found. Please complete the eligibility test.</p>
+    {% endif %}
+
+    <a href="{% url 'donor_eligibility_test' %}" class="btn-back">← Take Test Again</a>
+</div>
+
+<style>
+.main-content {
+    margin-left: 220px;
+    padding: 140px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h1 { color: #8B0000; margin-bottom: 20px; }
+.result-box {
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    max-width: 500px;
+    width: 100%;
+}
+.result-box.pass { background-color: #e8f8e8; color: #146b14; border: 1px solid #5cb85c; }
+.result-box.fail { background-color: #fdeaea; color: #a11a1a; border: 1px solid #dc3545; }
+.btn-back {
+    margin-top: 20px;
+    background-color: #8B0000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.btn-back:hover { background-color: #a51a1a; }
+</style>
+{% endblock %}

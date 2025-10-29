@@ -14,7 +14,8 @@ from .forms import DonorDetailsForm
 from .forms import HospitalDetailsForm
 from django.contrib.auth.models import User
 from django.db.models import Sum
-
+from django.contrib import messages
+from .forms import DonorRequestAppointmentForm
 
 
 def home(request):
@@ -161,14 +162,14 @@ def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {'recipient': recipient})
 
 
-# @login_required
-# def recipient_dashboard(request):
-#     # Get all recipients
-#     recipients = RecipientDetails.objects.all()  # fetch all recipients
+@login_required
+def recipient_dashboard(request):
+    # Get all recipients
+    recipients = RecipientDetails.objects.all()  # fetch all recipients
 
-#     return render(request, 'recipient_dashboard.html', {
-#         'recipients': recipients
-#     })
+    return render(request, 'recipient_dashboard.html', {
+        'recipients': recipients
+    })
 
 
 # @login_required
@@ -447,3 +448,78 @@ def recipient_blood_request_form(request):
 
 def received_history(request):
     return render(request, 'recipient/received_history.html')
+
+
+def search_blood(request):
+    return render(request, 'recipient/search_blood.html')
+
+
+
+@login_required
+def search_blood(request):
+    query = request.GET.get('q', '').strip()
+    blood_stock = BloodStock.objects.all().order_by('-added_at')
+
+    if query:
+        # Filter by blood group (case-insensitive)
+        blood_stock = blood_stock.filter(bloodgroup__icontains=query)
+
+    return render(request, 'recipient/search_blood.html', {
+        'blood_stock': blood_stock,
+        'query': query,
+    })
+
+
+
+def donor_eligibility_test(request):
+    if request.method == 'POST':
+        age = int(request.POST.get('age'))
+        weight = int(request.POST.get('weight'))
+        hemoglobin = float(request.POST.get('hemoglobin'))
+        recent_donation = request.POST.get('recent_donation')
+        illness = request.POST.get('illness')
+        medication = request.POST.get('medication')
+        surgery_vaccine = request.POST.get('surgery_vaccine')
+
+        # Eligibility logic
+        if age < 18 or age > 60:
+            result = "Not Eligible: Age must be between 18 and 60."
+        elif weight < 50:
+            result = "Not Eligible: Weight must be at least 50 kg."
+        elif hemoglobin < 12.5:
+            result = "Not Eligible: Hemoglobin level is too low."
+        elif recent_donation == "yes" or illness == "yes" or medication == "yes" or surgery_vaccine == "yes":
+            result = "Not Eligible: Health conditions do not permit donation currently."
+        else:
+            result = "Eligible: You can donate blood!"
+
+        # Redirect to result page with result in session
+        request.session['eligibility_result'] = result
+        return redirect('eligibility_result')
+
+    return render(request, 'donor/donor_eligibility_test.html')
+
+def eligibility_result(request):
+    result = request.session.get('eligibility_result', None)
+    return render(request, 'donor/eligibility_result.html', {'result': result})
+
+
+def donor_request_appointment(request):
+    if request.method == 'POST':
+        form = DonorRequestAppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment.donor = request.user
+            appointment.save()
+            messages.success(request, "Your appointment request has been submitted successfully.")
+            return redirect('donor_request_appointment')
+    else:
+        form = DonorRequestAppointmentForm()
+
+    return render(request, 'donor/donor_request_appointment.html', {'form': form})
+
+
+
+
+
+
