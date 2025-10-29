@@ -13,19 +13,19 @@
             <form method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <label for="id_preferred_date" class="form-label">Preferred Date</label>
+                    <label class="form-label">Preferred Date</label>
                     {{ form.preferred_date }}
                 </div>
                 <div class="mb-3">
-                    <label for="id_preferred_time" class="form-label">Preferred Time</label>
+                    <label class="form-label">Preferred Time</label>
                     {{ form.preferred_time }}
                 </div>
                 <div class="mb-3">
-                    <label for="id_hospital" class="form-label">Hospital</label>
+                    <label class="form-label">Hospital</label>
                     {{ form.hospital }}
                 </div>
                 <div class="mb-3">
-                    <label for="id_additional_notes" class="form-label">Additional Notes</label>
+                    <label class="form-label">Additional Notes</label>
                     {{ form.additional_notes }}
                 </div>
 

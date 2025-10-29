@@ -8,7 +8,7 @@
 
     <!-- Top Navigation -->
     <div class="top-bar">
-        <h1>Welcome, {{ donor.name }}!</h1>
+        <h1>{{ donor.name }}</h1>
         <div class="icon-container">
             <a href="{% url 'donor_notifications' %}" class="icon-btn">
                 <i class="fa fa-bell"></i>
@@ -26,12 +26,12 @@
     <!-- Main Content -->
     <div class="content-area">
         <div class="donor-actions">
+
             <!-- Donation History -->
             <a href="{% url 'donation_history' %}" class="action-card red">
                 <i class="fa-solid fa-droplet"></i>
                 <span>Donation History</span>
             </a>
-
 
             <!-- Eligibility Test -->
             <a href="{% url 'donor_eligibility_test' %}" class="action-card light">
@@ -39,36 +39,36 @@
                 <span>Eligibility Test</span>
             </a>
 
-            <!-- Request Appointment -->
-            <a href="{% url 'donor_request_appointment' %}" class="action-card dark">
-                <i class="fa-solid fa-calendar-check"></i>
-                <span>Request Appointment</span>
-            </a>
-            
+            <!-- Request Appointment (Locked if Not Eligible) -->
+            {% if request.session.eligibility_result and "Eligible" in request.session.eligibility_result %}
+                <a href="{% url 'donor_request_appointment' %}" class="action-card dark">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Request Appointment</span>
+                </a>
+            {% else %}
+                <div class="action-card dark" style="opacity:0.5; cursor:not-allowed;">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Request Appointment (Locked)</span>
+                </div>
+            {% endif %}
         </div>
     </div>
-
 </div>
 
-<!-- ================== STYLES ================== -->
+<!-- Styles -->
 <style>
 body {
     margin: 0;
     background: linear-gradient(180deg, #fff5f5 0%, #ffeaea 100%);
     font-family: "Poppins", sans-serif;
-    color: #333;
 }
-
 .donor-dashboard {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: center;
     padding: 50px 20px;
 }
-
-/* Top Bar */
 .top-bar {
     width: 100%;
     max-width: 1100px;
@@ -77,120 +77,50 @@ body {
     align-items: center;
     margin-bottom: 60px;
 }
-
 .top-bar h1 {
     font-size: 28px;
     color: #b30000;
     font-weight: 600;
-    margin: 0;
 }
-
 .icon-container {
     display: flex;
     align-items: center;
     gap: 25px;
 }
-
 .icon-btn {
     font-size: 22px;
     color: #444;
     text-decoration: none;
-    position: relative;
-    transition: color 0.2s;
 }
-
-.icon-btn:hover {
-    color: #b30000;
-}
-
-/* Profile image */
+.icon-btn:hover { color: #b30000; }
 .profile-img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px solid #b30000;
-    object-fit: cover;
-    cursor: pointer;
-    transition: transform 0.3s;
+    width: 50px; height: 50px; border-radius: 50%;
+    border: 2px solid #b30000; object-fit: cover;
 }
-
-.profile-img:hover {
-    transform: scale(1.1);
-}
-
-/* Main content area */
 .content-area {
-    width: 100%;
-    max-width: 1000px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%; max-width: 1000px; display: flex; justify-content: center;
 }
-
-/* Action Cards */
 .donor-actions {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 25px;
     width: 100%;
 }
-
 .action-card {
     text-decoration: none;
-    background-color: white;
     border-radius: 14px;
     padding: 40px 20px;
     text-align: center;
     font-weight: 500;
-    color: white;
     transition: transform 0.3s, box-shadow 0.3s;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: flex; flex-direction: column; align-items: center;
 }
-
-.action-card i {
-    font-size: 36px;
-    margin-bottom: 15px;
-}
-
-.action-card span {
-    font-size: 18px;
-    letter-spacing: 0.5px;
-}
-
-/* Colors */
-.action-card.red {
-    background: linear-gradient(135deg, #b30000, #e60000);
-}
-
-.action-card.dark {
-    background: linear-gradient(135deg, #444, #222);
-}
-
-.action-card.light {
-    background: linear-gradient(135deg, #f1f1f1, #ddd);
-    color: #333;
-}
-
-.action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .top-bar {
-        flex-direction: column;
-        gap: 20px;
-    }
-    .top-bar h1 {
-        font-size: 24px;
-    }
-}
+.action-card i { font-size: 36px; margin-bottom: 15px; }
+.action-card span { font-size: 18px; }
+.action-card.red { background: linear-gradient(135deg, #b30000, #e60000); color: white; }
+.action-card.dark { background: linear-gradient(135deg, #444, #222); color: white; }
+.action-card.light { background: linear-gradient(135deg, #f1f1f1, #ddd); color: #333; }
+.action-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
 </style>
-
-<!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}

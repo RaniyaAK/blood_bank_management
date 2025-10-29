@@ -499,12 +499,19 @@ def donor_eligibility_test(request):
 
     return render(request, 'donor/donor_eligibility_test.html')
 
+@login_required
 def eligibility_result(request):
     result = request.session.get('eligibility_result', None)
     return render(request, 'donor/eligibility_result.html', {'result': result})
 
 
 def donor_request_appointment(request):
+    result = request.session.get('eligibility_result', None)
+
+    if not result or "Not Eligible" in result:
+        messages.warning(request, "You are not eligible to request an appointment. Please complete the eligibility test first.")
+        return redirect('donor_eligibility_test')
+
     if request.method == 'POST':
         form = DonorRequestAppointmentForm(request.POST)
         if form.is_valid():
@@ -512,7 +519,7 @@ def donor_request_appointment(request):
             appointment.donor = request.user
             appointment.save()
             messages.success(request, "Your appointment request has been submitted successfully.")
-            return redirect('donor_request_appointment')
+            return redirect('donor')
     else:
         form = DonorRequestAppointmentForm()
 
