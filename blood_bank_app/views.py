@@ -18,6 +18,7 @@ from django.contrib import messages
 from .forms import DonorRequestAppointmentForm
 
 
+
 def home(request):
     return render(request, 'home.html')
 
@@ -470,7 +471,7 @@ def search_blood(request):
     })
 
 
-
+@login_required
 def donor_eligibility_test(request):
     if request.method == 'POST':
         age = int(request.POST.get('age'))
@@ -481,35 +482,60 @@ def donor_eligibility_test(request):
         medication = request.POST.get('medication')
         surgery_vaccine = request.POST.get('surgery_vaccine')
 
-        # Eligibility logic
+        # Logic
         if age < 18 or age > 60:
             result = "Not Eligible: Age must be between 18 and 60."
+            is_eligible = False
         elif weight < 50:
             result = "Not Eligible: Weight must be at least 50 kg."
+            is_eligible = False
         elif hemoglobin < 12.5:
             result = "Not Eligible: Hemoglobin level is too low."
+            is_eligible = False
         elif recent_donation == "yes" or illness == "yes" or medication == "yes" or surgery_vaccine == "yes":
             result = "Not Eligible: Health conditions do not permit donation currently."
+            is_eligible = False
         else:
             result = "Eligible: You can donate blood!"
+            is_eligible = True
 
-        # Redirect to result page with result in session
+        # Save to session and donor profile
         request.session['eligibility_result'] = result
+
+        donor = DonorDetails.objects.filter(user=request.user).first()
+        if donor:
+            donor.is_eligible = is_eligible
+            donor.save()
+
         return redirect('eligibility_result')
 
     return render(request, 'donor/donor_eligibility_test.html')
 
+
 @login_required
 def eligibility_result(request):
     result = request.session.get('eligibility_result', None)
+    donor = get_object_or_404(DonorDetails, user=request.user)
+
+    # ✅ If eligible, update status
+    if result and 'Eligible' in result and 'Not Eligible' not in result:
+        donor.is_eligible = True
+        donor.save()
+    else:
+        donor.is_eligible = False
+        donor.save()
+
     return render(request, 'donor/eligibility_result.html', {'result': result})
 
 
-def donor_request_appointment(request):
-    result = request.session.get('eligibility_result', None)
 
-    if not result or "Not Eligible" in result:
-        messages.warning(request, "You are not eligible to request an appointment. Please complete the eligibility test first.")
+
+@login_required
+def donor_request_appointment(request):
+    donor = get_object_or_404(DonorDetails, user=request.user)
+
+    if not donor.is_eligible:
+        messages.warning(request, "You must pass the eligibility test before requesting an appointment.")
         return redirect('donor_eligibility_test')
 
     if request.method == 'POST':
@@ -527,6 +553,14 @@ def donor_request_appointment(request):
 
 
 
+def donor_appointment_form(request):
+    if request.method == 'POST':
+        form = DonorRequestAppointmentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('success_page')  # change to your success URL
+    else:
+        form = DonorRequestAppointmentForm()  # ✅ must be created here
 
-
+    return render(request, 'donor/donor_appointment_form.html', {'form': form})
 

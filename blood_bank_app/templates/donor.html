@@ -20,6 +20,9 @@
                     <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
                 {% endif %}
             </a>
+
+            <!-- 🔹 Logout Button -->
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
         </div>
     </div>
 
@@ -97,6 +100,19 @@ body {
     width: 50px; height: 50px; border-radius: 50%;
     border: 2px solid #b30000; object-fit: cover;
 }
+.logout-btn {
+    background-color: #b30000;
+    color: white;
+    font-size: 14px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+.logout-btn:hover {
+    background-color: #d11a1a;
+}
 .content-area {
     width: 100%; max-width: 1000px; display: flex; justify-content: center;
 }
@@ -122,5 +138,6 @@ body {
 .action-card.light { background: linear-gradient(135deg, #f1f1f1, #ddd); color: #333; }
 .action-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
 </style>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}

@@ -28,6 +28,7 @@ urlpatterns = [
     path('donor/request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
     path('eligibility_result/', views.eligibility_result, name='eligibility_result'),
     path('donor_request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
+    path('donor/donor_appointment_form/', views.donor_appointment_form, name='donor_appointment_form'),
 
 
 

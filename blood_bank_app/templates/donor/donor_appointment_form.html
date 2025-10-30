@@ -1,0 +1,17 @@
+{% extends 'master.html' %}
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <h1>Blood Donation Appointment</h1>
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div class="text-center mt-3">
+      <button type="submit" class="btn btn-danger px-4">Submit Request</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

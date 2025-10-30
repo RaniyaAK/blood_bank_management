@@ -1,39 +1,76 @@
-{% extends "master.html" %}
-{% load static %}
-
-{% block title %}Donor Request Appointment{% endblock %}
+{% extends 'master.html' %}
+{% block title %}Request Appointment{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow border-0" style="max-width: 700px; margin: auto;">
-        <div class="card-header bg-danger text-white text-center">
-            <h4>Blood Donation Appointment Request</h4>
+<div class="main-content">
+    <h1>Blood Donation Appointment</h1>
+
+    {% if not donor.is_eligible %}
+        <!-- ❌ Donor is not eligible yet -->
+        <div class="alert-box">
+            <p>To request a donation appointment, you must first pass the eligibility test.</p>
+            <a href="{% url 'donor_eligibility_test' %}" class="btn-test">Take Eligibility Test</a>
         </div>
-        <div class="card-body">
+    {% else %}
+        <!-- ✅ Donor is eligible: show appointment form -->
+        <div class="form-box">
+            <h2>Book Your Appointment</h2>
             <form method="POST">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label">Preferred Date</label>
-                    {{ form.preferred_date }}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Preferred Time</label>
-                    {{ form.preferred_time }}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Hospital</label>
-                    {{ form.hospital }}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Additional Notes</label>
-                    {{ form.additional_notes }}
-                </div>
-
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-danger px-4">Submit Request</button>
-                </div>
+                {{ form.as_p }}
+                <button type="submit" class="btn-submit">Submit Request</button>
             </form>
         </div>
-    </div>
+    {% endif %}
 </div>
+
+<style>
+.main-content {
+    margin-left: 220px;
+    padding: 140px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+h1 {
+    color: #8B0000;
+    margin-bottom: 20px;
+}
+
+.alert-box, .form-box {
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.alert-box p {
+    color: #a11a1a;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.btn-test, .btn-submit {
+    display: inline-block;
+    background-color: #8B0000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-test:hover { background-color: #a51a1a; }
+
+.btn-submit {
+    background-color: #146b14;
+    border: none;
+    cursor: pointer;
+}
+.btn-submit:hover { background-color: #0f4d0f; }
+</style>
 {% endblock %}

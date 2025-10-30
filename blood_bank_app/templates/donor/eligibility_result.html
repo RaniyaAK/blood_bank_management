@@ -2,27 +2,136 @@
 {% block title %}Eligibility Result{% endblock %}
 
 {% block content %}
-<div class="main-content">
-    <h1>Blood Donor Eligibility Result</h1>
+<div class="eligibility-container">
+    <div class="result-card">
+        <h1>Blood Donor Eligibility Result</h1>
 
-    {% if result %}
-    <div class="result-box {% if 'Not Eligible' in result %}fail{% else %}pass{% endif %}">
-        <p>{{ result }}</p>
+        {% if result %}
+            <div class="result-box {% if 'Not Eligible' in result %}fail{% else %}pass{% endif %}">
+                {% if 'Not Eligible' in result %}
+                    <i class="fas fa-times-circle icon-fail"></i>
+                {% else %}
+                    <i class="fas fa-check-circle icon-pass"></i>
+                {% endif %}
+                <p>{{ result }}</p>
+            </div>
+
+            {% if 'Eligible' in result and 'Not Eligible' not in result %}
+                <a href="{% url 'donor_appointment_form' %}" class="btn-next">
+                    Proceed to Appointment Request
+                </a>
+            {% else %}
+                <a href="{% url 'donor_eligibility_test' %}" class="btn-back">
+                    Take Test Again
+                </a>
+            {% endif %}
+        {% else %}
+            <p class="no-result">No result found. Please complete the eligibility test.</p>
+            <a href="{% url 'donor_eligibility_test' %}" class="btn-back">Take Test</a>
+        {% endif %}
     </div>
-    {% else %}
-    <p>No result found. Please complete the eligibility test.</p>
-    {% endif %}
-
-    <a href="{% url 'donor_eligibility_test' %}" class="btn-back">← Take Test Again</a>
 </div>
 
 <style>
-.main-content { padding: 140px 40px; text-align: center; }
-h1 { color: #8B0000; margin-bottom: 20px; }
-.result-box { padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; font-weight: 600; }
-.result-box.pass { background-color: #e8f8e8; color: #146b14; border: 1px solid #5cb85c; }
-.result-box.fail { background-color: #fdeaea; color: #a11a1a; border: 1px solid #dc3545; }
-.btn-back { margin-top: 20px; background-color: #8B0000; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-block; }
-.btn-back:hover { background-color: #a51a1a; }
+/* --- Layout --- */
+.eligibility-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    background: linear-gradient(135deg, #fff8f8, #ffecec);
+    margin-left: 220px;
+    padding-top: 60px;
+}
+
+.result-card {
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    animation: fadeIn 0.5s ease;
+}
+
+h1 {
+    color: #8B0000;
+    font-size: 26px;
+    margin-bottom: 25px;
+}
+
+/* --- Result Boxes --- */
+.result-box {
+    border-radius: 12px;
+    padding: 25px 20px;
+    margin-bottom: 25px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.result-box.pass {
+    background-color: #eafbea;
+    color: #166d16;
+    border: 2px solid #5cb85c;
+}
+
+.result-box.fail {
+    background-color: #fdeaea;
+    color: #a11a1a;
+    border: 2px solid #dc3545;
+}
+
+/* --- Icons --- */
+.icon-pass, .icon-fail {
+    font-size: 48px;
+}
+.icon-pass { color: #2e8b57; }
+.icon-fail { color: #dc3545; }
+
+/* --- Buttons --- */
+.btn-back, .btn-next {
+    display: inline-block;
+    margin-top: 10px;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-back {
+    background-color: #8B0000;
+}
+.btn-next {
+    background-color: #166d16;
+}
+.btn-back:hover {
+    background-color: #a51a1a;
+    transform: scale(1.03);
+}
+.btn-next:hover {
+    background-color: #0e4d0e;
+    transform: scale(1.03);
+}
+
+.no-result {
+    color: #555;
+    margin-bottom: 15px;
+}
+
+/* --- Animation --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 {% endblock %}

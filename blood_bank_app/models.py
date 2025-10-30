@@ -57,7 +57,6 @@ class HospitalDetails(models.Model):
     def __str__(self):
         return self.name
 
-
 class DonorDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
@@ -68,9 +67,13 @@ class DonorDetails(models.Model):
     weight = models.DecimalField(max_digits=5, decimal_places=2)
     bloodgroup = models.CharField(max_length=5)
     photo = models.ImageField(upload_to='donor_photos/')
+    
+    # 🩸 New field to store eligibility
+    is_eligible = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
+
 
 
 class RecipientDetails(models.Model):
