@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "blood_bank_app/wsgi.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "yourproject/wsgi.py" }
+  ]
+}

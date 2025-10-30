@@ -1,0 +1,159 @@
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+    margin: 0;
+    background-color:#FAFAFA; 
+}
+
+.add-contact-card h1 {
+    margin-top: 0;
+    margin-bottom: 20px; 
+    font-size: 28px;
+    text-align: center;
+    color: #8B0000;
+}
+
+
+.login-register-box.container {
+    width: 100%;         
+    max-width: 400px;     
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #FAFAFA;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-sizing: border-box; 
+}
+
+.login-register-box h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.error-text {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+form p {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+input, select {
+    padding: 10px;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #C62828;
+    box-shadow:  0 0 8px rgba(198, 40, 40, 0.4);;
+}
+
+.role-dropdown {
+    background-color:#FAFAFA;
+    color: #333;
+    cursor: pointer;
+}
+
+.role-dropdown option {
+    padding: 10px;
+}
+
+.login-register-btn {
+    display: block;
+    width: 100%;
+    background-color:#ab0909;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.login-register-btn:hover {
+    background-color:#8B0000;
+}
+
+.login-register-link a {
+   
+    text-decoration: none;
+    font-size: 17px;
+    /* font-weight: bold; */
+}
+
+.login-register-link a:hover {
+    text-decoration: underline;
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: #C62828; 
+    box-shadow: 0 0 8px rgba(198, 40, 40, 0.4); 
+    transition: all 0.3s ease-in-out;
+}
+
+input {
+    padding: 8px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    transition: all 0.3s ease-in-out;
+}
+
+.login-register-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 16px;
+}
+.admin-box {
+    margin-top: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px 20px;
+    text-align: left;
+    width: 350px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.admin-box h3 {
+    margin-top: 0;
+    color:  rgb(46, 40, 40);
+    text-align: center;
+}
+
+.admin-box p {
+    margin: 5px 0;
+    font-size: 15px;
+}
+
+.forgot-password a{
+    text-decoration: none;
+}
+
+.forgot-password a:hover{
+    text-decoration:underline;
+}
+
+
+
+
+
+
+
+
+
