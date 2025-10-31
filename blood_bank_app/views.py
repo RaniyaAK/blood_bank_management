@@ -8,54 +8,57 @@ from django.contrib import messages
 from .forms import BloodStockForm
 from .models import BloodStock
 from datetime import datetime
-from .models import DonorDetails, RecipientDetails, Profile, BloodStock,HospitalDetails
+from .models import DonorDetails, RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTestForm
 from .forms import RecipientDetailsForm
 from .forms import DonorDetailsForm
 from .forms import HospitalDetailsForm
 from django.contrib.auth.models import User
 from django.db.models import Sum
-from django.contrib import messages
 from .forms import DonorRequestAppointmentForm
-
+from django.contrib.auth import authenticate, login as auth_login
+from django.shortcuts import render, redirect
+import datetime
 
 
 def home(request):
     return render(request, 'home.html')
 
+
+# register
+
 def register(request):
-    form = UserForm(request.POST or None)
-    error_message = None
-
     if request.method == 'POST':
-        first_name = request.POST.get("first_name",'').strip()
-        last_name = request.POST.get("last_name",'').strip()
-        username = request.POST.get('username', '').strip()
-        email = request.POST.get('email', '').strip()
-        password = request.POST.get('password', '')
-        confirm_password = request.POST.get('confirm_password', '')
-        role = request.POST.get('role', '')
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password']
+            )
+            user.first_name = form.cleaned_data['name']
+            user.save()
 
-       
-        if User.objects.filter(username=username).exists():
-            error_message = "Username already exists."
+            role = form.cleaned_data['role']
+            profile = Profile.objects.create(user=user, role=role)
 
-        if User.objects.filter(email=email).exists():
-            error_message = "Email already exists."    
+            # ✅ Automatically log in the user
+            auth_login(request, user)
+
+            # ✅ Redirect based on role
+            if role == 'donor':
+                return redirect('donor')
+            elif role == 'recipient':
+                return redirect('recipient')
+            elif role == 'hospital':
+                return redirect('hospital')
+            else:
+                return redirect('home')  # fallback
+    else:
+        form = UserForm()
+    return render(request, 'register.html', {'form': form})
 
 
-        elif password != confirm_password:
-            error_message = "Passwords do not match."
-
-        else:
-            user = User.objects.create_user(first_name=first_name, last_name=last_name,username=username, email=email, password=password)
-            Profile.objects.create(user=user, role=role)
-            return redirect('login')
-
-    return render(request, 'register.html', {
-        'form': form,
-        'error_message': error_message
-    })
-
+# login
 
 def user_login(request):
     error_message = None
@@ -97,8 +100,69 @@ def user_login(request):
 
     return render(request, 'login.html', {'form': form, 'error_message': error_message})
 
+def roles(request):
+    return render(request, 'roles.html')
 
 
+# passwords
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            # Redirect to reset password page with email as parameter
+            return redirect('reset_password', email=user.email)
+        except User.DoesNotExist:
+            messages.error(request, 'No account found with that email address.')
+    return render(request, 'forgot_password.html')
+
+
+def reset_password(request, email):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+        else:
+            try:
+                user = User.objects.get(email=email)
+                user.set_password(password)
+                user.save()
+
+                # ✅ Log in immediately
+                user = authenticate(username=user.username, password=password)
+                if user:
+                    auth_login(request, user)
+
+                    # ✅ Ensure profile exists and redirect by role
+                    profile, _ = Profile.objects.get_or_create(user=user, defaults={'role': 'recipient'})
+                    if profile.role == 'donor':
+                        return redirect('donor')
+                    elif profile.role == 'recipient':
+                        return redirect('recipient')
+                    elif profile.role == 'hospital':
+                        return redirect('hospital')
+                    else:
+                        return redirect('home')
+
+                messages.success(request, 'Password reset successful! You have been logged in.')
+
+            except User.DoesNotExist:
+                messages.error(request, 'Invalid user.')
+
+    return render(request, 'reset_password.html', {'email': email})
+
+
+# logout
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return redirect('login')
+
+#   __________________________________________________________________________________________________________________________
 
 # pages
 
@@ -171,18 +235,6 @@ def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {
         'recipients': recipients
     })
-
-
-# @login_required
-# def hospital_dashboard(request):
-#     hospitals = HospitalDetails.objects.all()  # get all registered hospitals
-#     hospital_count = hospitals.count()  # total hospitals
-
-#     return render(request, 'hospital_dashboard.html', {
-#         'hospitals': hospitals,
-#         'hospital_count': hospital_count
-#     })
-
 
 
 @login_required
@@ -337,41 +389,7 @@ def hospital_details_edit(request):
     return render(request, 'hospital_details_edit.html', {'form': form, 'hospital': hospital})
 
 
-# passwords
-
-def forgot_password(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        try:
-            user = User.objects.get(email=email)
-            # Redirect to reset password page with email as parameter
-            return redirect('reset_password', email=user.email)
-        except User.DoesNotExist:
-            messages.error(request, 'No account found with that email address.')
-    return render(request, 'forgot_password.html')
-
-
-def reset_password(request, email):
-    success = False  # to control message display
-
-    if request.method == 'POST':
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-
-        if password != confirm_password:
-            messages.error(request, 'Passwords do not match.')
-        else:
-            try:
-                user = User.objects.get(email=email)
-                user.set_password(password)
-                user.save()
-                success = True
-                messages.success(request, 'Password reset successful! You can now log in.')
-            except User.DoesNotExist:
-                messages.error(request, 'Invalid user.')
-
-    return render(request, 'reset_password.html', {'email': email, 'success': success})
-
+# ___________________________________________________________________________________________________________________
 
 
 # ✅ Create new donor
@@ -401,35 +419,6 @@ def donor_edit(request, donor_id):
 
 
 
-# logout
-
-@login_required
-def user_logout(request):
-    logout(request)
-    return redirect('login')
-
-
-# users_donor_dashboard
-
-@login_required
-def donor_notifications(request):
-    # temporary sample data (no database needed yet)
-    sample_notifications = [
-        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
-        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
-        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
-    ]
-    
-    return render(request, "donor/notifications.html", {"notifications": sample_notifications})
-
-def donation_history(request):
-    return render(request, 'donor/donation_history.html')
-
-def donor_eligibility_test(request):
-    return render(request, 'donor/donor_eligibility_test.html')
-
-def donor_request_appointment(request):
-    return render(request, 'donor/donor_request_appointment.html')
 
 
 # users recipient dashboard
@@ -471,50 +460,82 @@ def search_blood(request):
     })
 
 
+# users_donor_dashboard
+
 @login_required
-def donor_eligibility_test(request):
+def donor_notifications(request):
+    sample_notifications = [
+        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
+        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
+        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
+    ]
+    
+    return render(request, "donor/notifications.html", {"notifications": sample_notifications})
+
+
+def donation_history(request):
+    return render(request, 'donor/donation_history.html')
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import DonorEligibilityForm
+import datetime
+
+def donor_eligibility_test_form(request):
     if request.method == 'POST':
-        age = int(request.POST.get('age'))
-        weight = int(request.POST.get('weight'))
-        hemoglobin = float(request.POST.get('hemoglobin'))
-        recent_donation = request.POST.get('recent_donation')
-        illness = request.POST.get('illness')
-        medication = request.POST.get('medication')
-        surgery_vaccine = request.POST.get('surgery_vaccine')
+        form = DonorEligibilityForm(request.POST)
+        if form.is_valid():
+            test = form.save(commit=False)
+            if request.user.is_authenticated:
+                test.user = request.user
 
-        # Logic
-        if age < 18 or age > 60:
-            result = "Not Eligible: Age must be between 18 and 60."
-            is_eligible = False
-        elif weight < 50:
-            result = "Not Eligible: Weight must be at least 50 kg."
-            is_eligible = False
-        elif hemoglobin < 12.5:
-            result = "Not Eligible: Hemoglobin level is too low."
-            is_eligible = False
-        elif recent_donation == "yes" or illness == "yes" or medication == "yes" or surgery_vaccine == "yes":
-            result = "Not Eligible: Health conditions do not permit donation currently."
-            is_eligible = False
-        else:
-            result = "Eligible: You can donate blood!"
-            is_eligible = True
+            gender = form.cleaned_data.get('gender')
+            age = form.cleaned_data.get('age')
+            weight = form.cleaned_data.get('weight')
+            hemoglobin = form.cleaned_data.get('hemoglobin_level')
+            last_date = form.cleaned_data.get('last_donation_date')
+            has_disease = form.cleaned_data.get('has_disease')
+            on_medication = form.cleaned_data.get('on_medication')
+            had_surgery_recently = form.cleaned_data.get('had_surgery_recently')
 
-        # Save to session and donor profile
-        request.session['eligibility_result'] = result
+            # Eligibility logic
+            passed = True
+            if age < 18 or age > 60:
+                passed = False
+            if weight < 50:
+                passed = False
+            if hemoglobin < 12.5:
+                passed = False
+            if has_disease or on_medication or had_surgery_recently:
+                passed = False
 
-        donor = DonorDetails.objects.filter(user=request.user).first()
-        if donor:
-            donor.is_eligible = is_eligible
-            donor.save()
+            # Gender-based last donation gap
+            if last_date:
+                days_since = (datetime.date.today() - last_date).days
+                if gender == 'Male' and days_since < 90:
+                    passed = False
+                elif gender == 'Female' and days_since < 120:
+                    passed = False
 
-        return redirect('eligibility_result')
+            test.passed = passed
+            test.save()
 
-    return render(request, 'donor/donor_eligibility_test.html')
+            if passed:
+                messages.success(request, "✅ You are eligible to donate blood!")
+                return redirect('appointment_form')  # change if your next view is different
+            else:
+                messages.warning(request, "❌ You are not eligible to donate blood at this time.")
+                return redirect('donor_eligibility_test_form')
+    else:
+        form = DonorEligibilityForm()
+
+    return render(request, 'donor/donor_eligibility_test_form.html', {'form': form})
+
 
 
 @login_required
-def eligibility_result(request):
-    result = request.session.get('eligibility_result', None)
+def donor_eligibility_result(request):
+    result = request.session.get('donor_eligibility_result', None)
     donor = get_object_or_404(DonorDetails, user=request.user)
 
     # ✅ If eligible, update status
@@ -525,9 +546,7 @@ def eligibility_result(request):
         donor.is_eligible = False
         donor.save()
 
-    return render(request, 'donor/eligibility_result.html', {'result': result})
-
-
+    return render(request, 'donor/donor_eligibility_result.html', {'result': result})
 
 
 @login_required
@@ -536,7 +555,7 @@ def donor_request_appointment(request):
 
     if not donor.is_eligible:
         messages.warning(request, "You must pass the eligibility test before requesting an appointment.")
-        return redirect('donor_eligibility_test')
+        return redirect('donor_eligibility_test_form')
 
     if request.method == 'POST':
         form = DonorRequestAppointmentForm(request.POST)
@@ -553,7 +572,7 @@ def donor_request_appointment(request):
 
 
 
-def donor_appointment_form(request):
+def donor_request_appointment_form(request):
     if request.method == 'POST':
         form = DonorRequestAppointmentForm(request.POST)
         if form.is_valid():
@@ -562,5 +581,5 @@ def donor_appointment_form(request):
     else:
         form = DonorRequestAppointmentForm()  # ✅ must be created here
 
-    return render(request, 'donor/donor_appointment_form.html', {'form': form})
+    return render(request, 'donor/donor_request_appointment_form.html', {'form': form})
 

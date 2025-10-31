@@ -6,7 +6,7 @@
 {% block content %}
 <div class="donor-dashboard">
 
-    <!-- Top Navigation -->
+    <!-- 🔹 Top Navigation -->
     <div class="top-bar">
         <h1>{{ donor.name }}</h1>
         <div class="icon-container">
@@ -21,44 +21,31 @@
                 {% endif %}
             </a>
 
-            <!-- 🔹 Logout Button -->
             <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- 🔹 Main Content -->
     <div class="content-area">
         <div class="donor-actions">
 
-            <!-- Donation History -->
+            <!-- 🩸 Donation History -->
             <a href="{% url 'donation_history' %}" class="action-card red">
                 <i class="fa-solid fa-droplet"></i>
                 <span>Donation History</span>
             </a>
 
-            <!-- Eligibility Test -->
-            <a href="{% url 'donor_eligibility_test' %}" class="action-card light">
-                <i class="fa-solid fa-vial"></i>
-                <span>Eligibility Test</span>
+            <!-- 📅 Request Appointment -->
+            <a href="{% url 'donor_request_appointment' %}" class="action-card dark">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Request Appointment</span>
             </a>
 
-            <!-- Request Appointment (Locked if Not Eligible) -->
-            {% if request.session.eligibility_result and "Eligible" in request.session.eligibility_result %}
-                <a href="{% url 'donor_request_appointment' %}" class="action-card dark">
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <span>Request Appointment</span>
-                </a>
-            {% else %}
-                <div class="action-card dark" style="opacity:0.5; cursor:not-allowed;">
-                    <i class="fa-solid fa-lock"></i>
-                    <span>Request Appointment (Locked)</span>
-                </div>
-            {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Styles -->
+<!-- 🎨 Styles -->
 <style>
 body {
     margin: 0;
@@ -97,8 +84,11 @@ body {
 }
 .icon-btn:hover { color: #b30000; }
 .profile-img {
-    width: 50px; height: 50px; border-radius: 50%;
-    border: 2px solid #b30000; object-fit: cover;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #b30000;
+    object-fit: cover;
 }
 .logout-btn {
     background-color: #b30000;
@@ -114,7 +104,10 @@ body {
     background-color: #d11a1a;
 }
 .content-area {
-    width: 100%; max-width: 1000px; display: flex; justify-content: center;
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    justify-content: center;
 }
 .donor-actions {
     display: grid;
@@ -129,14 +122,31 @@ body {
     text-align: center;
     font-weight: 500;
     transition: transform 0.3s, box-shadow 0.3s;
-    display: flex; flex-direction: column; align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-.action-card i { font-size: 36px; margin-bottom: 15px; }
-.action-card span { font-size: 18px; }
-.action-card.red { background: linear-gradient(135deg, #b30000, #e60000); color: white; }
-.action-card.dark { background: linear-gradient(135deg, #444, #222); color: white; }
-.action-card.light { background: linear-gradient(135deg, #f1f1f1, #ddd); color: #333; }
-.action-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+.action-card i {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+.action-card span {
+    font-size: 18px;
+    margin-bottom: 15px;
+    display: block;
+}
+.action-card.red {
+    background: linear-gradient(135deg, #b30000, #e60000);
+    color: white;
+}
+.action-card.dark {
+    background: linear-gradient(135deg, #444, #222);
+    color: white;
+}
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">

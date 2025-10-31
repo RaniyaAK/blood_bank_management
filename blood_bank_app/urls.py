@@ -23,12 +23,13 @@ urlpatterns = [
     path('donor_registration_form/', views.donor_details_form, name='donor_details_form'),
     path('donor/details_edit/', views.donor_details_edit, name='donor_edit'),
     path('donor/notifications/', views.donor_notifications, name='donor_notifications'),
+
     path('donor/donation_history/', views.donation_history, name='donation_history'),
-    path('donor/eligibility_test/', views.donor_eligibility_test, name='donor_eligibility_test'),
-    path('donor/request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
-    path('eligibility_result/', views.eligibility_result, name='eligibility_result'),
-    path('donor_request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
-    path('donor/donor_appointment_form/', views.donor_appointment_form, name='donor_appointment_form'),
+
+    path('donor/donor_request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
+    path('donor/donor_request_appointment_form/', views.donor_request_appointment_form, name='donor_request_appointment_form'),
+    path('donor/donor_eligibility_test_form/', views.donor_eligibility_test_form, name='donor_eligibility_test_form'),
+    path('donor/donor_eligibility_result/', views.donor_eligibility_result, name='donor_eligibility_result'),
 
 
 

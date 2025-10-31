@@ -5,15 +5,14 @@ from .models import DonorRequestAppointment
 
 
 class UserForm(forms.ModelForm):
-    first_name = forms.CharField(widget=forms.TextInput)
-    last_name = forms.CharField(widget=forms.TextInput)
+    name = forms.CharField(widget=forms.TextInput)
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     role = forms.ChoiceField(choices=Profile.ROLE_CHOICES)
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'password']
+        fields = ['name', 'username', 'email', 'password']
         help_texts = {'username': None}
 
     def clean(self):
@@ -94,4 +93,25 @@ class DonorRequestAppointmentForm(forms.ModelForm):
             'preferred_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'hospital': forms.TextInput(attrs={'class': 'form-control'}),
             'additional_notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+        }
+
+
+from django import forms
+from .models import DonorEligibilityTestForm
+
+class DonorEligibilityForm(forms.ModelForm):
+    class Meta:
+        model = DonorEligibilityTestForm
+        fields = [
+            'gender',
+            'age',
+            'weight',
+            'hemoglobin_level',
+            'last_donation_date',
+            'has_disease',
+            'on_medication',
+            'had_surgery_recently',
+        ]
+        widgets = {
+            'last_donation_date': forms.DateInput(attrs={'type': 'date'}),
         }
