@@ -480,6 +480,19 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import DonorEligibilityForm
 import datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+import datetime
+from .models import DonorDetails
+from .forms import DonorEligibilityForm
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .forms import DonorEligibilityForm
+from .models import DonorDetails
+import datetime
+
 
 def donor_eligibility_test_form(request):
     if request.method == 'POST':
@@ -498,55 +511,76 @@ def donor_eligibility_test_form(request):
             on_medication = form.cleaned_data.get('on_medication')
             had_surgery_recently = form.cleaned_data.get('had_surgery_recently')
 
-            # Eligibility logic
             passed = True
+            reasons = []
+
             if age < 18 or age > 60:
                 passed = False
+                reasons.append("Age must be between 18 and 60 years.")
+
             if weight < 50:
                 passed = False
+                reasons.append("Weight must be at least 50 kg.")
+
             if hemoglobin < 12.5:
                 passed = False
-            if has_disease or on_medication or had_surgery_recently:
-                passed = False
+                reasons.append("Hemoglobin level must be 12.5 g/dL or higher.")
 
-            # Gender-based last donation gap
+            if has_disease:
+                passed = False
+                reasons.append("You have reported a disease condition.")
+
+            if on_medication:
+                passed = False
+                reasons.append("You are currently on medication.")
+
+            if had_surgery_recently:
+                passed = False
+                reasons.append("You have had surgery recently.")
+
             if last_date:
                 days_since = (datetime.date.today() - last_date).days
                 if gender == 'Male' and days_since < 90:
                     passed = False
+                    reasons.append("Males must wait at least 90 days after their last donation.")
                 elif gender == 'Female' and days_since < 120:
                     passed = False
+                    reasons.append("Females must wait at least 120 days after their last donation.")
 
             test.passed = passed
             test.save()
 
-            if passed:
-                messages.success(request, "✅ You are eligible to donate blood!")
-                return redirect('appointment_form')  # change if your next view is different
-            else:
-                messages.warning(request, "❌ You are not eligible to donate blood at this time.")
-                return redirect('donor_eligibility_test_form')
+            # ✅ Store result and reasons in session
+            request.session['donor_eligibility_result'] = {
+                'status': 'Eligible' if passed else 'Not Eligible',
+                'reasons': reasons
+            }
+
+            return redirect('donor_eligibility_result')
     else:
         form = DonorEligibilityForm()
 
     return render(request, 'donor/donor_eligibility_test_form.html', {'form': form})
 
 
-
-@login_required
 def donor_eligibility_result(request):
-    result = request.session.get('donor_eligibility_result', None)
+    result_data = request.session.get('donor_eligibility_result', None)
     donor = get_object_or_404(DonorDetails, user=request.user)
 
-    # ✅ If eligible, update status
-    if result and 'Eligible' in result and 'Not Eligible' not in result:
-        donor.is_eligible = True
-        donor.save()
-    else:
-        donor.is_eligible = False
-        donor.save()
+    if not result_data:
+        messages.warning(request, "Please take the eligibility test first.")
+        return redirect('donor_eligibility_test_form')
 
-    return render(request, 'donor/donor_eligibility_result.html', {'result': result})
+    passed = result_data['status'] == 'Eligible'
+
+    donor.is_eligible = passed
+    donor.save()
+
+    return render(request, 'donor/donor_eligibility_result.html', {
+        'status': result_data['status'],
+        'reasons': result_data['reasons']
+    })
+
 
 
 @login_required
