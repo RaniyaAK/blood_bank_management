@@ -8,17 +8,22 @@
     {% if not donor.is_eligible %}
         <!-- ❌ Donor is not eligible yet -->
         <div class="alert-box">
+            <i class="fas fa-triangle-exclamation warning-icon"></i>
             <p>To request a donation appointment, you must first pass the eligibility test.</p>
-            <a href="{% url 'donor_eligibility_test_form' %}" class="btn-test">Take Eligibility Test</a>
+            <a href="{% url 'donor_eligibility_test_form' %}" class="btn-test">
+                <i class="fas fa-heart-pulse"></i> Take Eligibility Test
+            </a>
         </div>
     {% else %}
         <!-- ✅ Donor is eligible: show appointment form -->
         <div class="form-box">
-            <h2>Book Your Appointment</h2>
+            <h2><i class="fas fa-calendar-check"></i> Book Your Appointment</h2>
             <form method="POST">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="btn-submit">Submit Request</button>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-paper-plane"></i> Submit Request
+                </button>
             </form>
         </div>
     {% endif %}
@@ -26,19 +31,23 @@
 
 <style>
 .main-content {
-    margin-left: 220px;
-    padding: 140px 40px 40px;
+    min-height: 100vh; /* full screen height */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: center; /* vertical center */
+    align-items: center;     /* horizontal center */
     text-align: center;
+    padding: 40px;
+    margin: 0; /* remove left margin */
 }
 
 h1 {
     color: #8B0000;
     margin-bottom: 20px;
+    font-family: 'Poppins', sans-serif;
 }
 
+/* Alert + Form boxes */
 .alert-box, .form-box {
     background-color: #f9f9f9;
     padding: 30px;
@@ -46,22 +55,40 @@ h1 {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     width: 100%;
     max-width: 500px;
+    margin-bottom: 30px;
 }
 
+/* Warning Icon */
+.warning-icon {
+    color: #e60000;
+    font-size: 2.5rem;
+    display: block;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Text */
 .alert-box p {
     color: #a11a1a;
     margin-bottom: 20px;
     font-weight: 500;
+    font-size: 1.05rem;
 }
 
+/* Buttons */
 .btn-test, .btn-submit {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     background-color: #8B0000;
     color: white;
     padding: 10px 20px;
     border-radius: 8px;
     text-decoration: none;
     transition: 0.3s;
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 .btn-test:hover { background-color: #a51a1a; }
@@ -72,5 +99,27 @@ h1 {
     cursor: pointer;
 }
 .btn-submit:hover { background-color: #0f4d0f; }
+
+/* Form */
+.form-box h2 {
+    color: #146b14;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+form input, form select, form textarea {
+    width: 100%;
+    padding: 12px 18px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+form input:focus, form select:focus, form textarea:focus {
+    border-color: #8B0000;
+    box-shadow: 0 0 6px rgba(139, 0, 0, 0.2);
+}
 </style>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
