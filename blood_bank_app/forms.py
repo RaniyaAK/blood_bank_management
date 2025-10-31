@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
 from .models import DonorRequestAppointment
-
+from .models import DonorEligibilityTestForm
 
 class UserForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput)
@@ -87,17 +87,11 @@ class HospitalDetailsForm(forms.ModelForm):
 class DonorRequestAppointmentForm(forms.ModelForm):
     class Meta:
         model = DonorRequestAppointment
-        fields = ['preferred_date', 'preferred_time', 'hospital', 'additional_notes']
+        fields = ['preferred_date', 'preferred_time']
         widgets = {
             'preferred_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'preferred_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
-            'hospital': forms.TextInput(attrs={'class': 'form-control'}),
-            'additional_notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
-
-
-from django import forms
-from .models import DonorEligibilityTestForm
 
 class DonorEligibilityForm(forms.ModelForm):
     class Meta:

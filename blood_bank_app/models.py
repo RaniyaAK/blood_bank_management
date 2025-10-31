@@ -95,8 +95,6 @@ class DonorRequestAppointment(models.Model):
     donor = models.ForeignKey(User, on_delete=models.CASCADE)
     preferred_date = models.DateField()
     preferred_time = models.TimeField()
-    hospital = models.CharField(max_length=150)
-    additional_notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
