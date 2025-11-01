@@ -202,18 +202,24 @@ def donor(request):
 
 # --- Dashboards ---
 
+from .models import Profile, DonorDetails, RecipientDetails, BloodStock
+
 @login_required
 def admin_dashboard(request):
-    donors_count = DonorDetails.objects.count()
-    recipients_count = RecipientDetails.objects.count()
+    donors_count = Profile.objects.filter(role='donor').count()
+    recipients_count = Profile.objects.filter(role='recipient').count()
+    hospitals_count = Profile.objects.filter(role='hospital').count()
     blood_units_count = BloodStock.objects.aggregate(total_units=Sum('unit'))['total_units'] or 0
 
     context = {
         'donors_count': donors_count,
         'recipients_count': recipients_count,
+        'hospitals_count': hospitals_count,
         'blood_units_count': blood_units_count,
     }
     return render(request, 'admin_dashboard.html', context)
+
+
 
 
 

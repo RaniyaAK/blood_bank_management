@@ -93,7 +93,6 @@ class DonorRequestAppointmentForm(forms.ModelForm):
             'preferred_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'preferred_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         }
-
 class DonorEligibilityForm(forms.ModelForm):
     class Meta:
         model = DonorEligibilityTestForm
@@ -108,10 +107,21 @@ class DonorEligibilityForm(forms.ModelForm):
             'had_surgery_recently',
         ]
         widgets = {
-            'last_donation_date': forms.DateInput(attrs={'type': 'date'}),
-            'dob': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'dob': forms.DateInput(
+                attrs={'type': 'date', 'class': 'form-control'},
+                format='%Y-%m-%d'  # ✅ tell Django the format
+            ),
+            'last_donation_date': forms.DateInput(
+                attrs={'type': 'date', 'class': 'form-control'},
+                format='%Y-%m-%d'
+            ),
             'weight': forms.NumberInput(attrs={'min': 40, 'max': 150, 'class': 'form-control', 'placeholder': 'Weight in kg'}),
             'hemoglobin_level': forms.NumberInput(attrs={'step': '0.1', 'class': 'form-control', 'placeholder': 'Hemoglobin in g/dL'}),
-            'last_donation_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'gender': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(DonorEligibilityForm, self).__init__(*args, **kwargs)
+        # ✅ accept browser-submitted date format
+        self.fields['dob'].input_formats = ['%Y-%m-%d']
+        self.fields['last_donation_date'].input_formats = ['%Y-%m-%d']
