@@ -1,93 +1,153 @@
 {% extends 'master.html' %}
 {% load static %}
 
-{% block title %}Donor Eligibility Test Form{% endblock %}
+{% block title %}Donor Eligibility Test{% endblock %}
 
 {% block content %}
 <style>
-    .eligibility-container {
-        max-width: 600px;
-        margin: 50px auto;
-        background: #fff;
-        padding: 30px 40px;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    body {
+        background: #f8fafc;
         font-family: "Poppins", sans-serif;
+    }
+
+    .eligibility-container {
+        max-width: 650px;
+        margin: 120px auto 80px; /* ✅ more top margin to make it fully visible */
+        background: #ffffff;
+        padding: 45px 50px;
+        border-radius: 16px;
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+        border-top: 5px solid #dc2626;
     }
 
     h2 {
         text-align: center;
-        color: #c1121f;
-        margin-bottom: 20px;
-    }
-
-    form label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 600;
-        color: #333;
-    }
-
-    form input, form select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 15px;
-    }
-
-    form input[type="checkbox"] {
-        width: auto;
-        margin-right: 8px;
-    }
-
-    .submit-btn {
-        background-color: #c1121f;
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        width: 100%;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .submit-btn:hover {
-        background-color: #a00f1a;
+        color: #b91c1c;
+        font-weight: 700;
+        font-size: 24px;
+        margin-bottom: 10px;
     }
 
     .note {
         text-align: center;
-        color: #666;
-        font-size: 14px;
-        margin-bottom: 10px;
+        color: #6b7280;
+        font-size: 15px;
+        margin-bottom: 30px;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #374151;
+        font-size: 15px;
+    }
+
+    form input,
+    form select {
+        width: 100%;
+        padding: 12px 14px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        background-color: #f9fafb;
+        font-size: 15px;
+        transition: all 0.25s ease;
+    }
+
+    form input:focus,
+    form select:focus {
+        border-color: #dc2626;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        outline: none;
+    }
+
+    /* Checkbox Section */
+    .section-title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #374151;
+        margin: 25px 0 12px;
+        border-bottom: 2px solid #f3f4f6;
+        padding-bottom: 5px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        background: #f9fafb;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+
+    .checkbox-item:hover {
+        background: #f1f5f9;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        accent-color: #dc2626;
+    }
+
+    .checkbox-item label {
+        margin: 0;
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    .submit-btn {
+        width: 100%;
+        background-color: #dc2626;
+        color: white;
+        border: none;
+        padding: 14px 0;
+        border-radius: 10px;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.25s;
+    }
+
+    .submit-btn:hover {
+        background-color: #b91c1c;
     }
 
     .message {
         text-align: center;
-        font-weight: bold;
-        padding: 10px;
+        font-weight: 600;
         border-radius: 8px;
-        margin-bottom: 10px;
+        padding: 10px;
+        margin-bottom: 15px;
     }
 
     .message.success {
-        background: #e6ffe6;
-        color: #007700;
+        background: #ecfdf5;
+        color: #047857;
     }
 
     .message.fail {
-        background: #ffe6e6;
-        color: #990000;
+        background: #fef2f2;
+        color: #b91c1c;
     }
 </style>
 
 <div class="eligibility-container">
-    <h2>🩸 Donor Eligibility Test</h2>
-    <p class="note">Fill in the details to check if you're eligible to donate blood.</p>
+    <h2>Donor Eligibility Test</h2>
+    <p class="note">Please fill in your details to check if you’re eligible to donate blood.</p>
 
     {% if messages %}
         {% for message in messages %}
@@ -99,14 +159,23 @@
 
     <form method="POST">
         {% csrf_token %}
-        {{ form.gender.label_tag }} {{ form.gender }}
-        {{ form.age.label_tag }} {{ form.age }}
-        {{ form.weight.label_tag }} {{ form.weight }}
-        {{ form.hemoglobin_level.label_tag }} {{ form.hemoglobin_level }}
-        {{ form.last_donation_date.label_tag }} {{ form.last_donation_date }}
-        {{ form.has_disease.label_tag }} {{ form.has_disease }}
-        {{ form.on_medication.label_tag }} {{ form.on_medication }}
-        {{ form.had_surgery_recently.label_tag }} {{ form.had_surgery_recently }}
+        <label>{{ form.gender.label }}</label> {{ form.gender }}
+        <label>{{ form.dob.label }}</label> {{ form.dob }}
+        <label>{{ form.hemoglobin_level.label }}</label> {{ form.hemoglobin_level }}
+        <label>{{ form.last_donation_date.label }}</label> {{ form.last_donation_date }}
+
+        <div class="section-title">Health Information</div>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                {{ form.has_disease }} <label for="{{ form.has_disease.id_for_label }}">{{ form.has_disease.label }}</label>
+            </div>
+            <div class="checkbox-item">
+                {{ form.on_medication }} <label for="{{ form.on_medication.id_for_label }}">{{ form.on_medication.label }}</label>
+            </div>
+            <div class="checkbox-item">
+                {{ form.had_surgery_recently }} <label for="{{ form.had_surgery_recently.id_for_label }}">{{ form.had_surgery_recently.label }}</label>
+            </div>
+        </div>
 
         <button type="submit" class="submit-btn">Submit</button>
     </form>

@@ -42,16 +42,17 @@ class BloodStockForm(forms.ModelForm):
 class DonorDetailsForm(forms.ModelForm):
     class Meta:
         model = DonorDetails
-        fields = ['name', 'gender', 'address', 'phonenumber', 'dob', 'bloodgroup', 'weight', 'photo']
+        fields = ['name', 'address','email' ,'phonenumber', 'age', 'bloodgroup', 'photo']
         widgets = {
-            'dob': forms.DateInput(attrs={'type': 'date'}),
-            'weight': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Weight in kg'}),
+            'age': forms.NumberInput(attrs={'min': 18, 'max': 65, 'placeholder': 'Enter your age'}),
             'address': forms.Textarea(attrs={'rows': 3}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
+
         }
         labels = {
-            'weight': 'Weight (kg)',
             'phonenumber': 'Phone Number'
         }
+        
 
 
 class RecipientDetailsForm(forms.ModelForm):
@@ -98,7 +99,7 @@ class DonorEligibilityForm(forms.ModelForm):
         model = DonorEligibilityTestForm
         fields = [
             'gender',
-            'age',
+            'dob',
             'weight',
             'hemoglobin_level',
             'last_donation_date',
@@ -108,4 +109,9 @@ class DonorEligibilityForm(forms.ModelForm):
         ]
         widgets = {
             'last_donation_date': forms.DateInput(attrs={'type': 'date'}),
+            'dob': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'weight': forms.NumberInput(attrs={'min': 40, 'max': 150, 'class': 'form-control', 'placeholder': 'Weight in kg'}),
+            'hemoglobin_level': forms.NumberInput(attrs={'step': '0.1', 'class': 'form-control', 'placeholder': 'Hemoglobin in g/dL'}),
+            'last_donation_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'gender': forms.Select(attrs={'class': 'form-control'}),
         }

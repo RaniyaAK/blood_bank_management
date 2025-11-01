@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout,login as auth_login
 from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, UserForm
 from .models import Profile
@@ -15,9 +15,10 @@ from .forms import HospitalDetailsForm
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from .forms import DonorRequestAppointmentForm
-from django.contrib.auth import authenticate, login as auth_login
-from django.shortcuts import render, redirect
 import datetime
+from .forms import DonorEligibilityForm
+from .models import DonorDetails
+from datetime import date
 
 
 def home(request):
@@ -476,22 +477,10 @@ def donor_notifications(request):
 def donation_history(request):
     return render(request, 'donor/donation_history.html')
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import DonorEligibilityForm
-import datetime
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-import datetime
-from .models import DonorDetails
-from .forms import DonorEligibilityForm
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .forms import DonorEligibilityForm
-from .models import DonorDetails
-import datetime
+def calculate_age(dob):
+    today = date.today()
+    return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
 
 def donor_eligibility_test_form(request):
@@ -503,7 +492,8 @@ def donor_eligibility_test_form(request):
                 test.user = request.user
 
             gender = form.cleaned_data.get('gender')
-            age = form.cleaned_data.get('age')
+            dob = form.cleaned_data.get('dob')
+            age = calculate_age(dob)
             weight = form.cleaned_data.get('weight')
             hemoglobin = form.cleaned_data.get('hemoglobin_level')
             last_date = form.cleaned_data.get('last_donation_date')
@@ -514,9 +504,10 @@ def donor_eligibility_test_form(request):
             passed = True
             reasons = []
 
+            # ✅ Eligibility logic
             if age < 18 or age > 60:
                 passed = False
-                reasons.append("Age must be between 18 and 60 years.")
+                reasons.append("You must be between 18 and 60 years old to donate blood.")
 
             if weight < 50:
                 passed = False
@@ -550,7 +541,7 @@ def donor_eligibility_test_form(request):
             test.passed = passed
             test.save()
 
-            # ✅ Store result and reasons in session
+            # ✅ Store result
             request.session['donor_eligibility_result'] = {
                 'status': 'Eligible' if passed else 'Not Eligible',
                 'reasons': reasons
@@ -603,7 +594,6 @@ def donor_request_appointment(request):
         form = DonorRequestAppointmentForm()
 
     return render(request, 'donor/donor_request_appointment.html', {'form': form})
-
 
 
 def donor_request_appointment_form(request):

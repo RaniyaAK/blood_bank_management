@@ -60,15 +60,13 @@ class HospitalDetails(models.Model):
 class DonorDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
-    gender = models.CharField(max_length=10)
-    dob = models.DateField()
+    email = models.EmailField(unique=True, null=True, blank=True)   
     phonenumber = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
     address = models.TextField()
-    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    age = models.PositiveIntegerField(null=True, blank=True) 
     bloodgroup = models.CharField(max_length=5)
     photo = models.ImageField(upload_to='donor_photos/')
     
-    # 🩸 New field to store eligibility
     is_eligible = models.BooleanField(default=False)
 
     def __str__(self):
@@ -113,7 +111,7 @@ class DonorEligibilityTestForm(models.Model):
     )
 
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    age = models.PositiveIntegerField(help_text="Age must be between 18 and 60 years.")
+    dob = models.DateField(verbose_name="Date of Birth")
     weight = models.FloatField(help_text="Weight must be at least 50 kg.")
     hemoglobin_level = models.FloatField(help_text="Hemoglobin level in g/dL.")
     last_donation_date = models.DateField(null=True, blank=True, help_text="Leave blank if this is your first donation.")
