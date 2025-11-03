@@ -12,13 +12,13 @@ from .models import DonorDetails, RecipientDetails, Profile, BloodStock,Hospital
 from .forms import RecipientDetailsForm
 from .forms import DonorDetailsForm
 from .forms import HospitalDetailsForm
-from django.contrib.auth.models import User
 from django.db.models import Sum
 from .forms import DonorRequestAppointmentForm
 import datetime
 from .forms import DonorEligibilityForm
 from .models import DonorDetails
 from datetime import date
+from .forms import RecipientBloodRequestForm
 
 
 def home(request):
@@ -628,3 +628,19 @@ def donor_request_appointment_form(request):
         'form': form,
         'donor': donor
     })
+
+
+
+def recipient_blood_request(request):
+    if request.method == 'POST':
+        form = RecipientBloodRequestForm(request.POST)
+        if form.is_valid():
+            blood_request = form.save(commit=False)
+            blood_request.recipient = request.user
+            blood_request.save()
+            messages.success(request, "Blood request submitted successfully!")
+            return redirect('recipient_dashboard')  # ✅ Best UX flow
+    else:
+        form = RecipientBloodRequestForm()
+
+    return render(request, 'recipient/recipient_blood_request.html', {'form': form})

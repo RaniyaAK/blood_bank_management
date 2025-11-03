@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
 from .models import DonorRequestAppointment, DonorEligibilityTestForm
+from .models import RecipientBloodRequestForm
 
 
 class UserForm(forms.ModelForm):
@@ -58,10 +59,9 @@ class DonorDetailsForm(forms.ModelForm):
 class RecipientDetailsForm(forms.ModelForm):
     class Meta:
         model = RecipientDetails
-        fields = ['name', 'address','email', 'phonenumber', 'gender', 'dob', 'bloodgroup', 'weight', 'photo']
+        fields = ['name', 'address','email', 'phonenumber', 'gender', 'dob', 'bloodgroup', 'photo']
         widgets = {
             'dob': forms.DateInput(attrs={'type': 'date'}),
-            'weight': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Weight in kg'}),
             'address': forms.Textarea(attrs={'rows': 3}),
             'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
 
@@ -140,3 +140,53 @@ class DonorEligibilityForm(forms.ModelForm):
         super(DonorEligibilityForm, self).__init__(*args, **kwargs)
         self.fields['dob'].input_formats = ['%Y-%m-%d']
         self.fields['last_donation_date'].input_formats = ['%Y-%m-%d']
+
+
+class RecipientBloodRequestForm(forms.ModelForm):
+    class Meta:
+        model = RecipientBloodRequestForm
+        fields = ['blood_group', 'units', 'required_date', 'urgency', 'reason']
+
+        widgets = {
+            'blood_group': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+            'units': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1,
+                'placeholder': 'Enter number of units needed',
+            }),
+            'required_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
+            'urgency': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+            'reason': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Describe the reason for the blood request...',
+            }),
+        }
+
+        labels = {
+            'blood_group': 'Blood Group',
+            'units': 'Number of Units',
+            'required_date': 'Required Date',
+            'urgency': 'Urgency Level',
+            'reason': 'Reason for Request',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # ⛔ Prevent choosing past dates in browser
+        if 'required_date' in self.fields:
+            self.fields['required_date'].widget.attrs['min'] = date.today().isoformat()
+
+    def clean_required_date(self):
+        required_date = self.cleaned_data.get('required_date')
+        if required_date and required_date < date.today():
+            raise ValidationError("You cannot select a past date.")
+        return required_date
+
