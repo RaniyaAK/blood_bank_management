@@ -347,7 +347,7 @@ def hospital_details_form(request):
     else:
         form = HospitalDetailsForm()
 
-    return render(request, 'hospital_details_form.html', {'form': form})
+    return render(request, 'hospital/hospital_details_form.html', {'form': form})
 
 
 
@@ -400,7 +400,7 @@ def hospital_details_edit(request):
     else:
         form = HospitalDetailsForm(instance=hospital)
 
-    return render(request, 'hospital_details_edit.html', {'form': form, 'hospital': hospital})
+    return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
 
 
 # ___________________________________________________________________________________________________________________
@@ -430,9 +430,6 @@ def donor_edit(request, donor_id):
     else:
         form = DonorDetailsForm(instance=donor)
     return render(request, 'edit_donor.html', {'form': form, 'donor': donor})
-
-
-
 
 
 # users recipient dashboard

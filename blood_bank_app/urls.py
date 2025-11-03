@@ -10,15 +10,23 @@ urlpatterns = [
     path('register/',views.register,name='register'),
     path('logout/', views.user_logout, name='logout'),
 
+
+# dashboard
     path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
     path('dashboard/hospital_dashboard/', views.hospital_dashboard, name='hospital_dashboard'),
     path('dashboard/donor_dashboard/', views.donor_dashboard, name='donor_dashboard'),
     path('dashboard/recipient_dashboard/', views.recipient_dashboard, name='recipient_dashboard'),
 
+
+
+# hospital
     path('hospital/', views.hospital, name='hospital'),
     path('hospital_registration_form/', views.hospital_details_form, name='hospital_details_form'),
     path('hospital/details_edit/', views.hospital_details_edit, name='hospital_edit'),
 
+
+
+# donor
     path('donor/', views.donor, name='donor'),
     path('donor_registration_form/', views.donor_details_form, name='donor_details_form'),
     path('donor/details_edit/', views.donor_details_edit, name='donor_edit'),
@@ -33,6 +41,7 @@ urlpatterns = [
 
 
 
+# recipient
     path('recipient/', views.recipient, name='recipient'),
 
     path('recipient_registration_form/', views.recipient_details_form, name='recipient_details_form'),
@@ -46,16 +55,15 @@ urlpatterns = [
 
     path('dashboard/blood_stock/', views.blood_stock_dashboard, name='blood_stock_dashboard'),
     path('dashboard/add_blood/', views.add_blood, name='add_blood'),
-    
+
+
+
+# passwords
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('reset_password/<str:email>/', views.reset_password, name='reset_password'),
 
     path('donor/add/', views.donor_create, name='donor_add'),
     path('donor/edit/<int:donor_id>/', views.donor_edit, name='donor_edit'),
-
-    
-
-
 
 ]
 
