@@ -58,7 +58,7 @@ class DonorDetailsForm(forms.ModelForm):
 class RecipientDetailsForm(forms.ModelForm):
     class Meta:
         model = RecipientDetails
-        fields = ['name', 'gender', 'address', 'phonenumber', 'dob', 'bloodgroup', 'weight', 'photo']
+        fields = ['name', 'address', 'phonenumber', 'gender', 'dob', 'bloodgroup', 'weight', 'photo']
         widgets = {
             'dob': forms.DateInput(attrs={'type': 'date'}),
             'weight': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Weight in kg'}),
