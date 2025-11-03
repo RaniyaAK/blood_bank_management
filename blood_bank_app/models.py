@@ -77,10 +77,11 @@ class DonorDetails(models.Model):
 class RecipientDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
+    phonenumber = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
+    email = models.EmailField(unique=True, null=True, blank=True)   
+    address = models.TextField()
     gender = models.CharField(max_length=10)
     dob = models.DateField()
-    phonenumber = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
-    address = models.TextField()
     weight = models.DecimalField(max_digits=5, decimal_places=2)
     bloodgroup = models.CharField(max_length=5)
     photo = models.ImageField(upload_to='recipient_photos/')

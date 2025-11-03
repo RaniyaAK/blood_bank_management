@@ -34,11 +34,13 @@ urlpatterns = [
 
 
     path('recipient/', views.recipient, name='recipient'),
+
     path('recipient_registration_form/', views.recipient_details_form, name='recipient_details_form'),
     path('recipient/details_edit/', views.recipient_details_edit, name='recipient_edit'),
     path('recipient/notifications/', views.recipient_notifications, name='recipient_notifications'),
-    path('recipient/recipient_blood_request_form/', views.recipient_blood_request_form, name='recipient_blood_request_form'),
+
     path('recipient/received_history/', views.received_history, name='received_history'),
+    path('recipient/recipient_blood_request_form/', views.recipient_blood_request_form, name='recipient_blood_request_form'),
     path('recipient/search_blood/', views.search_blood, name='search_blood'),
 
 

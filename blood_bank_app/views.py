@@ -326,7 +326,7 @@ def recipient_details_form(request):
     else:
         form = RecipientDetailsForm()
 
-    return render(request, 'recipient_details_form.html', {'form': form})
+    return render(request, 'recipient/recipient_details_form.html', {'form': form})
 
 
 @login_required
@@ -367,7 +367,7 @@ def recipient_details_edit(request):
     else:
         form = RecipientDetailsForm(instance=recipient)
 
-    return render(request, 'recipient_details_edit.html', {'form': form, 'recipient': recipient})
+    return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
 
 
 @login_required

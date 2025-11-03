@@ -51,22 +51,24 @@ class DonorDetailsForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
         }
         labels = {
-            'phonenumber': 'Phone Number'
+            'phonenumber': 'Contact Number'
         }
 
 
 class RecipientDetailsForm(forms.ModelForm):
     class Meta:
         model = RecipientDetails
-        fields = ['name', 'address', 'phonenumber', 'gender', 'dob', 'bloodgroup', 'weight', 'photo']
+        fields = ['name', 'address','email', 'phonenumber', 'gender', 'dob', 'bloodgroup', 'weight', 'photo']
         widgets = {
             'dob': forms.DateInput(attrs={'type': 'date'}),
             'weight': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Weight in kg'}),
             'address': forms.Textarea(attrs={'rows': 3}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
+
         }
         labels = {
             'weight': 'Weight (kg)',
-            'phonenumber': 'Phone Number'
+            'phonenumber': 'Contact Number'
         }
 
 
