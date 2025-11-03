@@ -234,14 +234,6 @@ def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {'recipient': recipient})
 
 
-@login_required
-def recipient_dashboard(request):
-    # Get all recipients
-    recipients = RecipientDetails.objects.all()  # fetch all recipients
-
-    return render(request, 'recipient_dashboard.html', {
-        'recipients': recipients
-    })
 
 
 @login_required
@@ -488,128 +480,136 @@ def calculate_age(dob):
     today = date.today()
     return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.urls import reverse
 
+@login_required
+def donor_request_appointment(request):
+    """
+    Warning/landing page shown when donor clicks the Request Appointment card.
+    Template (donor/donor_request_appointment.html) should show:
+      - If donor.is_eligible == False -> warning + button linking to donor_eligibility_test_form
+      - If donor.is_eligible == True -> either show message "You are eligible" and link to actual booking form
+    """
+    donor = get_object_or_404(DonorDetails, user=request.user)
+    return render(request, 'donor/donor_request_appointment.html', {
+        'donor': donor
+    })
+
+
+@login_required
 def donor_eligibility_test_form(request):
+    """
+    Shows the eligibility test form, evaluates it, updates donor.is_eligible,
+    and redirects to the eligibility result page.
+    """
+    donor = get_object_or_404(DonorDetails, user=request.user)
+
     if request.method == 'POST':
         form = DonorEligibilityForm(request.POST)
         if form.is_valid():
-            test = form.save(commit=False)
-            if request.user.is_authenticated:
-                test.user = request.user
+            # Calculate eligibility — you already have logic; reuse it.
+            # For clarity, run the same checks you had and set donor.is_eligible accordingly.
+            # Example minimal logic (adjust to your rules):
+            passed = True
+            reasons = []
 
-            gender = form.cleaned_data.get('gender')
             dob = form.cleaned_data.get('dob')
-            age = calculate_age(dob)
             weight = form.cleaned_data.get('weight')
             hemoglobin = form.cleaned_data.get('hemoglobin_level')
             last_date = form.cleaned_data.get('last_donation_date')
+            gender = form.cleaned_data.get('gender')
             has_disease = form.cleaned_data.get('has_disease')
             on_medication = form.cleaned_data.get('on_medication')
             had_surgery_recently = form.cleaned_data.get('had_surgery_recently')
 
-            passed = True
-            reasons = []
+            # You already have calculate_age helper in your code; reuse it
+            age = calculate_age(dob)
 
-            # ✅ Eligibility logic
             if age < 18 or age > 60:
                 passed = False
                 reasons.append("You must be between 18 and 60 years old to donate blood.")
-
             if weight < 50:
                 passed = False
                 reasons.append("Weight must be at least 50 kg.")
-
             if hemoglobin < 12.5:
                 passed = False
                 reasons.append("Hemoglobin level must be 12.5 g/dL or higher.")
-
             if has_disease:
                 passed = False
                 reasons.append("You have reported a disease condition.")
-
             if on_medication:
                 passed = False
                 reasons.append("You are currently on medication.")
-
             if had_surgery_recently:
                 passed = False
-                reasons.append("You have had surgery recently.")
-
+                reasons.append("You have had recent surgery.")
             if last_date:
-                days_since = (datetime.date.today() - last_date).days
+                days_since = (date.today() - last_date).days
                 if gender == 'Male' and days_since < 90:
                     passed = False
-                    reasons.append("Males must wait at least 90 days after their last donation.")
+                    reasons.append("Males must wait at least 90 days after last donation.")
                 elif gender == 'Female' and days_since < 120:
                     passed = False
-                    reasons.append("Females must wait at least 120 days after their last donation.")
+                    reasons.append("Females must wait at least 120 days after last donation.")
 
-            test.passed = passed
-            test.save()
+            donor.is_eligible = passed
+            donor.save()
 
-            # ✅ Store result
-            request.session['donor_eligibility_result'] = {
-                'status': 'Eligible' if passed else 'Not Eligible',
-                'reasons': reasons
-            }
+            # Store reasons (if any) into session so the result view can show them
+            request.session['eligibility_reasons'] = reasons
 
-            return redirect('donor_eligibility_result')
+            # Redirect to result page; we pass status via query param for clarity
+            return redirect(reverse('donor_eligibility_result') + f"?status={'Eligible' if passed else 'Not Eligible'}")
+
     else:
         form = DonorEligibilityForm()
 
-    return render(request, 'donor/donor_eligibility_test_form.html', {'form': form})
-
-
-def donor_eligibility_result(request):
-    result_data = request.session.get('donor_eligibility_result', None)
-    donor = get_object_or_404(DonorDetails, user=request.user)
-
-    if not result_data:
-        messages.warning(request, "Please take the eligibility test first.")
-        return redirect('donor_eligibility_test_form')
-
-    passed = result_data['status'] == 'Eligible'
-
-    donor.is_eligible = passed
-    donor.save()
-
-    return render(request, 'donor/donor_eligibility_result.html', {
-        'status': result_data['status'],
-        'reasons': result_data['reasons']
-    })
-
+    return render(request, 'donor/donor_eligibility_test_form.html', {'form': form, 'donor': donor})
 
 
 @login_required
-def donor_request_appointment(request):
+def donor_eligibility_result(request):
+    """
+    Shows eligibility result. If Eligible -> show Book Appointment button that links to the actual booking form.
+    If Not Eligible -> show reasons and a button to retake the test.
+    """
+    status = request.GET.get('status', None)
+    reasons = request.session.pop('eligibility_reasons', [])  # consume reasons from session
+
+    # Render your template (you already provided one). Make sure the template uses:
+    # {% if status == 'Eligible' %} ... link to donor_request_appointment_form ... {% endif %}
+    return render(request, 'donor/donor_eligibility_result.html', {
+        'status': status,
+        'reasons': reasons
+    })
+
+
+@login_required
+def donor_request_appointment_form(request):
+    """
+    The actual booking form. Only allow access if donor.is_eligible is True.
+    If not eligible -> redirect back to donor_request_appointment (warning page).
+    """
     donor = get_object_or_404(DonorDetails, user=request.user)
 
     if not donor.is_eligible:
-        messages.warning(request, "You must pass the eligibility test before requesting an appointment.")
-        return redirect('donor_eligibility_test_form')
+        messages.warning(request, "You must pass the eligibility test before booking an appointment.")
+        return redirect('donor_request_appointment')
 
     if request.method == 'POST':
         form = DonorRequestAppointmentForm(request.POST)
         if form.is_valid():
             appointment = form.save(commit=False)
-            appointment.donor = request.user
+            appointment.donor = request.user  # or donor
             appointment.save()
-            messages.success(request, "Your appointment request has been submitted successfully.")
-            return redirect('donor')
+            messages.success(request, "Appointment booked successfully!")
+            return redirect('donor')  # or any success page you prefer
     else:
         form = DonorRequestAppointmentForm()
 
-    return render(request, 'donor/donor_request_appointment.html', {'form': form})
-
-
-def donor_request_appointment_form(request):
-    if request.method == 'POST':
-        form = DonorRequestAppointmentForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('success_page')  # change to your success URL
-    else:
-        form = DonorRequestAppointmentForm()  # ✅ must be created here
-
-    return render(request, 'donor/donor_request_appointment_form.html', {'form': form})
-
+    return render(request, 'donor/donor_request_appointment_form.html', {
+        'form': form,
+        'donor': donor
+    })

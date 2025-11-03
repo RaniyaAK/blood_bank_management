@@ -1,8 +1,10 @@
 from django import forms
+from datetime import date
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
-from .models import DonorRequestAppointment
-from .models import DonorEligibilityTestForm
+from .models import DonorRequestAppointment, DonorEligibilityTestForm
+
 
 class UserForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput)
@@ -47,12 +49,10 @@ class DonorDetailsForm(forms.ModelForm):
             'age': forms.NumberInput(attrs={'min': 18, 'max': 65, 'placeholder': 'Enter your age'}),
             'address': forms.Textarea(attrs={'rows': 3}),
             'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
-
         }
         labels = {
             'phonenumber': 'Phone Number'
         }
-        
 
 
 class RecipientDetailsForm(forms.ModelForm):
@@ -84,7 +84,7 @@ class HospitalDetailsForm(forms.ModelForm):
         }
 
 
-
+# ✅ UPDATED DonorRequestAppointmentForm
 class DonorRequestAppointmentForm(forms.ModelForm):
     class Meta:
         model = DonorRequestAppointment
@@ -93,6 +93,20 @@ class DonorRequestAppointmentForm(forms.ModelForm):
             'preferred_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'preferred_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # ✅ Prevent user from choosing a date before today in the browser
+        if 'preferred_date' in self.fields:
+            self.fields['preferred_date'].widget.attrs['min'] = date.today().isoformat()
+
+    def clean_preferred_date(self):
+        preferred_date = self.cleaned_data.get('preferred_date')
+        if preferred_date and preferred_date < date.today():
+            raise ValidationError("You cannot select a past date.")
+        return preferred_date
+
+
 class DonorEligibilityForm(forms.ModelForm):
     class Meta:
         model = DonorEligibilityTestForm
@@ -109,7 +123,7 @@ class DonorEligibilityForm(forms.ModelForm):
         widgets = {
             'dob': forms.DateInput(
                 attrs={'type': 'date', 'class': 'form-control'},
-                format='%Y-%m-%d'  # ✅ tell Django the format
+                format='%Y-%m-%d'
             ),
             'last_donation_date': forms.DateInput(
                 attrs={'type': 'date', 'class': 'form-control'},
@@ -122,6 +136,5 @@ class DonorEligibilityForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DonorEligibilityForm, self).__init__(*args, **kwargs)
-        # ✅ accept browser-submitted date format
         self.fields['dob'].input_formats = ['%Y-%m-%d']
         self.fields['last_donation_date'].input_formats = ['%Y-%m-%d']
