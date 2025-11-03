@@ -1,0 +1,87 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block title %}Add Blood Stock{% endblock %}
+
+{% block content %}
+<div class="add-blood-container">
+    <h1>Add Blood Stock</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Blood Group</label>
+            {{ form.bloodgroup }}
+        </div>
+
+        <div class="form-group">
+            <label>Units</label>
+            {{ form.unit }}
+        </div>
+
+        <button type="submit" class="submit-btn">Add Blood</button>
+    </form>
+</div>
+
+<style>
+body {
+    background: linear-gradient(180deg, #fff5f5 0%, #ffeaea 100%);
+    font-family: "Poppins", sans-serif;
+}
+.add-blood-container {
+    max-width: 500px;
+    margin: 80px auto;
+    background: #fff;
+    padding: 40px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+h1 {
+    color: #b30000;
+    margin-bottom: 30px;
+}
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #333;
+}
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+.submit-btn {
+    background: linear-gradient(135deg, #b30000, #e60000);
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.2s;
+}
+.submit-btn:hover {
+    transform: scale(1.05);
+}
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}

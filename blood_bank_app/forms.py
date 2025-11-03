@@ -190,3 +190,12 @@ class RecipientBloodRequestForm(forms.ModelForm):
             raise ValidationError("You cannot select a past date.")
         return required_date
 
+
+class HospitalAddBloodStockForm(forms.ModelForm):
+    class Meta:
+        model = BloodStock
+        fields = ['bloodgroup', 'unit']
+        widgets = {
+            'bloodgroup': forms.Select(attrs={'class': 'form-control'}),
+            'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }

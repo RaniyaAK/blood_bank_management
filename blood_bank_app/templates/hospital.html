@@ -1,44 +1,169 @@
-{% extends 'master.html' %}
 
-{% block title %}Hospital Dashboard{% endblock %}
+
+
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}Donor Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-content">
-    <h1>hospital Dashboard</h1>
+<div class="hospital-dashboard">
 
-    {% if hospital %}
-        <div class="recipient-profile">
-            <a href="{% url 'hospital_edit' %}">
-                <img src="{{ hospital.photo.url }}" alt="{{ hospital.name }}" class="profile-pic">
+    <!-- 🔹 Top Navigation -->
+    <div class="top-bar">
+        <h1>{{ hospital.name }}</h1>
+        <div class="icon-container">
+            <a href="{% url 'hospital_notifications' %}" class="icon-btn">
+                <i class="fa fa-bell"></i>
             </a>
+            <a href="{% url 'hospital_edit' %}">
+                {% if donor.photo %}
+                    <img src="{{ hospital.photo.url }}" alt="{{ hospital.name }}" class="profile-img">
+                {% else %}
+                    <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
+                {% endif %}
+            </a>
+
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
         </div>
-    {% else %}
-        <p>You have not submitted your hospital details yet.</p>
-    {% endif %}
+    </div>
+
+    <!-- 🔹 Main Content -->
+    <div class="content-area">
+        <div class="hospital-actions">
+
+            <!-- 🩸 Donation History -->
+            <a href="#" class="action-card red">
+                <i class="fa-solid fa-droplet"></i>
+                <span>Donation History</span>
+            </a>
+
+            <!-- 📅 Request Appointment -->
+            <a href="#" class="action-card dark">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Request Appointment</span>
+            </a>
+
+            <!-- 🩸 Add Blood Stock -->
+            <a href="{% url 'hospital_add_blood_form' %}" class="action-card dark">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>Add Blood Stock</span>
+            </a>
+
+            <!-- 🩸 Add Blood Stock -->
+            <a href="{% url 'hospital_add_blood_form' %}" class="action-card dark">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>View Blood Stock</span>
+            </a>
+
+
+        </div>
+    </div>
 </div>
 
+<!-- 🎨 Styles -->
 <style>
-.dashboard-content {
-    text-align: center;
-    margin-top: 50px;
+body {
+    margin: 0;
+    background: linear-gradient(180deg, #fff5f5 0%, #ffeaea 100%);
+    font-family: "Poppins", sans-serif;
 }
-
-.recipient-profile {
-    display: inline-block;
+.hospital-dashboard {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px;
 }
-
-.profile-pic {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%; /* makes it circular */
+.top-bar {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+}
+.top-bar h1 {
+    font-size: 28px;
+    color: #b30000;
+    font-weight: 600;
+}
+.icon-container {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+.icon-btn {
+    font-size: 22px;
+    color: #444;
+    text-decoration: none;
+}
+.icon-btn:hover { color: #b30000; }
+.profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #b30000;
     object-fit: cover;
-    border: 3px solid #b30000;
-    cursor: pointer;
-    transition: transform 0.2s;
 }
-
-.profile-pic:hover {
-    transform: scale(1.1); /* slight zoom on hover */
+.logout-btn {
+    background-color: #b30000;
+    color: white;
+    font-size: 14px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+.logout-btn:hover {
+    background-color: #d11a1a;
+}
+.content-area {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    justify-content: center;
+}
+.hospital-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    width: 100%;
+}
+.action-card {
+    text-decoration: none;
+    border-radius: 14px;
+    padding: 40px 20px;
+    text-align: center;
+    font-weight: 500;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.action-card i {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+.action-card span {
+    font-size: 18px;
+    margin-bottom: 15px;
+    display: block;
+}
+.action-card.red {
+    background: linear-gradient(135deg, #b30000, #e60000);
+    color: white;
+}
+.action-card.dark {
+    background: linear-gradient(135deg, #444, #222);
+    color: white;
+}
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 </style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}

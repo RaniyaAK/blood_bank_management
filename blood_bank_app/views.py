@@ -19,6 +19,8 @@ from .forms import DonorEligibilityForm
 from .models import DonorDetails
 from datetime import date
 from .forms import RecipientBloodRequestForm
+from django.urls import reverse
+
 
 
 def home(request):
@@ -74,8 +76,8 @@ def register(request):
 
     return render(request, 'register.html', {'form': form})
 
-# login
 
+# login
 def user_login(request):
     error_message = None
     form = LoginForm(request.POST or None)
@@ -120,14 +122,13 @@ def roles(request):
     return render(request, 'roles.html')
 
 
-# passwords
 
+# passwords
 def forgot_password(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         try:
             user = User.objects.get(email=email)
-            # Redirect to reset password page with email as parameter
             return redirect('reset_password', email=user.email)
         except User.DoesNotExist:
             messages.error(request, 'No account found with that email address.')
@@ -147,12 +148,10 @@ def reset_password(request, email):
                 user.set_password(password)
                 user.save()
 
-                # ✅ Log in immediately
                 user = authenticate(username=user.username, password=password)
                 if user:
                     auth_login(request, user)
 
-                    # ✅ Ensure profile exists and redirect by role
                     profile, _ = Profile.objects.get_or_create(user=user, defaults={'role': 'recipient'})
                     if profile.role == 'donor':
                         return redirect('donor')
@@ -171,8 +170,8 @@ def reset_password(request, email):
     return render(request, 'reset_password.html', {'email': email})
 
 
-# logout
 
+# logout
 @login_required
 def user_logout(request):
     logout(request)
@@ -181,7 +180,6 @@ def user_logout(request):
 #   __________________________________________________________________________________________________________________________
 
 # pages
-
 @login_required
 def hospital(request):
     """Hospital dashboard"""
@@ -214,11 +212,7 @@ def donor(request):
     return render(request, 'donor.html', {'donor': donor_profile})
 
 
-
 # --- Dashboards ---
-
-from .models import Profile, DonorDetails, RecipientDetails, BloodStock
-
 @login_required
 def admin_dashboard(request):
     donors_count = Profile.objects.filter(role='donor').count()
@@ -235,9 +229,6 @@ def admin_dashboard(request):
     return render(request, 'admin_dashboard.html', context)
 
 
-
-
-
 @login_required
 def donor_dashboard(request):
     donors = DonorDetails.objects.all()
@@ -249,8 +240,6 @@ def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {'recipient': recipient})
 
 
-
-
 @login_required
 def hospital_dashboard(request):
     return render(request, 'hospital_dashboard.html')
@@ -258,7 +247,6 @@ def hospital_dashboard(request):
 
 @login_required
 def blood_stock_dashboard(request):
-    # Get all blood stock records, newest first
     blood_stock = BloodStock.objects.all().order_by('-added_at')
 
     return render(request, 'blood_stock_dashboard.html', {
@@ -267,14 +255,14 @@ def blood_stock_dashboard(request):
 
 @login_required
 def add_blood(request):
-    message = None  # success message
+    message = None
 
     if request.method == 'POST':
         form = BloodStockForm(request.POST)
         if form.is_valid():
             form.save()
             message = "Blood added successfully!"
-            form = BloodStockForm()  # reset the form after save
+            form = BloodStockForm()  
     else:
         form = BloodStockForm()
 
@@ -282,126 +270,6 @@ def add_blood(request):
         'form': form,
         'message': message
     })
-
-
-# detailsform
-
-@login_required
-def donor_details_form(request):
-     # Check if this recipient already has a profile
-    donor = DonorDetails.objects.filter(user=request.user).first()
-    if donor:
-        # Already filled, go to recipient dashboard
-        return redirect('donor')
-
-    if request.method == 'POST':
-        form = DonorDetailsForm(request.POST, request.FILES)
-        if form.is_valid():
-            donor = form.save(commit=False)  # don’t save yet
-            donor.user = request.user       # link to logged-in user
-            donor.save()                    # now save
-            return redirect('donor')        # Redirect to dashboard/profile
-    else:
-        form = DonorDetailsForm()
-
-    return render(request, 'donor/donor_details_form.html', {'form': form})
-
-
-
-@login_required
-def recipient_details_form(request):
-    # Check if this recipient already has a profile
-    recipient = RecipientDetails.objects.filter(user=request.user).first()
-    if recipient:
-        # Already filled, go to recipient dashboard
-        return redirect('recipient')
-
-    if request.method == 'POST':
-        form = RecipientDetailsForm(request.POST, request.FILES)
-        if form.is_valid():
-            recipient = form.save(commit=False)  # don’t save yet
-            recipient.user = request.user       # link to logged-in user
-            recipient.save()                    # now save
-            return redirect('recipient')        # Redirect to dashboard/profile
-    else:
-        form = RecipientDetailsForm()
-
-    return render(request, 'recipient/recipient_details_form.html', {'form': form})
-
-
-@login_required
-def hospital_details_form(request):
-    try:
-        hospital = HospitalDetails.objects.get(user=request.user)
-        return redirect('hospital')  
-    except HospitalDetails.DoesNotExist:
-        pass
-
-    if request.method == 'POST':
-        form = HospitalDetailsForm(request.POST, request.FILES)
-        if form.is_valid():
-            hospital = form.save(commit=False)
-            hospital.user = request.user
-            hospital.save()
-            return redirect('hospital')
-    else:
-        form = HospitalDetailsForm()
-
-    return render(request, 'hospital/hospital_details_form.html', {'form': form})
-
-
-
-
-# edit
-
-@login_required
-def recipient_details_edit(request):
-    """Edit profile"""
-    recipient = get_object_or_404(RecipientDetails, user=request.user)
-
-    if request.method == 'POST':
-        form = RecipientDetailsForm(request.POST, request.FILES, instance=recipient)
-        if form.is_valid():
-            form.save()
-            return redirect('recipient')
-    else:
-        form = RecipientDetailsForm(instance=recipient)
-
-    return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
-
-
-@login_required
-def donor_details_edit(request):
-    """Edit profile"""
-    donor = get_object_or_404(DonorDetails, user=request.user)
-
-    if request.method == 'POST':
-        form = DonorDetailsForm(request.POST, request.FILES, instance=donor)
-        if form.is_valid():
-            form.save()
-            return redirect('donor')
-    else:
-        form = DonorDetailsForm(instance=donor)
-
-    return render(request, 'donor/donor_details_edit.html', {'form': form, 'donor': donor})
-
-
-
-@login_required
-def hospital_details_edit(request):
-    """Edit profile"""
-    hospital = get_object_or_404(HospitalDetails, user=request.user)
-
-    if request.method == 'POST':
-        form = HospitalDetailsForm(request.POST, request.FILES, instance=hospital)
-        if form.is_valid():
-            form.save()
-            return redirect('hospital')
-    else:
-        form = HospitalDetailsForm(instance=hospital)
-
-    return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
-
 
 # ___________________________________________________________________________________________________________________
 
@@ -432,47 +300,8 @@ def donor_edit(request, donor_id):
     return render(request, 'edit_donor.html', {'form': form, 'donor': donor})
 
 
-# users recipient dashboard
-
-@login_required
-def recipient_notifications(request):
-    sample_notifications = [
-        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
-        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
-        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
-    ]
-    
-    return render(request, "recipient/recipient_notifications.html", {"notifications": sample_notifications})
-
-def recipient_blood_request_form(request):
-    return render(request,'recipient/recipient_blood_request_form.html')
-
-def received_history(request):
-    return render(request, 'recipient/received_history.html')
-
-
-def search_blood(request):
-    return render(request, 'recipient/search_blood.html')
-
-
-
-@login_required
-def search_blood(request):
-    query = request.GET.get('q', '').strip()
-    blood_stock = BloodStock.objects.all().order_by('-added_at')
-
-    if query:
-        # Filter by blood group (case-insensitive)
-        blood_stock = blood_stock.filter(bloodgroup__icontains=query)
-
-    return render(request, 'recipient/search_blood.html', {
-        'blood_stock': blood_stock,
-        'query': query,
-    })
-
 
 # users_donor_dashboard
-
 @login_required
 def donor_notifications(request):
     sample_notifications = [
@@ -492,9 +321,41 @@ def calculate_age(dob):
     today = date.today()
     return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.urls import reverse
+
+@login_required
+def donor_details_form(request):
+    donor = DonorDetails.objects.filter(user=request.user).first()
+    if donor:
+        return redirect('donor')
+
+    if request.method == 'POST':
+        form = DonorDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            donor = form.save(commit=False)  
+            donor.user = request.user      
+            donor.save()                    
+            return redirect('donor')        
+    else:
+        form = DonorDetailsForm()
+
+    return render(request, 'donor/donor_details_form.html', {'form': form})
+
+
+@login_required
+def donor_details_edit(request):
+    """Edit profile"""
+    donor = get_object_or_404(DonorDetails, user=request.user)
+
+    if request.method == 'POST':
+        form = DonorDetailsForm(request.POST, request.FILES, instance=donor)
+        if form.is_valid():
+            form.save()
+            return redirect('donor')
+    else:
+        form = DonorDetailsForm(instance=donor)
+
+    return render(request, 'donor/donor_details_edit.html', {'form': form, 'donor': donor})
+
 
 @login_required
 def donor_request_appointment(request):
@@ -536,7 +397,6 @@ def donor_eligibility_test_form(request):
             on_medication = form.cleaned_data.get('on_medication')
             had_surgery_recently = form.cleaned_data.get('had_surgery_recently')
 
-            # You already have calculate_age helper in your code; reuse it
             age = calculate_age(dob)
 
             if age < 18 or age > 60:
@@ -569,10 +429,8 @@ def donor_eligibility_test_form(request):
             donor.is_eligible = passed
             donor.save()
 
-            # Store reasons (if any) into session so the result view can show them
             request.session['eligibility_reasons'] = reasons
 
-            # Redirect to result page; we pass status via query param for clarity
             return redirect(reverse('donor_eligibility_result') + f"?status={'Eligible' if passed else 'Not Eligible'}")
 
     else:
@@ -627,6 +485,77 @@ def donor_request_appointment_form(request):
     })
 
 
+# users recipient dashboard
+
+@login_required
+def recipient_details_form(request):
+    # Check if this recipient already has a profile
+    recipient = RecipientDetails.objects.filter(user=request.user).first()
+    if recipient:
+        # Already filled, go to recipient dashboard
+        return redirect('recipient')
+
+    if request.method == 'POST':
+        form = RecipientDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipient = form.save(commit=False)  # don’t save yet
+            recipient.user = request.user       # link to logged-in user
+            recipient.save()                    # now save
+            return redirect('recipient')        # Redirect to dashboard/profile
+    else:
+        form = RecipientDetailsForm()
+
+    return render(request, 'recipient/recipient_details_form.html', {'form': form})
+
+
+
+@login_required
+def recipient_notifications(request):
+    sample_notifications = [
+        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
+        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
+        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
+    ]
+    
+    return render(request, "recipient/recipient_notifications.html", {"notifications": sample_notifications})
+
+def recipient_blood_request_form(request):
+    return render(request,'recipient/recipient_blood_request_form.html')
+
+def received_history(request):
+    return render(request, 'recipient/received_history.html')
+
+
+@login_required
+def recipient_details_edit(request):
+    """Edit profile"""
+    recipient = get_object_or_404(RecipientDetails, user=request.user)
+
+    if request.method == 'POST':
+        form = RecipientDetailsForm(request.POST, request.FILES, instance=recipient)
+        if form.is_valid():
+            form.save()
+            return redirect('recipient')
+    else:
+        form = RecipientDetailsForm(instance=recipient)
+
+    return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
+
+
+@login_required
+def search_blood(request):
+    query = request.GET.get('q', '').strip()
+    blood_stock = BloodStock.objects.all().order_by('-added_at')
+
+    if query:
+        # Filter by blood group (case-insensitive)
+        blood_stock = blood_stock.filter(bloodgroup__icontains=query)
+
+    return render(request, 'recipient/search_blood.html', {
+        'blood_stock': blood_stock,
+        'query': query,
+    })
+
 
 def recipient_blood_request(request):
     if request.method == 'POST':
@@ -641,3 +570,68 @@ def recipient_blood_request(request):
         form = RecipientBloodRequestForm()
 
     return render(request, 'recipient/recipient_blood_request.html', {'form': form})
+
+
+
+# users hospital dashboard
+@login_required
+def hospital_details_form(request):
+    try:
+        hospital = HospitalDetails.objects.get(user=request.user)
+        return redirect('hospital')  
+    except HospitalDetails.DoesNotExist:
+        pass
+
+    if request.method == 'POST':
+        form = HospitalDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            hospital = form.save(commit=False)
+            hospital.user = request.user
+            hospital.save()
+            return redirect('hospital')
+    else:
+        form = HospitalDetailsForm()
+
+    return render(request, 'hospital/hospital_details_form.html', {'form': form})
+
+
+def hospital_details_edit(request):
+    """Edit profile"""
+    hospital = get_object_or_404(HospitalDetails, user=request.user)
+
+    if request.method == 'POST':
+        form = HospitalDetailsForm(request.POST, request.FILES, instance=hospital)
+        if form.is_valid():
+            form.save()
+            return redirect('hospital')
+    else:
+        form = HospitalDetailsForm(instance=hospital)
+
+    return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
+
+
+def hospital_notifications(request):
+    sample_notifications = [
+        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
+        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
+        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
+    ]
+    
+    return render(request, "hospital/hospital_notifications.html", {"notifications": sample_notifications})
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import HospitalAddBloodStockForm
+
+def hospital_add_blood_form(request):
+    if request.method == 'POST':
+        form = BloodStockForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Blood stock added successfully!')
+            return redirect('hospital_add_blood_form')  # reloads same page
+    else:
+        form = BloodStockForm()
+    
+    return render(request, 'hospital/hospital_add_blood_form.html', {'form': form})

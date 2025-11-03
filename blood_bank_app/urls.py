@@ -23,6 +23,10 @@ urlpatterns = [
     path('hospital/', views.hospital, name='hospital'),
     path('hospital_registration_form/', views.hospital_details_form, name='hospital_details_form'),
     path('hospital/details_edit/', views.hospital_details_edit, name='hospital_edit'),
+    path('hospital/notifications/', views.hospital_notifications, name='hospital_notifications'),
+    path('hospital/hospital_add_blood_form/', views.hospital_add_blood_form, name='hospital_add_blood_form'),
+    
+
 
 
 
