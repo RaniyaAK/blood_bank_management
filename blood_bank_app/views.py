@@ -26,11 +26,11 @@ def home(request):
 
 
 # register
-
 def register(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
+            # ✅ Create user
             user = User.objects.create_user(
                 username=form.cleaned_data['username'],
                 email=form.cleaned_data['email'],
@@ -39,25 +39,40 @@ def register(request):
             user.first_name = form.cleaned_data['name']
             user.save()
 
+            # ✅ Create profile with role
             role = form.cleaned_data['role']
             profile = Profile.objects.create(user=user, role=role)
 
-            # ✅ Automatically log in the user
+            # ✅ Auto login
             auth_login(request, user)
 
-            # ✅ Redirect based on role
+            # ✅ Redirect based on role + completion status
             if role == 'donor':
-                return redirect('donor')
+                # If donor details not yet filled → send to details form
+                if not DonorDetails.objects.filter(user=user).exists():
+                    return redirect('donor_details_form')
+                else:
+                    return redirect('donor')
+
             elif role == 'recipient':
-                return redirect('recipient')
+                if not RecipientDetails.objects.filter(user=user).exists():
+                    return redirect('recipient_details_form')
+                else:
+                    return redirect('recipient')
+
             elif role == 'hospital':
-                return redirect('hospital')
+                if not HospitalDetails.objects.filter(user=user).exists():
+                    return redirect('hospital_details_form')
+                else:
+                    return redirect('hospital')
+
             else:
-                return redirect('home')  # fallback
+                return redirect('home')
+
     else:
         form = UserForm()
-    return render(request, 'register.html', {'form': form})
 
+    return render(request, 'register.html', {'form': form})
 
 # login
 
