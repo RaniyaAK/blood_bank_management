@@ -1,0 +1,192 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}Edit Donor{% endblock %}
+
+{% block content %}
+
+<div class="center-wrapper">
+    <div class="edit-box">
+
+        <!-- Profile photo -->
+        <div class="photo-wrapper">
+            <div class="photo-inner">
+                {% if donor.photo %}
+                    <img id="profileImage" src="{{ donor.photo.url }}" alt="{{ donor.name }} Photo">
+                {% else %}
+                    <img id="profileImage" src="{% static 'default_profile.png' %}" alt="Profile Photo">
+                {% endif %}
+                <label class="edit-photo-icon" for="id_photo">&#9998;</label>
+            </div>
+            <input type="file" id="id_photo" name="photo" style="display:none;" accept="image/*">
+        </div>
+
+        <!-- Form -->
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                {% if field.name != 'photo' %}
+                    <div class="form-field">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <div class="field-errors">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% for error in form.non_field_errors %}
+                <div class="field-errors">{{ error }}</div>
+            {% endfor %}
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<style>
+body {
+    background-color: #f5f5f5;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.center-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.edit-box {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+    padding: 40px 30px;
+    max-width: 650px;
+    width: 100%;
+    text-align: center;
+}
+
+.photo-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.photo-inner {
+    position: relative;
+    display: inline-block;
+}
+
+.photo-inner img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid #ccc;
+    object-fit: cover;
+    display: block;
+}
+
+.edit-photo-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(179,0,0,0.85);
+    color: white;
+    font-size: 16px;
+    padding: 7px 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.edit-photo-icon:hover {
+    background-color: rgba(153,0,0,0.9);
+}
+
+.form-field {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.form-field label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #b30000;
+    box-shadow: 0 0 4px rgba(179,0,0,0.3);
+}
+
+textarea {
+    resize: none;
+    height: 80px;
+}
+
+.field-errors {
+    color: red;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background-color: #b30000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 20px;
+    transition: 0.2s;
+}
+
+button:hover {
+    background-color: #990000;
+}
+
+@media (max-width: 480px) {
+    .photo-inner img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .edit-photo-icon {
+        padding: 6px 7px;
+        font-size: 14px;
+    }
+
+    .edit-box {
+        padding: 25px 20px;
+    }
+}
+</style>
+
+<script>
+document.getElementById('id_photo').addEventListener('change', function(event) {
+    const [file] = event.target.files;
+    if (file) {
+        document.getElementById('profileImage').src = URL.createObjectURL(file);
+    }
+});
+</script>
+
+{% endblock %}

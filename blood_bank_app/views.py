@@ -304,7 +304,7 @@ def donor_details_form(request):
     else:
         form = DonorDetailsForm()
 
-    return render(request, 'donor_details_form.html', {'form': form})
+    return render(request, 'donor/donor_details_form.html', {'form': form})
 
 
 
@@ -383,7 +383,7 @@ def donor_details_edit(request):
     else:
         form = DonorDetailsForm(instance=donor)
 
-    return render(request, 'donor_details_edit.html', {'form': form, 'donor': donor})
+    return render(request, 'donor/donor_details_edit.html', {'form': form, 'donor': donor})
 
 
 
@@ -417,7 +417,7 @@ def donor_create(request):
             return redirect('donor') 
     else:
         form = DonorDetailsForm()
-    return render(request, 'donor_details_form.html', {'form': form})
+    return render(request, 'donor/donor_details_form.html', {'form': form})
 
 
 def donor_edit(request, donor_id):
@@ -481,7 +481,7 @@ def donor_notifications(request):
         {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
     ]
     
-    return render(request, "donor/notifications.html", {"notifications": sample_notifications})
+    return render(request, "donor/donor_notifications.html", {"notifications": sample_notifications})
 
 
 def donation_history(request):
