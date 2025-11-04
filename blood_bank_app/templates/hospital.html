@@ -8,17 +8,20 @@
 
     <!-- 🔹 Header -->
     <div class="top-bar">
-        <h1>{{ hospital.name }}</h1>
-        <div class="icon-container">
-            <a href="{% url 'hospital_notifications' %}" class="icon-btn">
-                <i class="fa fa-bell"></i>
-            </a>
+        <div class="left-section">
             <a href="{% url 'hospital_edit' %}">
                 {% if hospital.photo %}
                     <img src="{{ hospital.photo.url }}" alt="{{ hospital.name }}" class="profile-img">
                 {% else %}
                     <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
                 {% endif %}
+            </a>
+            <h1>{{ hospital.name }}</h1>
+        </div>
+
+        <div class="icon-container">
+            <a href="{% url 'hospital_notifications' %}" class="icon-btn">
+                <i class="fa fa-bell"></i>
             </a>
             <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
         </div>
@@ -33,9 +36,9 @@
                 <span>Donation History</span>
             </a>
 
-            <a href="#" class="action-card">
+            <a href="{% url 'hospital_blood_request_form' %}" class="action-card">
                 <i class="fa-solid fa-calendar-check icon-red"></i>
-                <span>Request Appointment</span>
+                <span>Request Blood</span>
             </a>
 
             <a href="{% url 'hospital_add_blood_stock' %}" class="action-card">
@@ -76,16 +79,38 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px; /* 🔹 Small side spacing (not centered now) */
+    padding: 15px 30px;
     border-bottom: 2px solid #7a1f1f;
     box-sizing: border-box;
 }
 
-.top-bar h1 {
+/* ✅ Left Section (Profile + Name) */
+.left-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.left-section h1 {
     font-size: 30px;
-    color:#fff; /* ✅ Softer white tone */
+    color: #fff;
     font-weight: 600;
 }
+
+/* Profile Image */
+.profile-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 2px solid #ffb3b3;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.profile-img:hover {
+    transform: scale(1.1);
+}
+
+/* Right Icons */
 .icon-container {
     display: flex;
     align-items: center;
@@ -93,19 +118,12 @@ body {
 }
 .icon-btn {
     font-size: 22px;
-    color: #fff8f8; /* ✅ Changed to off-white */
+    color: #fff8f8;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 .icon-btn:hover { color: #ffb3b3; }
 
-.profile-img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid #ffb3b3; /* lighter border for contrast */
-    object-fit: cover;
-}
 .logout-btn {
     background: transparent;
     border: 2px solid #fff;
@@ -121,9 +139,6 @@ body {
     background: #fff;
     color: #8b0000;
 }
-
-
-
 
 /* Main Content */
 .content-area {
@@ -177,7 +192,6 @@ body {
     font-size: 18px;
 }
 </style>
-
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}

@@ -12,7 +12,7 @@
         {% endfor %}
     {% endif %}
 
-    <form method="POST">
+    <form method="POST" id="bloodForm">
         {% csrf_token %}
         <div class="form-group">
             <label>Blood Group</label>
@@ -24,10 +24,12 @@
             {{ form.unit }}
         </div>
 
-        <button type="submit" class="submit-btn">Add Blood</button>
+        <div class="btn-container">
+            <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
+            <button type="submit" class="submit-btn">Add Blood</button>
+        </div>
     </form>
 </div>
-
 
 <style>
 body {
@@ -64,9 +66,12 @@ label {
     border: 1px solid #ccc;
     font-size: 16px;
 }
-.submit-btn {
-    background: linear-gradient(135deg, #b30000, #e60000);
-    color: #fff;
+.btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.submit-btn, .cancel-btn {
     border: none;
     padding: 10px 25px;
     border-radius: 8px;
@@ -74,8 +79,20 @@ label {
     font-size: 16px;
     transition: transform 0.2s;
 }
+.submit-btn {
+    background: linear-gradient(135deg, #b30000, #e60000);
+    color: #fff;
+}
 .submit-btn:hover {
     transform: scale(1.05);
+}
+.cancel-btn {
+    background-color: #ccc;
+    color: #333;
+}
+.cancel-btn:hover {
+    transform: scale(1.05);
+    background-color: #bbb;
 }
 .message.success {
     background-color: #d4edda;
@@ -85,4 +102,11 @@ label {
     margin-bottom: 20px;
 }
 </style>
+
+<script>
+    // Reset form when Cancel button is clicked
+    document.getElementById('cancelBtn').addEventListener('click', function() {
+        document.getElementById('bloodForm').reset();
+    });
+</script>
 {% endblock %}

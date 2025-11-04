@@ -6,13 +6,9 @@
 {% block content %}
 <div class="donor-dashboard">
 
-    <!-- 🔹 Top Navigation -->
+    <!-- 🔹 Header -->
     <div class="top-bar">
-        <h1>{{ donor.name }}</h1>
-        <div class="icon-container">
-            <a href="{% url 'donor_notifications' %}" class="icon-btn">
-                <i class="fa fa-bell"></i>
-            </a>
+        <div class="left-section">
             <a href="{% url 'donor_edit' %}">
                 {% if donor.photo %}
                     <img src="{{ donor.photo.url }}" alt="{{ donor.name }}" class="profile-img">
@@ -20,8 +16,14 @@
                     <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
                 {% endif %}
             </a>
+        </div>
 
-            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        <div class="icon-container">
+            <a href="{% url 'donor_notifications' %}" class="icon-btn" title="Notifications">
+                <i class="fa fa-bell"></i>
+            </a>
+
+            <a href="{% url 'logout' %}" class="logout-btn" title="Logout">Logout</a>
         </div>
     </div>
 
@@ -30,14 +32,14 @@
         <div class="donor-actions">
 
             <!-- 🩸 Donation History -->
-            <a href="{% url 'donation_history' %}" class="action-card red">
-                <i class="fa-solid fa-droplet"></i>
+            <a href="{% url 'donation_history' %}" class="action-card">
+                <i class="fa-solid fa-droplet icon-red"></i>
                 <span>Donation History</span>
             </a>
 
             <!-- 📅 Request Appointment -->
-            <a href="{% url 'donor_request_appointment' %}" class="action-card dark">
-                <i class="fa-solid fa-calendar-check"></i>
+            <a href="{% url 'donor_request_appointment' %}" class="action-card">
+                <i class="fa-solid fa-calendar-check icon-red"></i>
                 <span>Request Appointment</span>
             </a>
 
@@ -49,105 +51,140 @@
 <style>
 body {
     margin: 0;
-    background: linear-gradient(180deg, #fff5f5 0%, #ffeaea 100%);
     font-family: "Poppins", sans-serif;
+    background: linear-gradient(180deg, #5c0000 0%, #8b0000 100%);
 }
+
+/* Layout */
 .donor-dashboard {
     min-height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 50px 20px;
+    padding: 40px 60px;
 }
+
+/* Header */
 .top-bar {
     width: 100%;
-    max-width: 1100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 60px;
+    padding: 15px 30px;
+    border-bottom: 2px solid #7a1f1f;
+    box-sizing: border-box;
 }
-.top-bar h1 {
-    font-size: 28px;
-    color: #b30000;
-    font-weight: 600;
+
+/* Profile Icon on Left */
+.left-section .profile-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 2px solid #ffb3b3;
+    object-fit: cover;
+    transition: transform 0.3s ease;
 }
+.left-section .profile-img:hover {
+    transform: scale(1.1);
+}
+
+/* Icons on Right */
 .icon-container {
     display: flex;
     align-items: center;
     gap: 25px;
 }
+
 .icon-btn {
     font-size: 22px;
-    color: #444;
+    color: #fff8f8;
     text-decoration: none;
+    transition: color 0.3s ease;
 }
-.icon-btn:hover { color: #b30000; }
-.profile-img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px solid #b30000;
-    object-fit: cover;
-}
+.icon-btn:hover { color: #ffb3b3; }
+
 .logout-btn {
-    background-color: #b30000;
-    color: white;
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
     font-size: 14px;
-    padding: 6px 14px;
+    padding: 8px 16px;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 500;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
 }
 .logout-btn:hover {
-    background-color: #d11a1a;
+    background: #fff;
+    color: #8b0000;
 }
+
+/* Main Content */
 .content-area {
+    flex: 1;
     width: 100%;
-    max-width: 1000px;
     display: flex;
+    align-items: center;
     justify-content: center;
 }
 .donor-actions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 35px;
     width: 100%;
+    max-width: 900px;
 }
+
+/* Cards */
 .action-card {
     text-decoration: none;
-    border-radius: 14px;
-    padding: 40px 20px;
+    background: #fff;
+    color: #2b0000;
+    border-radius: 16px;
+    padding: 50px 25px;
     text-align: center;
-    font-weight: 500;
-    transition: transform 0.3s, box-shadow 0.3s;
+    font-weight: 600;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-.action-card i {
-    font-size: 36px;
-    margin-bottom: 15px;
-}
-.action-card span {
-    font-size: 18px;
-    margin-bottom: 15px;
-    display: block;
-}
-.action-card.red {
-    background: linear-gradient(135deg, #b30000, #e60000);
-    color: white;
-}
-.action-card.dark {
-    background: linear-gradient(135deg, #444, #222);
-    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(179, 0, 0, 0.2);
 }
 .action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(179, 0, 0, 0.4);
+}
+
+/* Icons */
+.icon-red {
+    color: #b30000;
+    font-size: 42px;
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
+.action-card:hover .icon-red {
+    color: #d11a1a;
+}
+
+/* Text */
+.action-card span {
+    font-size: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .donor-actions {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
 }
 </style>
 
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}

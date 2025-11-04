@@ -19,6 +19,7 @@ from .forms import DonorEligibilityForm
 from .models import DonorDetails
 from datetime import date
 from .forms import RecipientBloodRequestForm
+from .forms import HospitalBloodRequestForm
 from django.urls import reverse
 from .forms import HospitalAddBloodStockForm
 
@@ -662,3 +663,18 @@ def hospital_blood_stock_chart(request):
         'values': json.dumps(values),
     }
     return render(request, 'hospital/hospital_blood_stock_chart.html', context)
+
+
+def hospital_blood_request_form(request):
+    if request.method == 'POST':
+        form = HospitalBloodRequestForm(request.POST)
+        if form.is_valid():
+            blood_request = form.save(commit=False)
+            blood_request.recipient = request.user
+            blood_request.save()
+            messages.success(request, "Blood request submitted successfully!")
+            return redirect('hospital_dashboard')  # ✅ Best UX flow
+    else:
+        form = RecipientBloodRequestForm()
+
+    return render(request, 'hospital/hospital_blood_request_form.html', {'form': form})

@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
 from .models import DonorRequestAppointment, DonorEligibilityTestForm
 from .models import RecipientBloodRequestForm
+from .models import HospitalBloodRequestForm
 
 
 class UserForm(forms.ModelForm):
@@ -198,4 +199,29 @@ class HospitalAddBloodStockForm(forms.ModelForm):
         widgets = {
             'bloodgroup': forms.Select(attrs={'class': 'form-control'}),
             'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }
+
+
+class HospitalBloodRequestForm(forms.ModelForm):
+    class Meta:
+        model = HospitalBloodRequestForm
+        fields = ['blood_group', 'units', 'required_date', 'urgency']
+
+        widgets = {
+            'blood_group': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+            'units': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1,
+                'placeholder': 'Enter number of units needed',
+            }),
+            'required_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
+            'urgency': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+
         }

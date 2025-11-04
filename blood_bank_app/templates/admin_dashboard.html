@@ -44,8 +44,9 @@
             <p>Total Recipients Registered</p>
         </div>
 
+        <!-- Total Hospitals -->
         <div class="card red">
-            <i class="fa-solid fa-user icon"></i>
+            <i class="fa-solid fa-hospital icon"></i>
             <h2>{{ hospitals_count }}</h2>
             <p>Total Hospitals Registered</p>
         </div>
@@ -174,10 +175,20 @@ body, html {
 }
 
 /* Main content */
-.main-content { margin-left: 220px; padding: 80px 40px 20px 40px; }
+.main-content { 
+    margin-left: 220px; 
+    padding: 80px 40px 20px 40px; 
+}
 
 /* Cards */
-.cards { display: flex; flex-wrap: wrap; gap: 25px; }
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center; /* ✅ Centers cards horizontally */
+    align-items: center;      /* ✅ Centers vertically across rows */
+}
+
 .card.red {
     background: linear-gradient(135deg, #8B0000, #b30000);
 }
@@ -191,6 +202,8 @@ body, html {
     padding: 25px 40px;
     text-align: center;
     width: 220px;
+    flex: 1 1 200px; /* ✅ Makes cards responsive */
+    max-width: 250px;
     transition: transform 0.2s, background 0.3s;
 }
 .card:hover { transform: scale(1.05); }

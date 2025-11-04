@@ -6,17 +6,11 @@
 {% block content %}
 <div class="recipient-dashboard">
 
-    <!-- Top Navigation -->
+    <!-- 🔹 Header -->
     <div class="top-bar">
-        <div class="logo-title">
-            <h1>Recipient Dashboard</h1>
-        </div>
 
-        <div class="icon-container">
-            <a href="{% url 'recipient_notifications' %}" class="icon-btn" title="Notifications">
-                <i class="fa fa-bell"></i>
-            </a>
-
+        <!-- ✅ Profile Icon (Left Side) -->
+        <div class="left-section">
             <a href="{% url 'recipient_edit' %}" title="Profile">
                 {% if recipient.photo %}
                     <img src="{{ recipient.photo.url }}" alt="{{ recipient.name }}" class="profile-img">
@@ -24,30 +18,37 @@
                     <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
                 {% endif %}
             </a>
+        </div>
+
+        <!-- 🔹 Icons (Right Side) -->
+        <div class="icon-container">
+            <a href="{% url 'recipient_notifications' %}" class="icon-btn" title="Notifications">
+                <i class="fa fa-bell"></i>
+            </a>
 
             <a href="{% url 'logout' %}" class="logout-btn" title="Logout">Logout</a>
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- 🔹 Main Content -->
     <div class="content-area">
         <div class="recipient-actions">
 
             <!-- Search Blood Availability -->
-            <a href="{% url 'search_blood' %}" class="action-card red">
-                <i class="fa-solid fa-magnifying-glass"></i>
+            <a href="{% url 'search_blood' %}" class="action-card">
+                <i class="fa-solid fa-magnifying-glass icon-red"></i>
                 <span>Search Blood Availability</span>
             </a>
 
             <!-- Request Blood -->
-            <a href="{% url 'recipient_blood_request_form' %}" class="action-card light">
-                <i class="fa-solid fa-droplet"></i>
+            <a href="{% url 'recipient_blood_request_form' %}" class="action-card">
+                <i class="fa-solid fa-droplet icon-red"></i>
                 <span>Request Blood</span>
             </a>
 
             <!-- Blood Received History -->
-            <a href="{% url 'received_history' %}" class="action-card dark">
-                <i class="fa-solid fa-file-lines"></i>
+            <a href="{% url 'received_history' %}" class="action-card">
+                <i class="fa-solid fa-file-lines icon-red"></i>
                 <span>Blood Received History</span>
             </a>
 
@@ -55,147 +56,130 @@
     </div>
 </div>
 
-<!-- ============= STYLES ============= -->
+<!-- 🎨 Styles -->
 <style>
 body {
     margin: 0;
-    background: linear-gradient(180deg, #fff5f5 0%, #ffeaea 100%);
     font-family: "Poppins", sans-serif;
-    color: #333;
+    background: linear-gradient(180deg, #5c0000 0%, #8b0000 100%);
 }
 
+/* Layout */
 .recipient-dashboard {
     min-height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 50px 20px;
+    padding: 40px 60px;
 }
 
-/* Top Bar */
+/* Header */
 .top-bar {
     width: 100%;
-    max-width: 1100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 60px;
+    padding: 15px 30px;
+    border-bottom: 2px solid #7a1f1f;
+    box-sizing: border-box;
 }
 
-.logo-title h1 {
-    font-size: 26px;
-    color: #b30000;
-    font-weight: 600;
-    margin: 0;
-    letter-spacing: 0.5px;
+/* ✅ Profile Icon Left */
+.left-section .profile-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 2px solid #ffb3b3;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.left-section .profile-img:hover {
+    transform: scale(1.1);
 }
 
+/* 🔹 Icons on Right */
 .icon-container {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 25px;
 }
 
 .icon-btn {
     font-size: 22px;
-    color: #444;
+    color: #fff8f8;
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color 0.3s ease;
 }
+.icon-btn:hover { color: #ffb3b3; }
 
-.icon-btn:hover {
-    color: #b30000;
-}
-
-/* Profile Image */
-.profile-img {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: 2px solid #b30000;
-    object-fit: cover;
-    transition: transform 0.3s;
-}
-
-.profile-img:hover {
-    transform: scale(1.1);
-}
-
-/* Logout Button */
 .logout-btn {
-    background: #b30000;
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 10px 20px;
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    font-size: 14px;
+    padding: 8px 16px;
     border-radius: 8px;
+    text-decoration: none;
     font-weight: 500;
-    transition: background 0.3s, transform 0.2s;
+    transition: all 0.3s ease;
 }
-
 .logout-btn:hover {
-    background: #e60000;
-    transform: translateY(-2px);
+    background: #fff;
+    color: #8b0000;
 }
 
-/* Content Grid */
+/* Main Content */
 .content-area {
+    flex: 1;
     width: 100%;
-    max-width: 1000px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 }
 
 .recipient-actions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 35px;
     width: 100%;
+    max-width: 1100px;
 }
 
+/* Cards */
 .action-card {
     text-decoration: none;
-    background-color: white;
-    border-radius: 14px;
-    padding: 40px 20px;
+    background: #fff;
+    color: #2b0000;
+    border-radius: 16px;
+    padding: 50px 25px;
     text-align: center;
-    font-weight: 500;
-    color: white;
-    transition: transform 0.3s, box-shadow 0.3s;
+    font-weight: 600;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(179, 0, 0, 0.2);
+}
+.action-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(179, 0, 0, 0.4);
 }
 
-.action-card i {
-    font-size: 36px;
+/* Icons */
+.icon-red {
+    color: #b30000;
+    font-size: 42px;
     margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
+.action-card:hover .icon-red {
+    color: #d11a1a;
 }
 
+/* Text */
 .action-card span {
     font-size: 18px;
-    letter-spacing: 0.5px;
-}
-
-/* Color Schemes */
-.action-card.red {
-    background: linear-gradient(135deg, #b30000, #e60000);
-}
-
-.action-card.light {
-    background: linear-gradient(135deg, #f1f1f1, #ddd);
-    color: #333;
-}
-
-.action-card.dark {
-    background: linear-gradient(135deg, #444, #222);
-}
-
-.action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 /* Responsive */
@@ -204,8 +188,9 @@ body {
         flex-direction: column;
         gap: 20px;
     }
-    .logo-title h1 {
-        font-size: 22px;
+    .recipient-actions {
+        grid-template-columns: 1fr;
+        gap: 25px;
     }
 }
 </style>
