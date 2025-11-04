@@ -4,7 +4,7 @@
 {% extends 'master.html' %}
 {% load static %}
 
-{% block title %}Donor Dashboard{% endblock %}
+{% block title %}Hospital Dashboard{% endblock %}
 
 {% block content %}
 <div class="hospital-dashboard">
@@ -17,7 +17,7 @@
                 <i class="fa fa-bell"></i>
             </a>
             <a href="{% url 'hospital_edit' %}">
-                {% if donor.photo %}
+                {% if hospital.photo %}
                     <img src="{{ hospital.photo.url }}" alt="{{ hospital.name }}" class="profile-img">
                 {% else %}
                     <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
@@ -45,13 +45,13 @@
             </a>
 
             <!-- 🩸 Add Blood Stock -->
-            <a href="{% url 'hospital_add_blood_form' %}" class="action-card dark">
+            <a href="{% url 'hospital_add_blood_stock' %}" class="action-card dark">
                 <i class="fa-solid fa-plus-circle"></i>
                 <span>Add Blood Stock</span>
             </a>
 
             <!-- 🩸 Add Blood Stock -->
-            <a href="{% url 'hospital_add_blood_form' %}" class="action-card dark">
+            <a href="{% url 'hospital_blood_stock_chart' %}" class="action-card dark">
                 <i class="fa-solid fa-plus-circle"></i>
                 <span>View Blood Stock</span>
             </a>

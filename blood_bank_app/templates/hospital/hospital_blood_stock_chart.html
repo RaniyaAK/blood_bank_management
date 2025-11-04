@@ -1,0 +1,75 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}Blood Stock Chart{% endblock %}
+
+{% block content %}
+<div class="chart-container">
+  <h1>Current Blood Stock Overview</h1>
+  <canvas id="bloodStockChart"></canvas>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+window.onload = function() {
+  const ctx = document.getElementById('bloodStockChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: JSON.parse('{{ labels|safe|escapejs }}'),
+      datasets: [{
+        label: 'Units Available',
+        data: JSON.parse('{{ values|safe|escapejs }}'),
+        backgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+          '#9966FF', '#FF9F40', '#D32F2F', '#388E3C'
+        ],
+        borderWidth: 1,
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#333', font: { size: 14 } }
+        },
+        title: {
+          display: true,
+          text: 'Blood Units by Blood Group',
+          font: { size: 18 },
+          color: '#B30000'
+        }
+      }
+    }
+  });
+}
+</script>
+
+<style>
+body {
+  background: #f9f9f9;
+  font-family: "Poppins", sans-serif;
+}
+.chart-container {
+  max-width: 700px;
+  margin: 60px auto;
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+h1 {
+  color: #b30000;
+  margin-bottom: 30px;
+}
+canvas {
+  width: 100% !important;
+  height: 400px !important;
+}
+</style>
+{% endblock %}

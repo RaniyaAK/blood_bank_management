@@ -20,6 +20,8 @@ from .models import DonorDetails
 from datetime import date
 from .forms import RecipientBloodRequestForm
 from django.urls import reverse
+from .forms import HospitalAddBloodStockForm
+
 
 
 
@@ -620,18 +622,43 @@ def hospital_notifications(request):
     return render(request, "hospital/hospital_notifications.html", {"notifications": sample_notifications})
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import HospitalAddBloodStockForm
-
-def hospital_add_blood_form(request):
+def hospital_add_blood_stock(request):
     if request.method == 'POST':
         form = BloodStockForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Blood stock added successfully!')
-            return redirect('hospital_add_blood_form')  # reloads same page
+            return redirect('hospital_add_blood_stock')  # reloads same page
     else:
         form = BloodStockForm()
     
-    return render(request, 'hospital/hospital_add_blood_form.html', {'form': form})
+    return render(request, 'hospital/hospital_add_blood_stock.html', {'form': form})
+
+
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import BloodStock
+import json
+
+def hospital_blood_stock_chart(request):
+    # Group by blood group and sum total units
+    stock_data = (
+        BloodStock.objects.values('bloodgroup')
+        .annotate(total_units=Sum('unit'))
+        .order_by('bloodgroup')
+    )
+
+    # Prepare data
+    labels = [entry['bloodgroup'] for entry in stock_data]
+    values = [entry['total_units'] for entry in stock_data]
+
+    # Debug print (inside function)
+    print("Labels:", labels)
+    print("Values:", values)
+
+    # Pass data to template
+    context = {
+        'labels': json.dumps(labels),
+        'values': json.dumps(values),
+    }
+    return render(request, 'hospital/hospital_blood_stock_chart.html', context)

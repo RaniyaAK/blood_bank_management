@@ -24,10 +24,10 @@ urlpatterns = [
     path('hospital_registration_form/', views.hospital_details_form, name='hospital_details_form'),
     path('hospital/details_edit/', views.hospital_details_edit, name='hospital_edit'),
     path('hospital/notifications/', views.hospital_notifications, name='hospital_notifications'),
-    path('hospital/hospital_add_blood_form/', views.hospital_add_blood_form, name='hospital_add_blood_form'),
+    path('hospital/hospital_add_blood_stock/', views.hospital_add_blood_stock, name='hospital_add_blood_stock'),
+    path('hospital/hospital_blood_stock_chart/', views.hospital_blood_stock_chart, name='hospital_blood_stock_chart'),
+
     
-
-
 
 
 # donor
