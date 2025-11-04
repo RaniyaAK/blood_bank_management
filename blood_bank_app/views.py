@@ -673,7 +673,7 @@ def hospital_blood_request_form(request):
             blood_request.recipient = request.user
             blood_request.save()
             messages.success(request, "Blood request submitted successfully!")
-            return redirect('hospital_dashboard')  # ✅ Best UX flow
+            return redirect('hospital')  # ✅ Best UX flow
     else:
         form = RecipientBloodRequestForm()
 
