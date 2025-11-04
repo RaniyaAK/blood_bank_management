@@ -26,7 +26,7 @@
 </div>
 
 <div class="topbar">
-    Donors Registered
+    Blood Stock
 </div>
 <div class="main-content">
     <h1>Blood Stock</h1>
@@ -41,25 +41,7 @@
 
     {% if blood_stock %}
     <div class="section">
-        <table>
-            <thead>
-                <tr>
-                    <th>Blood Group</th>
-                    <th>Units</th>
-                    <th>Added At</th>
-                    <!-- Optional actions -->
-                </tr>
-            </thead>
-            <tbody>
-                {% for blood in blood_stock %}
-                <tr>
-                    <td>{{ blood.bloodgroup }}</td>
-                    <td>{{ blood.unit }}</td>
-                    <td>{{ blood.added_at|date:"Y-m-d H:i" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        
     </div>
     {% else %}
         <p>No blood added yet.</p>

@@ -1,29 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout,login as auth_login
 from django.contrib.auth.decorators import login_required
-from .forms import LoginForm, UserForm
-from .models import Profile
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.urls import reverse
+from django.db.models import Sum
+
+from .forms import RecipientBloodRequestForm
+from .forms import HospitalBloodRequestForm
+from .forms import LoginForm, UserForm
 from .forms import BloodStockForm
-from .models import BloodStock
-from datetime import datetime
-from .models import DonorDetails, RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTestForm
 from .forms import RecipientDetailsForm
 from .forms import DonorDetailsForm
 from .forms import HospitalDetailsForm
-from django.db.models import Sum
 from .forms import DonorRequestAppointmentForm
-import datetime
 from .forms import DonorEligibilityForm
+
+from .models import Profile
+from .models import BloodStock
+from .models import DonorDetails, RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTestForm
 from .models import DonorDetails
+
 from datetime import date
-from .forms import RecipientBloodRequestForm
-from .forms import HospitalBloodRequestForm
-from django.urls import reverse
-from .forms import HospitalAddBloodStockForm
-
-
+import json
 
 
 def home(request):
@@ -635,11 +636,6 @@ def hospital_add_blood_stock(request):
     
     return render(request, 'hospital/hospital_add_blood_stock.html', {'form': form})
 
-
-from django.shortcuts import render
-from django.db.models import Sum
-from .models import BloodStock
-import json
 
 def hospital_blood_stock_chart(request):
     # Group by blood group and sum total units
