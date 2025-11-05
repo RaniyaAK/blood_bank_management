@@ -16,12 +16,14 @@ from .forms import RecipientDetailsForm
 from .forms import DonorDetailsForm
 from .forms import HospitalDetailsForm
 from .forms import DonorRequestAppointmentForm
-from .forms import DonorEligibilityForm
+from .forms import DonorEligibilityTestForm
 
 from .models import Profile
 from .models import BloodStock
 from .models import DonorDetails, RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTestForm
 from .models import DonorDetails
+from .models import AdminNotification
+
 
 from datetime import date
 import json
@@ -216,6 +218,13 @@ def donor(request):
 
 
 # --- Dashboards ---
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from .models import Profile, BloodStock, AdminNotification  # ✅ added import
+
+
+from .models import AdminNotification  # ✅ make sure this model is imported
+
 @login_required
 def admin_dashboard(request):
     donors_count = Profile.objects.filter(role='donor').count()
@@ -223,13 +232,19 @@ def admin_dashboard(request):
     hospitals_count = Profile.objects.filter(role='hospital').count()
     blood_units_count = BloodStock.objects.aggregate(total_units=Sum('unit'))['total_units'] or 0
 
+    # ✅ Fetch unread notification count
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
+
     context = {
         'donors_count': donors_count,
         'recipients_count': recipients_count,
         'hospitals_count': hospitals_count,
         'blood_units_count': blood_units_count,
+        'unread_notifications_count': unread_notifications_count,  # ✅ Pass to template
     }
     return render(request, 'dashboard/admin_dashboard.html', context)
+
+
 
 
 @login_required
@@ -335,7 +350,7 @@ def donor_eligibility_test_form(request):
     donor = get_object_or_404(DonorDetails, user=request.user)
 
     if request.method == 'POST':
-        form = DonorEligibilityForm(request.POST)
+        form = DonorEligibilityTestForm(request.POST)
         if form.is_valid():
             passed = True
             reasons = []
@@ -386,7 +401,7 @@ def donor_eligibility_test_form(request):
             return redirect(reverse('donor_eligibility_result') + f"?status={'Eligible' if passed else 'Not Eligible'}")
 
     else:
-        form = DonorEligibilityForm()
+        form = DonorEligibilityTestForm()
 
     return render(request, 'donor/donor_eligibility_test_form.html', {'form': form, 'donor': donor})
 
@@ -571,6 +586,10 @@ def hospital_details_edit(request):
 
     return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
 
+from django.contrib import messages
+from django.contrib.auth.models import User
+from .models import AdminNotification
+from .forms import HospitalBloodRequestForm
 
 def hospital_blood_request_form(request):
     if request.method == 'POST':
@@ -579,12 +598,22 @@ def hospital_blood_request_form(request):
             blood_request = form.save(commit=False)
             blood_request.hospital = request.user
             blood_request.save()
+
+            # ✅ Create Admin Notification after saving
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                AdminNotification.objects.create(
+                    user=admin_user,
+                    message=f"{request.user.username} requested {blood_request.units} units of {blood_request.blood_group} blood."
+                )
+
             messages.success(request, "Blood request submitted successfully!")
-            return redirect('hospital')  # ✅ Best UX flow
+            return redirect('hospital')  # ✅ Keeps your existing redirect
     else:
         form = HospitalBloodRequestForm()
 
     return render(request, 'hospital/hospital_blood_request_form.html', {'form': form})
+
 
 
 def hospital_add_blood_stock(request):
@@ -662,6 +691,18 @@ def users(request):
 
     return render(request, 'dashboard/users.html', {"user_data": user_data})
 
+from django.contrib.auth.decorators import login_required
+from .models import AdminNotification
 
+@login_required
 def admin_notifications(request):
-    return render(request, 'dashboard/admin_notifications.html')
+    notifications = AdminNotification.objects.all().order_by('-created_at')
+    unread_notifications = notifications.filter(is_read=False)
+
+    # Mark all as read when the page is visited
+    unread_notifications.update(is_read=True)
+
+    context = {
+        'notifications': notifications,
+    }
+    return render(request, 'notifications/admin_notifications.html', context)

@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-
 # Phone validators
 hospital_phone_validator = RegexValidator(
     regex=r'^(\+\d{1,3})?(\d{7}|\d{10})$',
@@ -149,7 +148,6 @@ class RecipientBloodRequestForm(models.Model):
         ('Medium', 'Medium'),
         ('Low', 'Low'),
     ]
-
     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
     units = models.PositiveIntegerField()
@@ -176,8 +174,9 @@ class HospitalBloodRequestForm(models.Model):
         ('Medium', 'Medium'),
         ('Low', 'Low'),
     ]
+    
 
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+    hospital = models.ForeignKey(User, on_delete=models.CASCADE)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
     units = models.PositiveIntegerField()
     required_date = models.DateField()
@@ -185,4 +184,18 @@ class HospitalBloodRequestForm(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Request by {self.recipient.username} - {self.blood_group} ({self.units} units)"
+        return f"Request by {self.hospital.username} - {self.blood_group} ({self.units} units)"
+    
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class AdminNotification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # ✅ added
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Admin Notification for {self.user.username if self.user else 'admin'} - {self.message[:50]}"

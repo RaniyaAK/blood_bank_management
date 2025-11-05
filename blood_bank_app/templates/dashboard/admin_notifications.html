@@ -1,0 +1,53 @@
+{% extends "master.html" %}
+{% block title %}Admin Notifications{% endblock %}
+
+{% block content %}
+<div class="section">
+  <h2>Notifications</h2>
+  <div class="notif-list">
+    {% for notif in notifications %}
+      <div class="notif-item {% if not notif.is_read %}unread{% endif %}">
+        <p>{{ notif.message }}</p>
+        <span class="notif-time">{{ notif.created_at|date:"Y-m-d H:i" }}</span>
+      </div>
+    {% empty %}
+      <p>No notifications yet.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+.section {
+  margin-left: 240px;
+  padding: 100px 40px;
+}
+
+.notif-list {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.notif-item {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.notif-item.unread {
+  background-color: #fdf2f2;
+  font-weight: 600;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-time {
+  color: #777;
+  font-size: 12px;
+  display: block;
+  text-align: right;
+}
+</style>
+{% endblock %}

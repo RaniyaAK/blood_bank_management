@@ -29,7 +29,11 @@
     <div class="topbar-icons">
         <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
             <i class="fa-solid fa-bell"></i>
-            <span class="notif-count">3</span>
+
+            {% if unread_notifications_count > 0 %}
+              <span class="notif-count">{{ unread_notifications_count }}</span>
+            {% endif %}
+
         </a>
     </div>
 
