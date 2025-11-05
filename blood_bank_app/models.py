@@ -48,6 +48,7 @@ class BloodStock(models.Model):
 class HospitalDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True, null=True, blank=True)   
     code = models.CharField(max_length=50)
     since = models.DateField()
     phonenumber = models.CharField(max_length=15, validators=[hospital_phone_validator])

@@ -47,11 +47,13 @@ class DonorDetailsForm(forms.ModelForm):
     class Meta:
         model = DonorDetails
         fields = ['name', 'address','email' ,'phonenumber', 'age', 'bloodgroup', 'photo']
+
         widgets = {
             'age': forms.NumberInput(attrs={'min': 18, 'max': 65, 'placeholder': 'Enter your age'}),
             'address': forms.Textarea(attrs={'rows': 3}),
             'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
         }
+
         labels = {
             'phonenumber': 'Contact Number'
         }
@@ -65,8 +67,8 @@ class RecipientDetailsForm(forms.ModelForm):
             'dob': forms.DateInput(attrs={'type': 'date'}),
             'address': forms.Textarea(attrs={'rows': 3}),
             'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
-
         }
+
         labels = {
             'weight': 'Weight (kg)',
             'phonenumber': 'Contact Number'
@@ -76,14 +78,18 @@ class RecipientDetailsForm(forms.ModelForm):
 class HospitalDetailsForm(forms.ModelForm):
     class Meta:
         model = HospitalDetails
-        fields = ['name', 'code', 'location', 'phonenumber', 'since', 'photo']
-        labels = {
-            'code': 'Hospital Code',
-            'phonenumber': 'Contact Number'
-        }
+        fields = ['name', 'code','email', 'location', 'phonenumber', 'since', 'photo']
+
         widgets = {
             'since': forms.DateInput(attrs={'type': 'date'}),
             'location': forms.Textarea(attrs={'rows': 3}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
+        }
+
+        labels = {
+            'name':'Hospital Name',
+            'code': 'Hospital Code',
+            'phonenumber': 'Contact Number'
         }
 
 
