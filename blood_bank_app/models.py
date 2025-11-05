@@ -83,7 +83,6 @@ class RecipientDetails(models.Model):
     address = models.TextField()
     gender = models.CharField(max_length=10)
     dob = models.DateField()
-    weight = models.DecimalField(max_digits=5, decimal_places=2)
     bloodgroup = models.CharField(max_length=5)
     photo = models.ImageField(upload_to='recipient_photos/')
 

@@ -70,7 +70,6 @@ class RecipientDetailsForm(forms.ModelForm):
         }
 
         labels = {
-            'weight': 'Weight (kg)',
             'phonenumber': 'Contact Number'
         }
 

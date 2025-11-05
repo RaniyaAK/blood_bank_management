@@ -633,7 +633,35 @@ def hospital_notifications(request):
 
 # ______________________________________________________________________________________________________________________________
 
+from django.contrib.auth.models import User
+from django.shortcuts import render
+from .models import HospitalDetails, DonorDetails, RecipientDetails
 
-@login_required
 def users(request):
-    return render(request, 'dashboard/users.html')
+    # exclude superusers and staff/admin users
+    all_users = User.objects.filter(is_superuser=False, is_staff=False).order_by('-date_joined')
+
+    user_data = []
+    for user in all_users:
+        if HospitalDetails.objects.filter(user=user).exists():
+            role = "Hospital"
+        elif DonorDetails.objects.filter(user=user).exists():
+            role = "Donor"
+        elif RecipientDetails.objects.filter(user=user).exists():
+            role = "Recipient"
+        else:
+            role = "User"
+
+        user_data.append({
+            "id": user.id,
+            "name": user.username,
+            "email": user.email,
+            "role": role,
+            "date_joined": user.date_joined,  # ✅ Add joined date here
+        })
+
+    return render(request, 'dashboard/users.html', {"user_data": user_data})
+
+
+def admin_notifications(request):
+    return render(request, 'dashboard/admin_notifications.html')

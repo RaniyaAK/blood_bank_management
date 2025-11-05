@@ -13,11 +13,9 @@ urlpatterns = [
 
 # dashboard
     path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
-    # path('dashboard/hospital_dashboard/', views.hospital_dashboard, name='hospital_dashboard'),
-    # path('dashboard/donor_dashboard/', views.donor_dashboard, name='donor_dashboard'),
-    # path('dashboard/recipient_dashboard/', views.recipient_dashboard, name='recipient_dashboard'),
     path('dashboard/users/', views.users, name='users'),
     path('dashboard/blood_stock_dashboard/', views.blood_stock_dashboard, name='blood_stock_dashboard'),
+    path('dashboard/admin_notifications/', views.admin_notifications, name='admin_notifications'),
 
 
 
