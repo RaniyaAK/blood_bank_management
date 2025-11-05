@@ -9,7 +9,7 @@
     <!-- 🔹 Header -->
     <div class="top-bar">
         <div class="left-section">
-            <a href="{% url 'donor_edit' %}">
+            <a href="{% url 'donor_details_edit' %}">
                 {% if donor.photo %}
                     <img src="{{ donor.photo.url }}" alt="{{ donor.name }}" class="profile-img">
                 {% else %}

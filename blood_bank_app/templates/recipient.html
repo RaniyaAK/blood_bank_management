@@ -11,7 +11,7 @@
 
         <!-- ✅ Profile Icon (Left Side) -->
         <div class="left-section">
-            <a href="{% url 'recipient_edit' %}" title="Profile">
+            <a href="{% url 'recipient_details_edit' %}" title="Profile">
                 {% if recipient.photo %}
                     <img src="{{ recipient.photo.url }}" alt="{{ recipient.name }}" class="profile-img">
                 {% else %}

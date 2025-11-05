@@ -174,7 +174,6 @@ def reset_password(request, email):
     return render(request, 'reset_password.html', {'email': email})
 
 
-
 # logout
 @login_required
 def user_logout(request):
@@ -230,49 +229,15 @@ def admin_dashboard(request):
         'hospitals_count': hospitals_count,
         'blood_units_count': blood_units_count,
     }
-    return render(request, 'admin_dashboard.html', context)
-
-
-@login_required
-def donor_dashboard(request):
-    donors = DonorDetails.objects.all()
-    return render(request, 'donor_dashboard.html', {'donors': donors})
-
-@login_required
-def recipient_dashboard(request):
-    recipient = RecipientDetails.objects.all()
-    return render(request, 'recipient_dashboard.html', {'recipient': recipient})
-
-
-@login_required
-def hospital_dashboard(request):
-    return render(request, 'hospital_dashboard.html')
+    return render(request, 'dashboard/admin_dashboard.html', context)
 
 
 @login_required
 def blood_stock_dashboard(request):
     blood_stock = BloodStock.objects.all().order_by('-added_at')
 
-    return render(request, 'blood_stock_dashboard.html', {
+    return render(request, 'dashboard/blood_stock_dashboard.html', {
         'blood_stock': blood_stock
-    })
-
-@login_required
-def add_blood(request):
-    message = None
-
-    if request.method == 'POST':
-        form = BloodStockForm(request.POST)
-        if form.is_valid():
-            form.save()
-            message = "Blood added successfully!"
-            form = BloodStockForm()  
-    else:
-        form = BloodStockForm()
-
-    return render(request, 'add_blood.html', {
-        'form': form,
-        'message': message
     })
 
 # ___________________________________________________________________________________________________________________
@@ -303,28 +268,9 @@ def donor_edit(request, donor_id):
         form = DonorDetailsForm(instance=donor)
     return render(request, 'edit_donor.html', {'form': form, 'donor': donor})
 
+# ______________________________________________________________________________________________________________________________
 
-
-# users_donor_dashboard
-@login_required
-def donor_notifications(request):
-    sample_notifications = [
-        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
-        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
-        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
-    ]
-    
-    return render(request, "donor/donor_notifications.html", {"notifications": sample_notifications})
-
-
-def donation_history(request):
-    return render(request, 'donor/donation_history.html')
-
-
-def calculate_age(dob):
-    today = date.today()
-    return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-
+# Donor_dashboard
 
 @login_required
 def donor_details_form(request):
@@ -348,7 +294,7 @@ def donor_details_form(request):
 @login_required
 def donor_details_edit(request):
     """Edit profile"""
-    donor = get_object_or_404(DonorDetails, user=request.user)
+    donor = get_object_or_404(DonorDetails, user=request.user )
 
     if request.method == 'POST':
         form = DonorDetailsForm(request.POST, request.FILES, instance=donor)
@@ -359,6 +305,11 @@ def donor_details_edit(request):
         form = DonorDetailsForm(instance=donor)
 
     return render(request, 'donor/donor_details_edit.html', {'form': form, 'donor': donor})
+
+
+def calculate_age(dob):
+    today = date.today()
+    return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
 
 @login_required
@@ -386,9 +337,6 @@ def donor_eligibility_test_form(request):
     if request.method == 'POST':
         form = DonorEligibilityForm(request.POST)
         if form.is_valid():
-            # Calculate eligibility — you already have logic; reuse it.
-            # For clarity, run the same checks you had and set donor.is_eligible accordingly.
-            # Example minimal logic (adjust to your rules):
             passed = True
             reasons = []
 
@@ -451,9 +399,6 @@ def donor_eligibility_result(request):
     """
     status = request.GET.get('status', None)
     reasons = request.session.pop('eligibility_reasons', [])  # consume reasons from session
-
-    # Render your template (you already provided one). Make sure the template uses:
-    # {% if status == 'Eligible' %} ... link to donor_request_appointment_form ... {% endif %}
     return render(request, 'donor/donor_eligibility_result.html', {
         'status': status,
         'reasons': reasons
@@ -489,14 +434,28 @@ def donor_request_appointment_form(request):
     })
 
 
-# users recipient dashboard
+@login_required
+def donor_notifications(request):
+    sample_notifications = [
+        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
+        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
+        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
+    ]
+    
+    return render(request, "donor/donor_notifications.html", {"notifications": sample_notifications})
+
+
+def donation_history(request):
+    return render(request, 'donor/donation_history.html')
+
+# ____________________________________________________________________________________________________________________________
+
+# Recipient 
 
 @login_required
 def recipient_details_form(request):
-    # Check if this recipient already has a profile
     recipient = RecipientDetails.objects.filter(user=request.user).first()
     if recipient:
-        # Already filled, go to recipient dashboard
         return redirect('recipient')
 
     if request.method == 'POST':
@@ -510,24 +469,6 @@ def recipient_details_form(request):
         form = RecipientDetailsForm()
 
     return render(request, 'recipient/recipient_details_form.html', {'form': form})
-
-
-
-@login_required
-def recipient_notifications(request):
-    sample_notifications = [
-        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
-        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
-        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
-    ]
-    
-    return render(request, "recipient/recipient_notifications.html", {"notifications": sample_notifications})
-
-def recipient_blood_request_form(request):
-    return render(request,'recipient/recipient_blood_request_form.html')
-
-def received_history(request):
-    return render(request, 'recipient/received_history.html')
 
 
 @login_required
@@ -546,6 +487,37 @@ def recipient_details_edit(request):
     return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
 
 
+def recipient_blood_request_form(request):
+    if request.method == 'POST':
+        form = RecipientBloodRequestForm(request.POST)
+        if form.is_valid():
+            blood_request = form.save(commit=False)
+            blood_request.recipient = request.user
+            blood_request.save()
+            messages.success(request, "Blood request submitted successfully!")
+            return redirect('recipient') 
+    else:
+        form = RecipientBloodRequestForm()
+
+    return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
+
+
+
+@login_required
+def recipient_notifications(request):
+    sample_notifications = [
+        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
+        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
+        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
+    ]
+    
+    return render(request, "recipient/recipient_notifications.html", {"notifications": sample_notifications})
+
+
+def received_history(request):
+    return render(request, 'recipient/received_history.html')
+
+
 @login_required
 def search_blood(request):
     query = request.GET.get('q', '').strip()
@@ -561,23 +533,9 @@ def search_blood(request):
     })
 
 
-def recipient_blood_request(request):
-    if request.method == 'POST':
-        form = RecipientBloodRequestForm(request.POST)
-        if form.is_valid():
-            blood_request = form.save(commit=False)
-            blood_request.recipient = request.user
-            blood_request.save()
-            messages.success(request, "Blood request submitted successfully!")
-            return redirect('recipient_dashboard')  # ✅ Best UX flow
-    else:
-        form = RecipientBloodRequestForm()
+# ____________________________________________________________________________________________________________________
 
-    return render(request, 'recipient/recipient_blood_request.html', {'form': form})
-
-
-
-# users hospital dashboard
+# Hospital 
 @login_required
 def hospital_details_form(request):
     try:
@@ -614,14 +572,19 @@ def hospital_details_edit(request):
     return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
 
 
-def hospital_notifications(request):
-    sample_notifications = [
-        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
-        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
-        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
-    ]
-    
-    return render(request, "hospital/hospital_notifications.html", {"notifications": sample_notifications})
+def hospital_blood_request_form(request):
+    if request.method == 'POST':
+        form = HospitalBloodRequestForm(request.POST)
+        if form.is_valid():
+            blood_request = form.save(commit=False)
+            blood_request.hospital = request.user
+            blood_request.save()
+            messages.success(request, "Blood request submitted successfully!")
+            return redirect('hospital')  # ✅ Best UX flow
+    else:
+        form = HospitalBloodRequestForm()
+
+    return render(request, 'hospital/hospital_blood_request_form.html', {'form': form})
 
 
 def hospital_add_blood_stock(request):
@@ -630,7 +593,7 @@ def hospital_add_blood_stock(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Blood stock added successfully!')
-            return redirect('hospital_add_blood_stock')  # reloads same page
+            return redirect('hospital_add_blood_stock')
     else:
         form = BloodStockForm()
     
@@ -638,7 +601,6 @@ def hospital_add_blood_stock(request):
 
 
 def hospital_blood_stock_chart(request):
-    # Group by blood group and sum total units
     stock_data = (
         BloodStock.objects.values('bloodgroup')
         .annotate(total_units=Sum('unit'))
@@ -649,7 +611,6 @@ def hospital_blood_stock_chart(request):
     labels = [entry['bloodgroup'] for entry in stock_data]
     values = [entry['total_units'] for entry in stock_data]
 
-    # Debug print (inside function)
     print("Labels:", labels)
     print("Values:", values)
 
@@ -661,16 +622,18 @@ def hospital_blood_stock_chart(request):
     return render(request, 'hospital/hospital_blood_stock_chart.html', context)
 
 
-def hospital_blood_request_form(request):
-    if request.method == 'POST':
-        form = HospitalBloodRequestForm(request.POST)
-        if form.is_valid():
-            blood_request = form.save(commit=False)
-            blood_request.recipient = request.user
-            blood_request.save()
-            messages.success(request, "Blood request submitted successfully!")
-            return redirect('hospital')  # ✅ Best UX flow
-    else:
-        form = RecipientBloodRequestForm()
+def hospital_notifications(request):
+    sample_notifications = [
+        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
+        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
+        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
+    ]
+    
+    return render(request, "hospital/hospital_notifications.html", {"notifications": sample_notifications})
 
-    return render(request, 'hospital/hospital_blood_request_form.html', {'form': form})
+# ______________________________________________________________________________________________________________________________
+
+
+@login_required
+def users(request):
+    return render(request, 'dashboard/users.html')

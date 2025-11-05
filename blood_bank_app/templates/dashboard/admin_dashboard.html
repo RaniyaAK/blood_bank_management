@@ -1,6 +1,7 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
+{% load static %}
 
-{% block title %} Donor Dashboard {% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
 
@@ -17,49 +18,43 @@
     </div>
 
     <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-    <a href="{% url 'hospital_dashboard' %}"><i class="fa-solid fa-hospital"></i> Hospitals</a>
-    <a href="{% url 'donor_dashboard' %}"><i class="fa-solid fa-hand-holding-medical"></i> Donors</a>
-    <a href="{% url 'recipient_dashboard' %}"><i class="fa-solid fa-user"></i> Recipients</a>
+    <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
     <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
 </div>
 
 <div class="topbar">
-    Donors Registered
+    Admin Dashboard
 </div>
 
 <div class="main-content">
+    <div class="cards">
+        <!-- Total Donors -->
+        <div class="card red">
+            <i class="fa-solid fa-hand-holding-medical icon"></i>
+            <h2>{{ donors_count }}</h2>
+            <p>Total Donors Registered</p>
+        </div>
 
+        <!-- Total Recipients -->
+        <div class="card red">
+            <i class="fa-solid fa-user icon"></i>
+            <h2>{{ recipients_count }}</h2>
+            <p>Total Recipients Registered</p>
+        </div>
 
-    <div class="section">
-        <h2>All Donors</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Blood Group</th>
-                    <th>Contact</th>
-                    <th>City</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for donor in donors %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ donor.user.first_name }} {{ donor.user.last_name }}</td>
-                    <td>{{ donor.user.email }}</td>
-                    <td>{{ donor.blood_group }}</td>
-                    <td>{{ donor.contact }}</td>
-                    <td>{{ donor.city }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6">No donors registered yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Total Hospitals -->
+        <div class="card red">
+            <i class="fa-solid fa-hospital icon"></i>
+            <h2>{{ hospitals_count }}</h2>
+            <p>Total Hospitals Registered</p>
+        </div>
+
+        <!-- Available Blood Units -->
+        <div class="card red">
+            <i class="fa-solid fa-droplet icon"></i>
+            <h2>{{ blood_units_count }}</h2>
+            <p>Available Blood Units</p>
+        </div>
     </div>
 </div>
 
@@ -141,8 +136,8 @@ body, html {
 }
 .profile-dropdown p { margin: 10px 15px; font-weight: 500; }
 .profile-dropdown a { display: block; padding: 10px 15px; text-decoration: none; border-top: 1px solid #ddd; color:#333; }
-.profile-dropdown a.logout-link { color: #333 !important; }
-.profile-dropdown a.logout-link:hover { background-color: #eee4e4; color: #8B0000; }
+.logout-link { color: #333; padding: 8px 16px; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; white-space: nowrap; }
+.logout-link:hover { transform: scale(1.07); background-color: #eee4e4; color: #8B0000; }
 
 .sidebar a {
     display: flex;
@@ -157,7 +152,7 @@ body, html {
     font-weight: 500;
     font-size: 15px;
 }
-.sidebar a:hover { background-color: #00897B; padding-left: 30px; }
+.sidebar a:hover { background-color:#00897B; padding-left: 30px; }
 
 /* Topbar */
 .topbar {
@@ -178,32 +173,40 @@ body, html {
 }
 
 /* Main content */
-.main-content {
-    margin-left: 220px;
-    padding: 80px 40px 20px 40px;
+.main-content { 
+    margin-left: 220px; 
+    padding: 80px 40px 20px 40px; 
 }
 
 /* Cards */
-.cards { display: flex; flex-wrap: wrap; gap: 25px; margin-bottom: 40px; }
-.card {
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center; /* ✅ Centers cards horizontally */
+    align-items: center;      /* ✅ Centers vertically across rows */
+}
+
+.card.red {
     background: linear-gradient(135deg, #8B0000, #b30000);
+}
+.card.red:hover {
+    background: linear-gradient(135deg, #b30000, #8B0000);
+}
+
+/* Common card styles */
+.card {
     border-radius: 12px;
     padding: 25px 40px;
     text-align: center;
     width: 220px;
-    transition: transform 0.2s;
+    flex: 1 1 200px; /* ✅ Makes cards responsive */
+    max-width: 250px;
+    transition: transform 0.2s, background 0.3s;
 }
 .card:hover { transform: scale(1.05); }
 .card .icon { font-size: 36px; margin-bottom: 15px; color: #fff; }
 .card h2, .card p { color: #fff; margin: 0; font-weight: 500; }
-
-/* Table section */
-.section { margin-top: 40px; background: white; border-radius: 10px; padding: 20px 30px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
-.section h2 { color: #2f3640; margin-bottom: 15px; border-bottom: 3px solid #40739e; display: inline-block; padding-bottom: 5px; }
-.section table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-.section th, .section td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-.section tr:nth-child(even) { background-color: #f9f9f9; }
-.section tr:hover { background-color: #eef4ff; }
 
 /* Responsive */
 @media (max-width: 768px) {

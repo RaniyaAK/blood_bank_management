@@ -9,7 +9,7 @@
     <!-- 🔹 Header -->
     <div class="top-bar">
         <div class="left-section">
-            <a href="{% url 'hospital_edit' %}">
+            <a href="{% url 'hospital_details_edit' %}">
                 {% if hospital.photo %}
                     <img src="{{ hospital.photo.url }}" alt="{{ hospital.name }}" class="profile-img">
                 {% else %}
