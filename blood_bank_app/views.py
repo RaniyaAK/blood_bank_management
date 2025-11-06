@@ -17,17 +17,17 @@ from .forms import DonorDetailsForm
 from .forms import HospitalDetailsForm
 from .forms import DonorRequestAppointmentForm
 from .forms import DonorEligibilityTestForm
+from .forms import RecipientBloodRequestForm
 
 from .models import Profile
 from .models import BloodStock
-from .models import DonorDetails, RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTestForm
+from .models import RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTestForm
 from .models import DonorDetails
+from .models import HospitalDetails
 from .models import AdminNotification
-
 
 from datetime import date
 import json
-
 
 def home(request):
     return render(request, 'home.html')
@@ -218,12 +218,6 @@ def donor(request):
 
 
 # --- Dashboards ---
-from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
-from .models import Profile, BloodStock, AdminNotification  # ✅ added import
-
-
-from .models import AdminNotification  # ✅ make sure this model is imported
 
 @login_required
 def admin_dashboard(request):
@@ -500,9 +494,6 @@ def recipient_details_edit(request):
     return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
 
 
-
-
-
 @login_required
 def recipient_notifications(request):
     sample_notifications = [
@@ -532,6 +523,8 @@ def search_blood(request):
         'query': query,
     })
 
+def recipient_blood_request_form(request):
+    return render(request, 'recipient/recipient_blood_request_form.html')
 
 # ____________________________________________________________________________________________________________________
 
@@ -645,10 +638,6 @@ def hospital_notifications(request):
 
 # ______________________________________________________________________________________________________________________________
 
-from django.contrib.auth.models import User
-from django.shortcuts import render
-from .models import HospitalDetails, DonorDetails, RecipientDetails
-
 def users(request):
     # exclude superusers and staff/admin users
     all_users = User.objects.filter(is_superuser=False, is_staff=False).order_by('-date_joined')
@@ -689,3 +678,32 @@ def admin_notifications(request):
         'notifications': notifications,
     }
     return render(request, 'dashboard/admin_notifications.html', context)
+
+
+
+
+@login_required
+def recipient_blood_request_form(request):
+    if request.method == 'POST':
+        form = RecipientBloodRequestForm(request.POST)
+        if form.is_valid():
+            blood_request = form.save(commit=False)
+            blood_request.recipient = request.user
+            blood_request.save()
+
+            # ✅ Notify admin
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                AdminNotification.objects.create(
+                    user=admin_user,
+                    message=f"{request.user.username} requested {blood_request.units} units of {blood_request.blood_group} blood (Urgency: {blood_request.urgency})."
+                )
+
+            messages.success(request, "Blood request submitted successfully!")
+            form = RecipientBloodRequestForm()  # reset form
+    else:
+        form = RecipientBloodRequestForm()
+
+    return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
+
+

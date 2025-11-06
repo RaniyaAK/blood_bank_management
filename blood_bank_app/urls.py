@@ -52,7 +52,7 @@ urlpatterns = [
     path('recipient/notifications/', views.recipient_notifications, name='recipient_notifications'),
 
     path('recipient/received_history/', views.received_history, name='received_history'),
-    # path('recipient/recipient_blood_request_form/', views.recipient_blood_request_form, name='recipient_blood_request_form'),
+    path('recipient/recipient_blood_request_form/', views.recipient_blood_request_form, name='recipient_blood_request_form'),
     path('recipient/search_blood/', views.search_blood, name='search_blood'),
 
 

@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
 from .models import DonorRequestAppointment, DonorEligibilityTestForm
-# from .models import RecipientBloodRequestForm
+from .models import RecipientBloodRequest
 from .models import HospitalBloodRequest
 
 
@@ -204,3 +204,30 @@ def clean_required_date(self):
     if required_date and required_date < date.today():
         raise ValidationError("Required date cannot be in the past.")
     return required_date
+
+
+class RecipientBloodRequestForm(forms.ModelForm):
+    class Meta:
+        model = RecipientBloodRequest
+        fields = ['blood_group', 'units', 'required_date', 'urgency']
+        widgets = {
+            'blood_group': forms.Select(attrs={'class': 'form-control'}),
+            'units': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1,
+                'placeholder': 'Enter number of units needed',
+            }),
+            'required_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'min': date.today().strftime('%Y-%m-%d'),  # ✅ restricts to future dates in UI
+            }),
+            'urgency': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    # ✅ Backend validation — prevents past dates being submitted manually
+    def clean_required_date(self):
+        required_date = self.cleaned_data.get('required_date')
+        if required_date and required_date < date.today():
+            raise ValidationError("Required date cannot be in the past.")
+        return required_date
