@@ -3,6 +3,10 @@
 {% block title %}Add Blood Stock{% endblock %}
 
 {% block content %}
+
+<!-- 🔙 Back Arrow outside form -->
+<a href="javascript:history.back()" class="back-arrow">&#8592; Back</a>
+
 <div class="add-blood-container">
     <h1>Add Blood Stock</h1>
 
@@ -38,7 +42,25 @@
     margin: 0;
     padding: 0;
   }
-.add-blood-container {
+
+  /* 🔙 Back Arrow */
+  .back-arrow {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 18px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .back-arrow:hover {
+    color: #f1f1f1;
+    text-decoration: underline;
+  }
+
+  .add-blood-container {
     max-width: 500px;
     margin: 80px auto;
     background: #fff;
@@ -46,63 +68,74 @@
     border-radius: 14px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     text-align: center;
-}
-h1 {
+  }
+
+  h1 {
     color: #b30000;
     margin-bottom: 30px;
-}
-.form-group {
+  }
+
+  .form-group {
     margin-bottom: 20px;
     text-align: left;
-}
-label {
+  }
+
+  label {
     display: block;
     font-weight: 500;
     margin-bottom: 6px;
     color: #333;
-}
-.form-control {
+  }
+
+  .form-control {
     width: 100%;
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
     font-size: 16px;
-}
-.btn-container {
+  }
+
+  .btn-container {
     display: flex;
     justify-content: center;
     gap: 10px;
-}
-.submit-btn, .cancel-btn {
+  }
+
+  .submit-btn, .cancel-btn {
     border: none;
     padding: 10px 25px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
     transition: transform 0.2s;
-}
-.submit-btn {
+  }
+
+  .submit-btn {
     background: linear-gradient(135deg, #b30000, #e60000);
     color: #fff;
-}
-.submit-btn:hover {
+  }
+
+  .submit-btn:hover {
     transform: scale(1.05);
-}
-.cancel-btn {
+  }
+
+  .cancel-btn {
     background-color: #ccc;
     color: #333;
-}
-.cancel-btn:hover {
+  }
+
+  .cancel-btn:hover {
     transform: scale(1.05);
     background-color: #bbb;
-}
-.message.success {
+  }
+
+  .message.success {
     background-color: #d4edda;
     color: #155724;
     padding: 10px;
     border-radius: 6px;
     margin-bottom: 20px;
-}
+  }
 </style>
 
 <script>

@@ -23,7 +23,15 @@
 </div>
 
 <div class="topbar">
-    Admin Dashboard
+    <span>Admin Dashboard</span>
+    <div class="topbar-icons">
+        <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
+            <i class="fa-solid fa-bell"></i>
+            {% if unread_notifications_count > 0 %}
+                <span class="notif-count">{{ unread_notifications_count }}</span>
+            {% endif %}
+        </a>
+    </div>
 </div>
 
 <div class="main-content">
@@ -164,12 +172,47 @@ body, html {
     background-color: #8B0000; 
     color: #fff;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding-left: 30px;
+    padding: 0 30px;
     font-size: 1.5em;
     font-weight: 600;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 90;
+}
+
+/* Notification icon */
+.topbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.notification-icon {
+    color: #fff;
+    font-size: 20px;
+    position: relative;
+    transition: transform 0.2s;
+}
+.notification-icon:hover {
+    transform: scale(1.12);
+    color: #ffd9d9;
+}
+.notif-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background-color: #FF3B30;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 600;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
 }
 
 /* Main content */
@@ -183,8 +226,8 @@ body, html {
     display: flex;
     flex-wrap: wrap;
     gap: 25px;
-    justify-content: center; /* ✅ Centers cards horizontally */
-    align-items: center;      /* ✅ Centers vertically across rows */
+    justify-content: center;
+    align-items: center;
 }
 
 .card.red {
@@ -194,13 +237,12 @@ body, html {
     background: linear-gradient(135deg, #b30000, #8B0000);
 }
 
-/* Common card styles */
 .card {
     border-radius: 12px;
     padding: 25px 40px;
     text-align: center;
     width: 220px;
-    flex: 1 1 200px; /* ✅ Makes cards responsive */
+    flex: 1 1 200px;
     max-width: 250px;
     transition: transform 0.2s, background 0.3s;
 }

@@ -4,8 +4,9 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
 from .models import DonorRequestAppointment, DonorEligibilityTestForm
-from .models import RecipientBloodRequestForm
-from .models import HospitalBloodRequestForm
+# from .models import RecipientBloodRequestForm
+from .models import HospitalBloodRequest
+
 
 
 class UserForm(forms.ModelForm):
@@ -147,35 +148,6 @@ class DonorEligibilityForm(forms.ModelForm):
         self.fields['dob'].input_formats = ['%Y-%m-%d']
         self.fields['last_donation_date'].input_formats = ['%Y-%m-%d']
 
-
-class RecipientBloodRequestForm(forms.ModelForm):
-    class Meta:
-        model = RecipientBloodRequestForm
-        fields = ['blood_group', 'units', 'required_date', 'urgency', 'reason']
-
-        widgets = {
-            'blood_group': forms.Select(attrs={
-                'class': 'form-control',
-            }),
-            'units': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1,
-                'placeholder': 'Enter number of units needed',
-            }),
-            'required_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date',
-            }),
-            'urgency': forms.Select(attrs={
-                'class': 'form-control',
-            }),
-            'reason': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4,
-                'placeholder': 'Describe the reason for the blood request...',
-            }),
-        }
-
         labels = {
             'blood_group': 'Blood Group',
             'units': 'Number of Units',
@@ -209,13 +181,10 @@ class HospitalAddBloodStockForm(forms.ModelForm):
 
 class HospitalBloodRequestForm(forms.ModelForm):
     class Meta:
-        model = HospitalBloodRequestForm
+        model = HospitalBloodRequest
         fields = ['blood_group', 'units', 'required_date', 'urgency']
-
         widgets = {
-            'blood_group': forms.Select(attrs={
-                'class': 'form-control',
-            }),
+            'blood_group': forms.Select(attrs={'class': 'form-control'}),
             'units': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': 1,
@@ -224,9 +193,14 @@ class HospitalBloodRequestForm(forms.ModelForm):
             'required_date': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date',
+                'min': date.today().strftime('%Y-%m-%d'),
             }),
-            'urgency': forms.Select(attrs={
-                'class': 'form-control',
-            }),
-
+            'urgency': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    # ✅ Backend validation
+def clean_required_date(self):
+    required_date = self.cleaned_data.get('required_date')
+    if required_date and required_date < date.today():
+        raise ValidationError("Required date cannot be in the past.")
+    return required_date

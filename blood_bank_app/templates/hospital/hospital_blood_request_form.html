@@ -12,10 +12,27 @@
     padding: 0;
   }
 
+  /* 🔙 Back Arrow — outside the form */
+  .back-arrow {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 18px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .back-arrow:hover {
+    color: #f1f1f1;
+    text-decoration: underline;
+  }
+
   .form-container {
     width: 90%;
     max-width: 500px;
-    margin: 60px auto;
+    margin: 80px auto 60px; /* extra top margin to give space for back arrow */
     background: #fff;
     padding: 30px 40px;
     border-radius: 16px;
@@ -100,6 +117,9 @@
   }
 </style>
 
+<!-- 🔙 Back Arrow outside form -->
+<a href="javascript:history.back()" class="back-arrow">&#8592; Back</a>
+
 <div class="form-container">
   <h2>Blood Request Form</h2>
 
@@ -117,15 +137,19 @@
 
     <label for="id_blood_group">Blood Group:</label>
     {{ form.blood_group }}
+    {{ form.blood_group.errors }}
 
     <label for="id_units">Units Required:</label>
     {{ form.units }}
+    {{ form.units.errors }}
 
     <label for="id_required_date">Required Date:</label>
     {{ form.required_date }}
+    {{ form.required_date.errors }}
 
     <label for="id_urgency">Urgency Level:</label>
     {{ form.urgency }}
+    {{ form.urgency.errors }}
 
     <div class="btn-container">
       <button type="reset" class="cancel-btn">Cancel</button>

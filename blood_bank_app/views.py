@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.db.models import Sum
 
-from .forms import RecipientBloodRequestForm
+# from .forms import RecipientBloodRequestForm
 from .forms import HospitalBloodRequestForm
 from .forms import LoginForm, UserForm
 from .forms import BloodStockForm
@@ -329,13 +329,11 @@ def calculate_age(dob):
 
 @login_required
 def donor_request_appointment(request):
-    """
-    Warning/landing page shown when donor clicks the Request Appointment card.
-    Template (donor/donor_request_appointment.html) should show:
-      - If donor.is_eligible == False -> warning + button linking to donor_eligibility_test_form
-      - If donor.is_eligible == True -> either show message "You are eligible" and link to actual booking form
-    """
-    donor = get_object_or_404(DonorDetails, user=request.user)
+    donor = DonorDetails.objects.filter(user=request.user).first()
+    if not donor:
+        messages.warning(request, "Please complete your donor profile before requesting an appointment.")
+        return redirect('donor_details_form')
+
     return render(request, 'donor/donor_request_appointment.html', {
         'donor': donor
     })
@@ -502,19 +500,6 @@ def recipient_details_edit(request):
     return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
 
 
-def recipient_blood_request_form(request):
-    if request.method == 'POST':
-        form = RecipientBloodRequestForm(request.POST)
-        if form.is_valid():
-            blood_request = form.save(commit=False)
-            blood_request.recipient = request.user
-            blood_request.save()
-            messages.success(request, "Blood request submitted successfully!")
-            return redirect('recipient') 
-    else:
-        form = RecipientBloodRequestForm()
-
-    return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
 
 
 
@@ -586,10 +571,6 @@ def hospital_details_edit(request):
 
     return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
 
-from django.contrib import messages
-from django.contrib.auth.models import User
-from .models import AdminNotification
-from .forms import HospitalBloodRequestForm
 
 def hospital_blood_request_form(request):
     if request.method == 'POST':
@@ -608,7 +589,9 @@ def hospital_blood_request_form(request):
                 )
 
             messages.success(request, "Blood request submitted successfully!")
-            return redirect('hospital')  # ✅ Keeps your existing redirect
+
+            # ✅ Show success message and reset form (stay on same page)
+            form = HospitalBloodRequestForm()  # clears form fields
     else:
         form = HospitalBloodRequestForm()
 
@@ -705,4 +688,4 @@ def admin_notifications(request):
     context = {
         'notifications': notifications,
     }
-    return render(request, 'notifications/admin_notifications.html', context)
+    return render(request, 'dashboard/admin_notifications.html', context)

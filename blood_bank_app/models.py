@@ -57,6 +57,7 @@ class HospitalDetails(models.Model):
     def __str__(self):
         return self.name
 
+
 class DonorDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
@@ -71,7 +72,6 @@ class DonorDetails(models.Model):
 
     def __str__(self):
         return self.name
-
 
 
 class RecipientDetails(models.Model):
@@ -135,33 +135,7 @@ class DonorEligibilityTestForm(models.Model):
         ordering = ['-test_date']
 
 
-class RecipientBloodRequestForm(models.Model):
-    BLOOD_GROUP_CHOICES = [
-        ('A+', 'A+'), ('A-', 'A-'),
-        ('B+', 'B+'), ('B-', 'B-'),
-        ('AB+', 'AB+'), ('AB-', 'AB-'),
-        ('O+', 'O+'), ('O-', 'O-'),
-    ]
-
-    URGENCY_LEVEL_CHOICES = [
-        ('High', 'High'),
-        ('Medium', 'Medium'),
-        ('Low', 'Low'),
-    ]
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
-    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
-    units = models.PositiveIntegerField()
-    required_date = models.DateField()
-    urgency = models.CharField(max_length=10, choices=URGENCY_LEVEL_CHOICES)
-    reason = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Request by {self.recipient.username} - {self.blood_group} ({self.units} units)"
-
-
-
-class HospitalBloodRequestForm(models.Model):
+class HospitalBloodRequest(models.Model):
     BLOOD_GROUP_CHOICES = [
         ('A+', 'A+'), ('A-', 'A-'),
         ('B+', 'B+'), ('B-', 'B-'),
@@ -175,7 +149,6 @@ class HospitalBloodRequestForm(models.Model):
         ('Low', 'Low'),
     ]
     
-
     hospital = models.ForeignKey(User, on_delete=models.CASCADE)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
     units = models.PositiveIntegerField()
@@ -186,10 +159,6 @@ class HospitalBloodRequestForm(models.Model):
     def __str__(self):
         return f"Request by {self.hospital.username} - {self.blood_group} ({self.units} units)"
     
-
-
-from django.db import models
-from django.contrib.auth.models import User
 
 class AdminNotification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # ✅ added

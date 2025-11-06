@@ -1,9 +1,8 @@
 {% extends 'master.html' %}
 
-{% block title %} blood stock dashboard {% endblock %}
+{% block title %}Blood Stock Dashboard{% endblock %}
 
 {% block content %}
-
 
 <div class="sidebar">
     <div class="profile-container">
@@ -20,35 +19,59 @@
     <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
     <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
     <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
-    
 </div>
 
 <div class="topbar">
-    Blood Stock
+    <span>Blood Stock</span>
+    <div class="topbar-icons">
+        <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
+            <i class="fa-solid fa-bell"></i>
+            {% if unread_notifications_count > 0 %}
+                <span class="notif-count">{{ unread_notifications_count }}</span>
+            {% endif %}
+        </a>
+    </div>
 </div>
+
 <div class="main-content">
     <h1>Blood Stock</h1>
-
 
     <!-- Display messages -->
     {% if messages %}
         {% for message in messages %}
-            <p style="color: green; font-weight: bold; text-align:center;">{{ message }}</p>
+            <p class="message">{{ message }}</p>
         {% endfor %}
     {% endif %}
 
     {% if blood_stock %}
     <div class="section">
-        
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Blood Group</th>
+                    <th>Units Available</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in blood_stock %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ stock.blood_group }}</td>
+                    <td>{{ stock.units }}</td>
+                    <td>{{ stock.updated_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     {% else %}
         <p>No blood added yet.</p>
     {% endif %}
 </div>
 
-
 <script>
-
 function toggleProfile() {
     var dropdown = document.getElementById("profileDropdown");
     dropdown.classList.toggle("show");
@@ -62,7 +85,6 @@ window.onclick = function(event) {
     }
 };
 </script>
-
 
 <style>
 /* Body & Font */
@@ -188,21 +210,56 @@ body, html {
     background-color: #8B0000;
     color: #fff;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding-left: 30px;
+    padding: 0 30px;
     font-size: 1.5em;
     font-weight: 600;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 90;
 }
 
+/* Notification icon */
+.topbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.notification-icon {
+    color: #fff;
+    font-size: 20px;
+    position: relative;
+    transition: transform 0.2s;
+}
+.notification-icon:hover {
+    transform: scale(1.12);
+    color: #ffd9d9;
+}
+.notif-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background-color: #FF3B30;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 600;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+}
+
 /* Main content */
 .main-content {
-    margin-left: 220px; /* space for sidebar */
-    padding: 140px 40px 40px 40px; /* increased top padding to clear topbar */
+    margin-left: 220px;
+    padding: 140px 40px 40px 40px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* center content horizontally */
+    align-items: center;
     box-sizing: border-box;
     min-height: calc(100vh - 140px);
 }
@@ -216,30 +273,13 @@ body, html {
     text-align: center;
 }
 
-/* Add Blood Button */
-.add-blood-btn {
-    display: inline-block;
-    margin-bottom: 25px;
-    background-color: #ab0909;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
-
-.add-blood-btn:hover {
-    background-color: #8B0000;
-}
-
 /* Table section */
 .section {
     width: 100%;
     max-width: 900px;
     background: white;
     border-radius: 12px;
-    padding: 25px 35px; /* slightly bigger box */
+    padding: 25px 35px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
@@ -264,7 +304,7 @@ tr:hover {
     background-color: #eef4ff;
 }
 
-/* Success message */
+/* Messages */
 p.message {
     text-align: center;
     color: green;
@@ -274,9 +314,8 @@ p.message {
 
 p{
  text-align:center;
- color:#555
+ color:#555;
 }
-
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">

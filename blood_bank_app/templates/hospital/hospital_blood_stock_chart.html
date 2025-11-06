@@ -4,8 +4,12 @@
 {% block title %}Blood Stock Chart{% endblock %}
 
 {% block content %}
+
+<!-- 🔙 Back Arrow outside the chart box -->
+<a href="javascript:history.back()" class="back-arrow">&#8592; Back</a>
+
 <div class="chart-container">
-  <h1>Current Blood Stock Overview</h1>
+  <h1>Blood Stock Overview</h1>
   <canvas id="bloodStockChart"></canvas>
 </div>
 
@@ -56,22 +60,43 @@ window.onload = function() {
     margin: 0;
     padding: 0;
   }
-.chart-container {
-  max-width: 700px;
-  margin: 60px auto;
-  background: #fff;
-  padding: 30px 40px;
-  border-radius: 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-h1 {
-  color: #b30000;
-  margin-bottom: 30px;
-}
-canvas {
-  width: 100% !important;
-  height: 400px !important;
-}
+
+  /* 🔙 Back Arrow */
+  .back-arrow {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 18px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .back-arrow:hover {
+    color: #f1f1f1;
+    text-decoration: underline;
+  }
+
+  .chart-container {
+    max-width: 700px;
+    margin: 80px auto;
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  h1 {
+    color: #b30000;
+    margin-bottom: 30px;
+  }
+
+  canvas {
+    width: 100% !important;
+    height: 400px !important;
+  }
 </style>
+
 {% endblock %}
