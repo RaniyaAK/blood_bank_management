@@ -49,7 +49,7 @@ class HospitalDetails(models.Model):
     email = models.EmailField(unique=True, null=True, blank=True)   
     code = models.CharField(max_length=50)
     since = models.DateField()
-    phonenumber = models.CharField(max_length=15, validators=[hospital_phone_validator])
+    phone_number = models.CharField(max_length=15, validators=[hospital_phone_validator])
     location = models.TextField()
     photo = models.ImageField(upload_to='hospital_photos/')
 
@@ -76,12 +76,12 @@ class DonorDetails(models.Model):
 class RecipientDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
-    phonenumber = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
+    phone_number = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
     email = models.EmailField(unique=True, null=True, blank=True)   
     address = models.TextField()
     gender = models.CharField(max_length=10)
     dob = models.DateField()
-    bloodgroup = models.CharField(max_length=5)
+    blood_group = models.CharField(max_length=5)
     photo = models.ImageField(upload_to='recipient_photos/')
 
     def __str__(self):
@@ -105,7 +105,7 @@ class DonorRequestAppointment(models.Model):
         return f"{self.donor.username} - {self.preferred_date} {self.preferred_time}"
 
 
-class DonorEligibilityTestForm(models.Model):
+class DonorEligibilityTest(models.Model):
     GENDER_CHOICES = [
         ('Male', 'Male'),
         ('Female', 'Female'),

@@ -21,7 +21,7 @@ from .forms import RecipientBloodRequestForm
 
 from .models import Profile
 from .models import BloodStock
-from .models import RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTestForm
+from .models import RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTest
 from .models import DonorDetails
 from .models import HospitalDetails
 from .models import AdminNotification
@@ -365,7 +365,6 @@ def donor_request_appointment(request):
         'donor': donor
     })
 
-
 @login_required
 def donor_eligibility_test_form(request):
     """
@@ -389,8 +388,10 @@ def donor_eligibility_test_form(request):
             on_medication = form.cleaned_data.get('on_medication')
             had_surgery_recently = form.cleaned_data.get('had_surgery_recently')
 
+            from datetime import date  # ✅ ensure date is imported
             age = calculate_age(dob)
 
+            # ✅ Eligibility checks
             if age < 18 or age > 60:
                 passed = False
                 reasons.append("You must be between 18 and 60 years old to donate blood.")
@@ -421,14 +422,23 @@ def donor_eligibility_test_form(request):
             donor.is_eligible = passed
             donor.save()
 
+            # Save reasons in session for display on result page
             request.session['eligibility_reasons'] = reasons
 
-            return redirect(reverse('donor_eligibility_result') + f"?status={'Eligible' if passed else 'Not Eligible'}")
+            return redirect(
+                reverse('donor_eligibility_result') +
+                f"?status={'Eligible' if passed else 'Not Eligible'}"
+            )
 
     else:
-        form = DonorEligibilityTestForm()
+        form = DonorEligibilityTestForm()  # initial GET
 
-    return render(request, 'donor/donor_eligibility_test_form.html', {'form': form, 'donor': donor})
+    return render(request, 'donor/donor_eligibility_test_form.html', {
+        'form': form,
+        'donor': donor
+    })
+
+
 
 
 @login_required

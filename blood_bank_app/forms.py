@@ -3,7 +3,7 @@ from datetime import date
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
-from .models import DonorRequestAppointment, DonorEligibilityTestForm
+from .models import DonorRequestAppointment, DonorEligibilityTest
 from .models import RecipientBloodRequest
 from .models import HospitalBloodRequest
 
@@ -81,10 +81,10 @@ class RecipientDetailsForm(forms.ModelForm):
     choices=BLOOD_GROUP_CHOICES,
     widget=forms.Select(attrs={'class': 'form-control'})
     )
-    
+
     class Meta:
         model = RecipientDetails
-        fields = ['name', 'address','email', 'phonenumber', 'gender', 'dob', 'bloodgroup', 'photo']
+        fields = ['name', 'address','email', 'phone_number', 'gender', 'dob', 'bloodgroup', 'photo']
         widgets = {
             'dob': forms.DateInput(attrs={'type': 'date'}),
             'address': forms.Textarea(attrs={'rows': 3}),
@@ -92,14 +92,14 @@ class RecipientDetailsForm(forms.ModelForm):
         }
 
         labels = {
-            'phonenumber': 'Contact Number'
+            'phone_number': 'Contact Number'
         }
 
 
 class HospitalDetailsForm(forms.ModelForm):
     class Meta:
         model = HospitalDetails
-        fields = ['name', 'code','email', 'location', 'phonenumber', 'since', 'photo']
+        fields = ['name', 'code','email', 'location', 'phone_number', 'since', 'photo']
 
         widgets = {
             'since': forms.DateInput(attrs={'type': 'date'}),
@@ -110,7 +110,7 @@ class HospitalDetailsForm(forms.ModelForm):
         labels = {
             'name':'Hospital Name',
             'code': 'Hospital Code',
-            'phonenumber': 'Contact Number'
+            'phone_number': 'Contact Number'
         }
 
 
@@ -137,9 +137,9 @@ class DonorRequestAppointmentForm(forms.ModelForm):
         return preferred_date
 
 
-class DonorEligibilityForm(forms.ModelForm):
+class DonorEligibilityTestForm(forms.ModelForm):
     class Meta:
-        model = DonorEligibilityTestForm
+        model = DonorEligibilityTest
         fields = [
             'gender',
             'dob',
@@ -165,7 +165,7 @@ class DonorEligibilityForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        super(DonorEligibilityForm, self).__init__(*args, **kwargs)
+        super(DonorEligibilityTestForm, self).__init__(*args, **kwargs)
         self.fields['dob'].input_formats = ['%Y-%m-%d']
         self.fields['last_donation_date'].input_formats = ['%Y-%m-%d']
 
