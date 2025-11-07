@@ -177,11 +177,10 @@ class HospitalAddBloodStockForm(forms.ModelForm):
             'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
-
 class HospitalBloodRequestForm(forms.ModelForm):
     class Meta:
         model = HospitalBloodRequest
-        fields = ['blood_group', 'units', 'required_date', 'urgency']
+        fields = ['blood_group', 'units', 'required_date', 'urgency']  # ✅ no 'status'
         widgets = {
             'blood_group': forms.Select(attrs={'class': 'form-control'}),
             'units': forms.NumberInput(attrs={
@@ -197,12 +196,13 @@ class HospitalBloodRequestForm(forms.ModelForm):
             'urgency': forms.Select(attrs={'class': 'form-control'}),
         }
 
-    # ✅ Backend validation
-def clean_required_date(self):
-    required_date = self.cleaned_data.get('required_date')
-    if required_date and required_date < date.today():
-        raise ValidationError("Required date cannot be in the past.")
-    return required_date
+    # ✅ Backend validation — ensure required_date isn’t in the past
+    def clean_required_date(self):
+        required_date = self.cleaned_data.get('required_date')
+        if required_date and required_date < date.today():
+            raise ValidationError("Required date cannot be in the past.")
+        return required_date
+
 
 
 class RecipientBloodRequestForm(forms.ModelForm):

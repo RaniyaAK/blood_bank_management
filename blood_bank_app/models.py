@@ -89,14 +89,21 @@ class RecipientDetails(models.Model):
 
 
 class DonorRequestAppointment(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+
     donor = models.ForeignKey(User, on_delete=models.CASCADE)
     preferred_date = models.DateField()
     preferred_time = models.TimeField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ Added
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.donor.username} - {self.preferred_date} {self.preferred_time}"
-    
+
 
 class DonorEligibilityTestForm(models.Model):
     GENDER_CHOICES = [
@@ -133,7 +140,6 @@ class DonorEligibilityTestForm(models.Model):
         verbose_name_plural = "Donor Eligibility Tests"
         ordering = ['-test_date']
 
-
 class HospitalBloodRequest(models.Model):
     BLOOD_GROUP_CHOICES = [
         ('A+', 'A+'), ('A-', 'A-'),
@@ -147,16 +153,24 @@ class HospitalBloodRequest(models.Model):
         ('Medium', 'Medium'),
         ('Low', 'Low'),
     ]
-    
+
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+
     hospital = models.ForeignKey(User, on_delete=models.CASCADE)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
     units = models.PositiveIntegerField()
     required_date = models.DateField()
     urgency = models.CharField(max_length=10, choices=URGENCY_LEVEL_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ Added
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Request by {self.hospital.username} - {self.blood_group} ({self.units} units)"
+
     
 
 class AdminNotification(models.Model):
@@ -167,7 +181,6 @@ class AdminNotification(models.Model):
 
     def __str__(self):
         return f"Admin Notification for {self.user.username if self.user else 'admin'} - {self.message[:50]}"
-
 
 
 class RecipientBloodRequest(models.Model):
@@ -184,12 +197,20 @@ class RecipientBloodRequest(models.Model):
         ('Low', 'Low'),
     ]
 
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+
     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
     units = models.PositiveIntegerField()
     required_date = models.DateField()
     urgency = models.CharField(max_length=10, choices=URGENCY_LEVEL_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ Added
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Request by {self.recipient.username} - {self.blood_group} ({self.units} units)"
+

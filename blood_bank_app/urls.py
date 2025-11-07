@@ -16,6 +16,7 @@ urlpatterns = [
     path('dashboard/users/', views.users, name='users'),
     path('dashboard/blood_stock_dashboard/', views.blood_stock_dashboard, name='blood_stock_dashboard'),
     path('dashboard/admin_notifications/', views.admin_notifications, name='admin_notifications'),
+    path('dashboard/manage_requests/', views.manage_requests, name='manage_requests'),
 
 
 
@@ -67,8 +68,19 @@ urlpatterns = [
     path('donor/add/', views.donor_create, name='donor_add'),
     path('donor/edit/<int:donor_id>/', views.donor_edit, name='donor_edit'),
 
+
+    # ✅ Manage Requests Actions
+    path('approve_hospital_request/<int:request_id>/', views.approve_hospital_request, name='approve_hospital_request'),
+    path('reject_hospital_request/<int:request_id>/', views.reject_hospital_request, name='reject_hospital_request'),
+
+    path('approve_donor_request/<int:request_id>/', views.approve_donor_request, name='approve_donor_request'),
+    path('reject_donor_request/<int:request_id>/', views.reject_donor_request, name='reject_donor_request'),
+
+    path('approve_recipient_request/<int:request_id>/', views.approve_recipient_request, name='approve_recipient_request'),
+    path('reject_recipient_request/<int:request_id>/', views.reject_recipient_request, name='reject_recipient_request'),
 ]
 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

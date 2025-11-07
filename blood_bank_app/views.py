@@ -236,8 +236,6 @@ def admin_dashboard(request):
     return render(request, 'dashboard/admin_dashboard.html', context)
 
 
-
-
 @login_required
 def blood_stock_dashboard(request):
     blood_stock = BloodStock.objects.all().order_by('-added_at')
@@ -246,6 +244,44 @@ def blood_stock_dashboard(request):
         'blood_stock': blood_stock
     })
 
+def users(request):
+    # exclude superusers and staff/admin users
+    all_users = User.objects.filter(is_superuser=False, is_staff=False).order_by('-date_joined')
+
+    user_data = []
+    for user in all_users:
+        if HospitalDetails.objects.filter(user=user).exists():
+            role = "Hospital"
+        elif DonorDetails.objects.filter(user=user).exists():
+            role = "Donor"
+        elif RecipientDetails.objects.filter(user=user).exists():
+            role = "Recipient"
+        else:
+            role = "User"
+
+        user_data.append({
+            "id": user.id,
+            "name": user.username,
+            "email": user.email,
+            "role": role,
+            "date_joined": user.date_joined,  # ✅ Add joined date here
+        })
+
+    return render(request, 'dashboard/users.html', {"user_data": user_data})
+
+
+@login_required
+def admin_notifications(request):
+    notifications = AdminNotification.objects.all().order_by('-created_at')
+    unread_notifications = notifications.filter(is_read=False)
+
+    # Mark all as read when the page is visited
+    unread_notifications.update(is_read=True)
+
+    context = {
+        'notifications': notifications,
+    }
+    return render(request, 'dashboard/admin_notifications.html', context)
 # ___________________________________________________________________________________________________________________
 
 
@@ -453,7 +489,6 @@ def donation_history(request):
     return render(request, 'donor/donation_history.html')
 
 # ____________________________________________________________________________________________________________________________
-
 # Recipient 
 
 @login_required
@@ -520,8 +555,30 @@ def search_blood(request):
         'query': query,
     })
 
+
+@login_required
 def recipient_blood_request_form(request):
-    return render(request, 'recipient/recipient_blood_request_form.html')
+    if request.method == 'POST':
+        form = RecipientBloodRequestForm(request.POST)
+        if form.is_valid():
+            blood_request = form.save(commit=False)
+            blood_request.recipient = request.user
+            blood_request.save()
+
+            # ✅ Notify admin
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                AdminNotification.objects.create(
+                    user=admin_user,
+                    message=f"{request.user.username} requested {blood_request.units} units of {blood_request.blood_group} blood (Urgency: {blood_request.urgency})."
+                )
+
+            messages.success(request, "Blood request submitted successfully!")
+            form = RecipientBloodRequestForm()  # reset form
+    else:
+        form = RecipientBloodRequestForm()
+
+    return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
 
 # ____________________________________________________________________________________________________________________
 
@@ -635,72 +692,124 @@ def hospital_notifications(request):
 
 # ______________________________________________________________________________________________________________________________
 
-def users(request):
-    # exclude superusers and staff/admin users
-    all_users = User.objects.filter(is_superuser=False, is_staff=False).order_by('-date_joined')
+def manage_requests(request):
+    return render(request, 'dashboard/manage_requests.html')
 
-    user_data = []
-    for user in all_users:
-        if HospitalDetails.objects.filter(user=user).exists():
-            role = "Hospital"
-        elif DonorDetails.objects.filter(user=user).exists():
-            role = "Donor"
-        elif RecipientDetails.objects.filter(user=user).exists():
-            role = "Recipient"
-        else:
-            role = "User"
 
-        user_data.append({
-            "id": user.id,
-            "name": user.username,
-            "email": user.email,
-            "role": role,
-            "date_joined": user.date_joined,  # ✅ Add joined date here
-        })
-
-    return render(request, 'dashboard/users.html', {"user_data": user_data})
-
-from django.contrib.auth.decorators import login_required
-from .models import AdminNotification
+from .models import HospitalBloodRequest, DonorRequestAppointment, RecipientBloodRequest  # ✅ import your request models
 
 @login_required
-def admin_notifications(request):
-    notifications = AdminNotification.objects.all().order_by('-created_at')
-    unread_notifications = notifications.filter(is_read=False)
+def manage_requests(request):
+    # 🏥 Hospital Requests
+    hospital_requests = HospitalBloodRequest.objects.all().order_by('-created_at')
 
-    # Mark all as read when the page is visited
-    unread_notifications.update(is_read=True)
+    # 🩸 Donor Requests
+    donor_requests = DonorRequestAppointment.objects.all().order_by('-created_at')
+
+    # 💉 Recipient Requests
+    recipient_requests = RecipientBloodRequest.objects.all().order_by('-created_at')
+
+    # 🔔 Unread notifications count
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
     context = {
-        'notifications': notifications,
+        'hospital_requests': hospital_requests,
+        'donor_requests': donor_requests,
+        'recipient_requests': recipient_requests,
+        'unread_notifications_count': unread_notifications_count,
     }
-    return render(request, 'dashboard/admin_notifications.html', context)
+
+    return render(request, 'dashboard/manage_requests.html', context)
 
 
+# -------------------- APPROVE / REJECT REQUESTS --------------------
+
+@login_required
+def approve_hospital_request(request, request_id):
+    hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
+    hospital_request.status = 'Approved'
+    hospital_request.save()
+
+    # notify admin or hospital
+    AdminNotification.objects.create(
+        user=request.user,
+        message=f"Hospital request from {hospital_request.hospital.username} has been approved."
+    )
+
+    messages.success(request, "Hospital request approved successfully!")
+    return redirect('manage_requests')
 
 
 @login_required
-def recipient_blood_request_form(request):
-    if request.method == 'POST':
-        form = RecipientBloodRequestForm(request.POST)
-        if form.is_valid():
-            blood_request = form.save(commit=False)
-            blood_request.recipient = request.user
-            blood_request.save()
+def reject_hospital_request(request, request_id):
+    hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
+    hospital_request.status = 'Rejected'
+    hospital_request.save()
 
-            # ✅ Notify admin
-            admin_user = User.objects.filter(is_superuser=True).first()
-            if admin_user:
-                AdminNotification.objects.create(
-                    user=admin_user,
-                    message=f"{request.user.username} requested {blood_request.units} units of {blood_request.blood_group} blood (Urgency: {blood_request.urgency})."
-                )
+    AdminNotification.objects.create(
+        user=request.user,
+        message=f"Hospital request from {hospital_request.hospital.username} has been rejected."
+    )
 
-            messages.success(request, "Blood request submitted successfully!")
-            form = RecipientBloodRequestForm()  # reset form
-    else:
-        form = RecipientBloodRequestForm()
-
-    return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
+    messages.error(request, "Hospital request rejected.")
+    return redirect('manage_requests')
 
 
+@login_required
+def approve_donor_request(request, request_id):
+    donor_request = get_object_or_404(DonorRequestAppointment, id=request_id)
+    donor_request.status = 'Approved'
+    donor_request.save()
+
+    AdminNotification.objects.create(
+        user=request.user,
+        message=f"Donor appointment from {donor_request.donor.username} approved."
+    )
+
+    messages.success(request, "Donor appointment approved successfully!")
+    return redirect('manage_requests')
+
+
+@login_required
+def reject_donor_request(request, request_id):
+    donor_request = get_object_or_404(DonorRequestAppointment, id=request_id)
+    donor_request.status = 'Rejected'
+    donor_request.save()
+
+    AdminNotification.objects.create(
+        user=request.user,
+        message=f"Donor appointment from {donor_request.donor.username} rejected."
+    )
+
+    messages.error(request, "Donor appointment rejected.")
+    return redirect('manage_requests')
+
+
+@login_required
+def approve_recipient_request(request, request_id):
+    recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
+    recipient_request.status = 'Approved'
+    recipient_request.save()
+
+    AdminNotification.objects.create(
+        user=request.user,
+        message=f"Recipient request from {recipient_request.recipient.username} approved."
+    )
+
+    messages.success(request, "Recipient blood request approved successfully!")
+    return redirect('manage_requests')
+
+
+@login_required
+def reject_recipient_request(request, request_id):
+    recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
+    recipient_request.status = 'Rejected'
+    recipient_request.save()
+
+    AdminNotification.objects.create(
+        user=request.user,
+        message=f"Recipient request from {recipient_request.recipient.username} rejected."
+    )
+
+    messages.error(request, "Recipient blood request rejected.")
+    return redirect('manage_requests')

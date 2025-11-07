@@ -1,6 +1,6 @@
 {% extends 'master.html' %}
 
-{% block title %}Blood Stock Dashboard{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
 
@@ -19,6 +19,8 @@
     <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
     <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
     <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
+    <a href="{% url 'manage_requests' %}" class="active"><i class="fa-solid fa-hand-holding-droplet"></i> Manage Requests</a>
+
 </div>
 
 <div class="topbar">
