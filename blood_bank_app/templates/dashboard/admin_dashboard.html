@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+
 {% load static %}
 
 {% block title %}Admin Dashboard{% endblock %}
@@ -19,6 +20,7 @@
 
     <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
     <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
+    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
     <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
 </div>
 
@@ -63,6 +65,8 @@
             <h2>{{ blood_units_count }}</h2>
             <p>Available Blood Units</p>
         </div>
+
+        
     </div>
 </div>
 

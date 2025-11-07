@@ -14,7 +14,6 @@ donor_recipient_phone_validator = RegexValidator(
     message="Enter a valid phone number."
 )
 
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     ROLE_CHOICES = (

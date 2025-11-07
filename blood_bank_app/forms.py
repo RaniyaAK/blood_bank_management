@@ -10,14 +10,13 @@ from .models import HospitalBloodRequest
 
 
 class UserForm(forms.ModelForm):
-    name = forms.CharField(widget=forms.TextInput)
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     role = forms.ChoiceField(choices=Profile.ROLE_CHOICES)
 
     class Meta:
         model = User
-        fields = ['name', 'username', 'email', 'password']
+        fields = ['username', 'email', 'password']
         help_texts = {'username': None}
 
     def clean(self):

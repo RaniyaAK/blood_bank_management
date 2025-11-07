@@ -32,7 +32,6 @@ import json
 def home(request):
     return render(request, 'home.html')
 
-
 # register
 def register(request):
     if request.method == 'POST':
@@ -44,7 +43,6 @@ def register(request):
                 email=form.cleaned_data['email'],
                 password=form.cleaned_data['password']
             )
-            user.first_name = form.cleaned_data['name']
             user.save()
 
             # ✅ Create profile with role
@@ -93,7 +91,6 @@ def user_login(request):
            
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-
             user = authenticate(request, username=username, password=password)
     
 
