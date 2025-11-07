@@ -7,8 +7,6 @@ from .models import DonorRequestAppointment, DonorEligibilityTestForm
 from .models import RecipientBloodRequest
 from .models import HospitalBloodRequest
 
-
-
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
@@ -42,11 +40,22 @@ class BloodStockForm(forms.ModelForm):
             'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
-
 class DonorDetailsForm(forms.ModelForm):
+    BLOOD_GROUP_CHOICES = [
+        ('A+', 'A+'), ('A-', 'A-'),
+        ('B+', 'B+'), ('B-', 'B-'),
+        ('AB+', 'AB+'), ('AB-', 'AB-'),
+        ('O+', 'O+'), ('O-', 'O-'),
+    ]
+
+    bloodgroup = forms.ChoiceField(
+        choices=BLOOD_GROUP_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = DonorDetails
-        fields = ['name', 'address','email' ,'phonenumber', 'age', 'bloodgroup', 'photo']
+        fields = ['name', 'address', 'email', 'phonenumber', 'age', 'bloodgroup', 'photo']
 
         widgets = {
             'age': forms.NumberInput(attrs={'min': 18, 'max': 65, 'placeholder': 'Enter your age'}),
@@ -60,6 +69,19 @@ class DonorDetailsForm(forms.ModelForm):
 
 
 class RecipientDetailsForm(forms.ModelForm):
+
+    BLOOD_GROUP_CHOICES = [
+        ('A+', 'A+'), ('A-', 'A-'),
+        ('B+', 'B+'), ('B-', 'B-'),
+        ('AB+', 'AB+'), ('AB-', 'AB-'),
+        ('O+', 'O+'), ('O-', 'O-'),
+    ]
+
+    bloodgroup = forms.ChoiceField(
+    choices=BLOOD_GROUP_CHOICES,
+    widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
     class Meta:
         model = RecipientDetails
         fields = ['name', 'address','email', 'phonenumber', 'gender', 'dob', 'bloodgroup', 'photo']
