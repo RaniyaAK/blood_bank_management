@@ -440,7 +440,6 @@ def donor_eligibility_test_form(request):
 
 
 
-
 @login_required
 def donor_eligibility_result(request):
     """
@@ -701,12 +700,20 @@ def hospital_notifications(request):
     return render(request, "hospital/hospital_notifications.html", {"notifications": sample_notifications})
 
 # ______________________________________________________________________________________________________________________________
+from datetime import date
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import (
+    HospitalBloodRequest,
+    DonorRequestAppointment,
+    RecipientBloodRequest,
+    AdminNotification
+)
+from django.contrib.auth.models import User
 
-def manage_requests(request):
-    return render(request, 'dashboard/manage_requests.html')
 
-
-from .models import HospitalBloodRequest, DonorRequestAppointment, RecipientBloodRequest  # ✅ import your request models
+# -------------------- MANAGE REQUESTS (Dashboard) --------------------
 
 @login_required
 def manage_requests(request):
@@ -727,6 +734,7 @@ def manage_requests(request):
         'donor_requests': donor_requests,
         'recipient_requests': recipient_requests,
         'unread_notifications_count': unread_notifications_count,
+        'today': date.today(),  # ✅ Added — used in template for expiry check
     }
 
     return render(request, 'dashboard/manage_requests.html', context)
@@ -734,13 +742,19 @@ def manage_requests(request):
 
 # -------------------- APPROVE / REJECT REQUESTS --------------------
 
+# ✅ Hospital Requests
 @login_required
 def approve_hospital_request(request, request_id):
     hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
+
+    # ❌ Prevent approval if required date has passed
+    if hospital_request.required_date < date.today():
+        messages.error(request, "Cannot approve — the required date has already passed.")
+        return redirect('manage_requests')
+
     hospital_request.status = 'Approved'
     hospital_request.save()
 
-    # notify admin or hospital
     AdminNotification.objects.create(
         user=request.user,
         message=f"Hospital request from {hospital_request.hospital.username} has been approved."
@@ -753,6 +767,11 @@ def approve_hospital_request(request, request_id):
 @login_required
 def reject_hospital_request(request, request_id):
     hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
+
+    if hospital_request.required_date < date.today():
+        messages.error(request, "Cannot reject — the required date has already passed.")
+        return redirect('manage_requests')
+
     hospital_request.status = 'Rejected'
     hospital_request.save()
 
@@ -765,6 +784,7 @@ def reject_hospital_request(request, request_id):
     return redirect('manage_requests')
 
 
+# ✅ Donor Requests (No date restriction)
 @login_required
 def approve_donor_request(request, request_id):
     donor_request = get_object_or_404(DonorRequestAppointment, id=request_id)
@@ -795,9 +815,16 @@ def reject_donor_request(request, request_id):
     return redirect('manage_requests')
 
 
+# ✅ Recipient Requests
 @login_required
 def approve_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
+
+    # ❌ Prevent approval if required date has passed
+    if recipient_request.required_date < date.today():
+        messages.error(request, "Cannot approve — the required date has already passed.")
+        return redirect('manage_requests')
+
     recipient_request.status = 'Approved'
     recipient_request.save()
 
@@ -813,6 +840,11 @@ def approve_recipient_request(request, request_id):
 @login_required
 def reject_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
+
+    if recipient_request.required_date < date.today():
+        messages.error(request, "Cannot reject — the required date has already passed.")
+        return redirect('manage_requests')
+
     recipient_request.status = 'Rejected'
     recipient_request.save()
 

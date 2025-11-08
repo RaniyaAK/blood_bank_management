@@ -6,324 +6,351 @@
 {% block content %}
 <!-- Sidebar -->
 <div class="sidebar">
-    <div class="profile-container">
-        <div class="profile-icon" onclick="toggleProfile()">
-            {{ request.user.username|slice:":1"|upper }}
-        </div>
-        <div class="profile-dropdown" id="profileDropdown">
-            <p><strong>{{ request.user.username }}</strong></p>
-            <p>{{ request.user.email }}</p>
-            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
-        </div>
+  <div class="profile-container">
+    <div class="profile-icon" onclick="toggleProfile()">
+      {{ request.user.username|slice:":1"|upper }}
     </div>
+    <div class="profile-dropdown" id="profileDropdown">
+      <p><strong>{{ request.user.username }}</strong></p>
+      <p>{{ request.user.email }}</p>
+      <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+    </div>
+  </div>
 
-    <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-    <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
-    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
-    <a href="{% url 'manage_requests' %}" class="active"><i class="fa-solid fa-hand-holding-droplet"></i> Manage Requests</a>
+  <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+  <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
+  <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood Stock</a>
+  <a href="{% url 'manage_requests' %}" class="active"><i class="fa-solid fa-hand-holding-droplet"></i> Manage Requests</a>
 </div>
 
 <!-- Topbar -->
 <div class="topbar">
-    <span>Admin Dashboard</span>
-    <div class="topbar-icons">
-        <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
-            <i class="fa-solid fa-bell"></i>
-            {% if unread_notifications_count > 0 %}
-                <span class="notif-count">{{ unread_notifications_count }}</span>
-            {% endif %}
-        </a>
-    </div>
+  <span>Admin Dashboard</span>
+  <div class="topbar-icons">
+    <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
+      <i class="fa-solid fa-bell"></i>
+      {% if unread_notifications_count > 0 %}
+      <span class="notif-count">{{ unread_notifications_count }}</span>
+      {% endif %}
+    </a>
+  </div>
 </div>
 
-<!-- Main content -->
+<!-- Main Content -->
 <div class="main-content">
-    <h2 class="text-center mb-4">Manage All Requests</h2>
 
-    <!-- 🏥 Hospital Requests -->
-    <h3 style="color:#8B0000;">🏥 Hospital Requests</h3>
-    <table class="table table-bordered table-hover mb-5">
-        <thead class="table-dark">
-            <tr>
-                <th>Hospital</th>
-                <th>Blood Group</th>
-                <th>Units</th>
-                <th>Urgency</th>
-                <th>Required Date</th>
-                <th>Status</th>
-                <th>Requested On</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for req in hospital_requests %}
-            <tr>
-                <td>{{ req.hospital.username }}</td>
-                <td>{{ req.blood_group }}</td>
-                <td>{{ req.units }}</td>
-                <td>{{ req.urgency }}</td>
-                <td>{{ req.required_date }}</td>
-                <td>
-                    {% if req.status == 'Pending' %}
-                        <span class="badge bg-warning text-dark">{{ req.status }}</span>
-                    {% elif req.status == 'Approved' %}
-                        <span class="badge bg-success">{{ req.status }}</span>
-                    {% else %}
-                        <span class="badge bg-danger">{{ req.status }}</span>
-                    {% endif %}
-                </td>
-                <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-                <td>
-                    {% if req.status == 'Pending' %}
-                        <a href="{% url 'approve_hospital_request' req.id %}" class="btn btn-success btn-sm">Approve</a>
-                        <a href="{% url 'reject_hospital_request' req.id %}" class="btn btn-danger btn-sm">Reject</a>
-                    {% else %}
-                        <em>No action</em>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="8" class="text-center">No hospital requests found.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <!-- 🏥 Hospital Requests -->
+  <h3 class="section-title">🏥 Hospital Requests</h3>
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>Hospital</th>
+        <th>Blood Group</th>
+        <th>Units</th>
+        <th>Urgency</th>
+        <th>Required Date</th>
+        <th>Status</th>
+        <th>Requested On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in hospital_requests %}
+      <tr>
+        <td>{{ req.hospital.username }}</td>
+        <td>{{ req.blood_group }}</td>
+        <td>{{ req.units }}</td>
+        <td class="{% if req.urgency == 'High' %}urgency-high{% elif req.urgency == 'Medium' %}urgency-medium{% else %}urgency-low{% endif %}">
+          {{ req.urgency }}
+        </td>
+        <td>{{ req.required_date }}</td>
+        <td>
+          <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
+            {{ req.status }}
+          </span>
+        </td>
+        <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          {% if req.status == 'Pending' %}
+            {% if req.required_date < today %}
+              <em>Expired</em>
+            {% else %}
+              <a href="{% url 'approve_hospital_request' req.id %}" class="btn-approve">Approve</a>
+              <a href="{% url 'reject_hospital_request' req.id %}" class="btn-reject">Reject</a>
+            {% endif %}
+          {% else %}
+            <em>------</em>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8" class="text-center">No hospital requests found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-    <!-- 🩸 Donor Requests -->
-    <h3 style="color:#8B0000;">🩸 Donor Requests</h3>
-    <table class="table table-bordered table-hover mb-5">
-        <thead class="table-dark">
-            <tr>
-                <th>Donor</th>
-                <th>Blood Group</th>
-                <th>Status</th>
-                <th>Requested On</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for req in donor_requests %}
-            <tr>
-                <td>{{ req.donor.username }}</td>
-                <td>{{ req.blood_group }}</td>
-                <td>
-                    {% if req.status == 'Pending' %}
-                        <span class="badge bg-warning text-dark">{{ req.status }}</span>
-                    {% elif req.status == 'Approved' %}
-                        <span class="badge bg-success">{{ req.status }}</span>
-                    {% else %}
-                        <span class="badge bg-danger">{{ req.status }}</span>
-                    {% endif %}
-                </td>
-                <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-                <td>
-                    {% if req.status == 'Pending' %}
-                        <a href="{% url 'approve_donor_request' req.id %}" class="btn btn-success btn-sm">Approve</a>
-                        <a href="{% url 'reject_donor_request' req.id %}" class="btn btn-danger btn-sm">Reject</a>
-                    {% else %}
-                        <em>No action</em>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6" class="text-center">No donor requests found.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <!-- 🩸 Donor Requests -->
+  <h3 class="section-title">🩸 Donor Requests</h3>
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>Donor</th>
+        <th>Blood Group</th>
+        <th>Status</th>
+        <th>Requested On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in donor_requests %}
+      <tr>
+        <td>{{ req.donor.username }}</td>
+        <td>{{ req.blood_group }}</td>
+        <td>
+          <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
+            {{ req.status }}
+          </span>
+        </td>
+        <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          {% if req.status == 'Pending' %}
+          <a href="{% url 'approve_donor_request' req.id %}" class="btn-approve">Approve</a>
+          <a href="{% url 'reject_donor_request' req.id %}" class="btn-reject">Reject</a>
+          {% else %}
+          <em>------</em>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center">No donor requests found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-    <!-- 💉 Recipient Requests -->
-    <h3 style="color:#8B0000;">💉 Recipient Requests</h3>
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Recipient</th>
-                <th>Blood Group</th>
-                <th>Units</th>
-                <th>Status</th>
-                <th>Requested On</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for req in recipient_requests %}
-            <tr>
-                <td>{{ req.recipient.username }}</td>
-                <td>{{ req.blood_group }}</td>
-                <td>{{ req.units }}</td>
-                <td>
-                    {% if req.status == 'Pending' %}
-                        <span class="badge bg-warning text-dark">{{ req.status }}</span>
-                    {% elif req.status == 'Approved' %}
-                        <span class="badge bg-success">{{ req.status }}</span>
-                    {% else %}
-                        <span class="badge bg-danger">{{ req.status }}</span>
-                    {% endif %}
-                </td>
-                <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-                <td>
-                    {% if req.status == 'Pending' %}
-                        <a href="{% url 'approve_recipient_request' req.id %}" class="btn btn-success btn-sm">Approve</a>
-                        <a href="{% url 'reject_recipient_request' req.id %}" class="btn btn-danger btn-sm">Reject</a>
-                    {% else %}
-                        <em>No action</em>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6" class="text-center">No recipient requests found.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <!-- 💉 Recipient Requests -->
+  <h3 class="section-title">💉 Recipient Requests</h3>
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>Recipient</th>
+        <th>Blood Group</th>
+        <th>Units</th>
+        <th>Required Date</th>
+        <th>Status</th>
+        <th>Requested On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in recipient_requests %}
+      <tr>
+        <td>{{ req.recipient.username }}</td>
+        <td>{{ req.blood_group }}</td>
+        <td>{{ req.units }}</td>
+        <td>{{ req.required_date }}</td>
+        <td>
+          <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
+            {{ req.status }}
+          </span>
+        </td>
+        <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          {% if req.status == 'Pending' %}
+            {% if req.required_date < today %}
+              <em>Expired</em>
+            {% else %}
+              <a href="{% url 'approve_recipient_request' req.id %}" class="btn-approve">Approve</a>
+              <a href="{% url 'reject_recipient_request' req.id %}" class="btn-reject">Reject</a>
+            {% endif %}
+          {% else %}
+            <em>------</em>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-center">No recipient requests found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
 </div>
 
+<!-- JS for profile dropdown -->
 <script>
 function toggleProfile() {
-    var dropdown = document.getElementById("profileDropdown");
-    dropdown.classList.toggle("show");
+  var dropdown = document.getElementById("profileDropdown");
+  dropdown.classList.toggle("show");
 }
 window.onclick = function(event) {
-    var dropdown = document.getElementById("profileDropdown");
-    var icon = document.querySelector(".profile-icon");
-    if (!icon.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.classList.remove("show");
-    }
+  var dropdown = document.getElementById("profileDropdown");
+  var icon = document.querySelector(".profile-icon");
+  if (!icon.contains(event.target) && !dropdown.contains(event.target)) {
+    dropdown.classList.remove("show");
+  }
 };
 </script>
 
+<!-- Styles -->
 <style>
 body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #FAFAFA;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #FAFAFA;
 }
+
+/* Sidebar */
 .sidebar {
-    width: 220px;
-    background-color: #8B0000;
-    color: white;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    padding-top: 20px;
-    z-index: 50;
+  width: 220px;
+  background-color: #8B0000;
+  color: white;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding-top: 20px;
+  z-index: 50;
 }
+.sidebar a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 12px 20px;
+  font-size: 15px;
+}
+.sidebar a:hover, .sidebar a.active {
+  background-color: #A52A2A;
+  border-left: 4px solid white;
+}
+
+/* Topbar */
+.topbar {
+  position: fixed;
+  left: 220px;
+  right: 0;
+  top: 0;
+  height: 60px;
+  background-color: #8B0000;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  font-size: 1.4em;
+  font-weight: 600;
+  z-index: 90;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 220px;
+  padding: 70px 40px 40px 40px;
+  min-height: calc(100vh - 60px);
+}
+
+/* Section Title */
+.section-title {
+  color: #8B0000;
+  margin-bottom: 10px;
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+/* Table */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 40px;
+  background-color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.styled-table th {
+  background-color: #8B0000;
+  color: white;
+  padding: 12px;
+}
+.styled-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+.styled-table tr:hover { background-color: #f9f9f9; }
+
+/* Urgency colors */
+.urgency-high { color: red; font-weight: bold; }
+.urgency-medium { color: #e6b800; font-weight: bold; }
+.urgency-low { color: #28a745; font-weight: bold; }
+
+/* Status badges */
+.badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.badge.approved { background-color: #28a745; color: white; }
+.badge.pending { background-color: #ffc107; color: black; }
+.badge.rejected { background-color: #dc3545; color: white; }
+
+/* Buttons */
+.btn-approve, .btn-reject {
+  padding: 6px 12px;
+  text-decoration: none;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+}
+.btn-approve { background-color: #28a745; }
+.btn-approve:hover { background-color: #218838; }
+.btn-reject { background-color: #dc3545; }
+.btn-reject:hover { background-color: #c82333; }
+
+/* Notification bubble */
+.notif-count {
+  background-color: yellow;
+  color: black;
+  border-radius: 50%;
+  font-size: 0.7em;
+  padding: 2px 6px;
+  position: relative;
+  top: -10px;
+  right: 10px;
+}
+
+/* Profile icon */
 .profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-    position: relative;
+  text-align: center;
+  margin-bottom: 20px;
 }
 .profile-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #FAFAFA;
-    color: #8B0000;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  width: 50px;
+  height: 50px;
+  background-color: white;
+  color: #8B0000;
+  border-radius: 50%;
+  font-weight: bold;
+  line-height: 50px;
+  margin: 0 auto;
+  cursor: pointer;
 }
 .profile-dropdown {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    color: #2f3640;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    min-width: 180px;
-    z-index: 100;
-    text-align: center;
-    padding-bottom: 10px;
+  display: none;
+  background-color: white;
+  color: black;
+  text-align: center;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 10px;
 }
-.profile-dropdown.show {
-    max-height: 500px;
-    opacity: 1;
+.profile-dropdown.show { display: block; }
+.logout-link {
+  color: #8B0000;
+  text-decoration: none;
+  font-weight: bold;
 }
-.profile-dropdown p { margin: 10px 15px; font-weight: 500; }
-.profile-dropdown a { display: block; padding: 10px 15px; text-decoration: none; border-top: 1px solid #ddd; color:#333; }
-.logout-link:hover { background-color: #eee4e4; color: #8B0000; }
-.sidebar a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    text-decoration: none;
-    padding: 12px 25px;
-    margin: 8px 0;
-    border-radius: 6px;
-    transition: 0.2s;
-    font-weight: 500;
-    font-size: 15px;
-}
-.sidebar a:hover { background-color:#00897B; padding-left: 30px; }
-
-.topbar {
-    position: fixed;
-    left: 220px;
-    right: 0;
-    top: 0;
-    height: 60px;
-    background-color: #8B0000;
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 30px;
-    font-size: 1.5em;
-    font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 90;
-}
-.topbar-icons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-.notification-icon {
-    color: #fff;
-    font-size: 20px;
-    position: relative;
-    transition: transform 0.2s;
-}
-.notification-icon:hover { transform: scale(1.12); color: #ffd9d9; }
-.notif-count {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    background-color: #FF3B30;
-    color: #fff;
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: 600;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 4px rgba(0,0,0,0.2);
-}
-
-/* ✅ Fix: Prevent overlap with topbar */
-.main-content {
-    margin-left: 220px;
-    padding: 100px 40px 40px 40px; /* increased top padding */
-}
-
-@media (max-width: 768px) {
-    .main-content { padding: 120px 20px 20px 20px; }
-}
+.logout-link:hover { text-decoration: underline; }
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 {% endblock %}

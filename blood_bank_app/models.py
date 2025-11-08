@@ -35,12 +35,12 @@ class BloodStock(models.Model):
         ('O+', 'O+'), ('O-', 'O-'),
     ]
     
-    bloodgroup = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
+    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
     unit = models.PositiveIntegerField()
     added_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.bloodgroup} - {self.unit} units"
+        return f"{self.blood_group} - {self.unit} units"
 
 
 class HospitalDetails(models.Model):
@@ -61,10 +61,10 @@ class DonorDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True, null=True, blank=True)   
-    phonenumber = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
+    phone_number = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
     address = models.TextField()
     age = models.PositiveIntegerField(null=True, blank=True) 
-    bloodgroup = models.CharField(max_length=5)
+    blood_group = models.CharField(max_length=5)
     photo = models.ImageField(upload_to='donor_photos/')
     
     is_eligible = models.BooleanField(default=False)

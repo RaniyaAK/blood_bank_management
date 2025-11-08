@@ -34,9 +34,9 @@ class LoginForm(forms.Form):
 class BloodStockForm(forms.ModelForm):
     class Meta:
         model = BloodStock
-        fields = ['bloodgroup', 'unit']
+        fields = ['blood_group', 'unit']
         widgets = {
-            'bloodgroup': forms.Select(attrs={'class': 'form-control'}),
+            'blood_group': forms.Select(attrs={'class': 'form-control'}),
             'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
@@ -48,14 +48,14 @@ class DonorDetailsForm(forms.ModelForm):
         ('O+', 'O+'), ('O-', 'O-'),
     ]
 
-    bloodgroup = forms.ChoiceField(
+    blood_group = forms.ChoiceField(
         choices=BLOOD_GROUP_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     class Meta:
         model = DonorDetails
-        fields = ['name', 'address', 'email', 'phonenumber', 'age', 'bloodgroup', 'photo']
+        fields = ['name', 'address', 'email', 'phone_number', 'age', 'blood_group', 'photo']
 
         widgets = {
             'age': forms.NumberInput(attrs={'min': 18, 'max': 65, 'placeholder': 'Enter your age'}),
@@ -64,7 +64,7 @@ class DonorDetailsForm(forms.ModelForm):
         }
 
         labels = {
-            'phonenumber': 'Contact Number'
+            'phone_number': 'Contact Number'
         }
 
 
@@ -77,14 +77,14 @@ class RecipientDetailsForm(forms.ModelForm):
         ('O+', 'O+'), ('O-', 'O-'),
     ]
 
-    bloodgroup = forms.ChoiceField(
+    blood_group = forms.ChoiceField(
     choices=BLOOD_GROUP_CHOICES,
     widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     class Meta:
         model = RecipientDetails
-        fields = ['name', 'address','email', 'phone_number', 'gender', 'dob', 'bloodgroup', 'photo']
+        fields = ['name', 'address','email', 'phone_number', 'gender', 'dob', 'blood_group', 'photo']
         widgets = {
             'dob': forms.DateInput(attrs={'type': 'date'}),
             'address': forms.Textarea(attrs={'rows': 3}),
@@ -193,9 +193,9 @@ class DonorEligibilityTestForm(forms.ModelForm):
 class HospitalAddBloodStockForm(forms.ModelForm):
     class Meta:
         model = BloodStock
-        fields = ['bloodgroup', 'unit']
+        fields = ['blood_group', 'unit']
         widgets = {
-            'bloodgroup': forms.Select(attrs={'class': 'form-control'}),
+            'blood_group': forms.Select(attrs={'class': 'form-control'}),
             'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
