@@ -29,6 +29,15 @@ from .models import AdminNotification
 from datetime import date
 import json
 
+from .models import (
+    HospitalBloodRequest,
+    RecipientBloodRequest,
+    DonorRequestAppointment,
+    HospitalNotification,
+)
+
+
+
 def home(request):
     return render(request, 'home.html')
 
@@ -689,28 +698,18 @@ def hospital_blood_stock_chart(request):
     }
     return render(request, 'hospital/hospital_blood_stock_chart.html', context)
 
-
+@login_required
 def hospital_notifications(request):
-    sample_notifications = [
-        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
-        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
-        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
-    ]
-    
-    return render(request, "hospital/hospital_notifications.html", {"notifications": sample_notifications})
+    hospital_user = request.user
+    notifications = HospitalNotification.objects.filter(
+        hospital=hospital_user
+    ).order_by('-created_at')
+    notifications.filter(is_read=False).update(is_read=True)
+
+    return render(request, 'hospital/hospital_notifications.html', {'notifications': notifications})
+
 
 # ______________________________________________________________________________________________________________________________
-from datetime import date
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import (
-    HospitalBloodRequest,
-    DonorRequestAppointment,
-    RecipientBloodRequest,
-    AdminNotification
-)
-from django.contrib.auth.models import User
 
 
 # -------------------- MANAGE REQUESTS (Dashboard) --------------------
@@ -742,25 +741,29 @@ def manage_requests(request):
 
 # -------------------- APPROVE / REJECT REQUESTS --------------------
 
+
+# ✅ Hospital Requests
 # ✅ Hospital Requests
 @login_required
 def approve_hospital_request(request, request_id):
     hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
 
-    # ❌ Prevent approval if required date has passed
-    if hospital_request.required_date < date.today():
-        messages.error(request, "Cannot approve — the required date has already passed.")
-        return redirect('manage_requests')
-
     hospital_request.status = 'Approved'
     hospital_request.save()
 
+    # Notify admin (optional, for log)
     AdminNotification.objects.create(
         user=request.user,
         message=f"Hospital request from {hospital_request.hospital.username} has been approved."
     )
 
-    messages.success(request, "Hospital request approved successfully!")
+    # ✅ Notify hospital user
+    HospitalNotification.objects.create(
+        hospital=hospital_request.hospital,
+        message="Your blood request has been approved."
+    )
+
+    # ❌ Removed messages.success
     return redirect('manage_requests')
 
 
@@ -768,20 +771,24 @@ def approve_hospital_request(request, request_id):
 def reject_hospital_request(request, request_id):
     hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
 
-    if hospital_request.required_date < date.today():
-        messages.error(request, "Cannot reject — the required date has already passed.")
-        return redirect('manage_requests')
-
     hospital_request.status = 'Rejected'
     hospital_request.save()
 
+    # Notify admin (optional)
     AdminNotification.objects.create(
         user=request.user,
         message=f"Hospital request from {hospital_request.hospital.username} has been rejected."
     )
 
-    messages.error(request, "Hospital request rejected.")
+    # ✅ Notify hospital user
+    HospitalNotification.objects.create(
+        hospital=hospital_request.hospital,
+        message="Your blood request has been rejected."
+    )
+
+    # ❌ Removed messages.error
     return redirect('manage_requests')
+
 
 
 # ✅ Donor Requests (No date restriction)
@@ -820,11 +827,6 @@ def reject_donor_request(request, request_id):
 def approve_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
 
-    # ❌ Prevent approval if required date has passed
-    if recipient_request.required_date < date.today():
-        messages.error(request, "Cannot approve — the required date has already passed.")
-        return redirect('manage_requests')
-
     recipient_request.status = 'Approved'
     recipient_request.save()
 
@@ -840,10 +842,6 @@ def approve_recipient_request(request, request_id):
 @login_required
 def reject_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
-
-    if recipient_request.required_date < date.today():
-        messages.error(request, "Cannot reject — the required date has already passed.")
-        return redirect('manage_requests')
 
     recipient_request.status = 'Rejected'
     recipient_request.save()
