@@ -199,7 +199,16 @@ def hospital(request):
     except HospitalDetails.DoesNotExist:
         hospital_profile = None
 
-    return render(request, 'hospital.html', {'hospital': hospital_profile})
+    # ✅ Count unread hospital notifications
+    unread_notifications_count = HospitalNotification.objects.filter(
+        hospital=request.user, is_read=False
+    ).count()
+
+    return render(request, 'hospital.html', {
+        'hospital': hospital_profile,
+        'unread_notifications_count': unread_notifications_count
+    })
+
 
 
 @login_required
@@ -823,6 +832,7 @@ def reject_donor_request(request, request_id):
 
 
 # ✅ Recipient Requests
+# ✅ Recipient Requests (Clean version without messages)
 @login_required
 def approve_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
@@ -830,12 +840,12 @@ def approve_recipient_request(request, request_id):
     recipient_request.status = 'Approved'
     recipient_request.save()
 
+    # Notify admin/log
     AdminNotification.objects.create(
         user=request.user,
         message=f"Recipient request from {recipient_request.recipient.username} approved."
     )
 
-    messages.success(request, "Recipient blood request approved successfully!")
     return redirect('manage_requests')
 
 
@@ -846,10 +856,10 @@ def reject_recipient_request(request, request_id):
     recipient_request.status = 'Rejected'
     recipient_request.save()
 
+    # Notify admin/log
     AdminNotification.objects.create(
         user=request.user,
         message=f"Recipient request from {recipient_request.recipient.username} rejected."
     )
 
-    messages.error(request, "Recipient blood request rejected.")
     return redirect('manage_requests')
