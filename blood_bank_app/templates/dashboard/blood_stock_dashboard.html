@@ -1,325 +1,51 @@
-{% extends 'master.html' %}
+{% extends 'dashboard/admin_base.html' %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Manage Users{% endblock %}
+{% block page_title %}Manage Users{% endblock %}
 
-{% block content %}
+{% block content_admin %}
 
-<div class="sidebar">
-    <div class="profile-container">
-        <div class="profile-icon" onclick="toggleProfile()">
-            {{ request.user.username|slice:":1"|upper }}
-        </div>
-        <div class="profile-dropdown" id="profileDropdown">
-            <p><strong>{{ request.user.username }}</strong></p>
-            <p>{{ request.user.email }}</p>
-            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
-        </div>
-    </div>
+<!-- Display messages -->
+{% if messages %}
+    {% for message in messages %}
+        <p class="message">{{ message }}</p>
+    {% endfor %}
+{% endif %}
 
-    <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-    <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
-    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
-    <a href="{% url 'manage_requests' %}" class="active"><i class="fa-solid fa-hand-holding-droplet"></i> Manage Requests</a>
-
+<div class="section">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Date Joined</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.date_joined|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'edit_user' user.id %}" class="btn-approve">Edit</a>
+                    <a href="{% url 'delete_user' user.id %}" class="btn-reject">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-
-<div class="topbar">
-    <span>Blood Stock</span>
-    <div class="topbar-icons">
-        <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
-            <i class="fa-solid fa-bell"></i>
-            {% if unread_notifications_count > 0 %}
-                <span class="notif-count">{{ unread_notifications_count }}</span>
-            {% endif %}
-        </a>
-    </div>
-</div>
-
-<div class="main-content">
-    <h1>Blood Stock</h1>
-
-    <!-- Display messages -->
-    {% if messages %}
-        {% for message in messages %}
-            <p class="message">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-
-    {% if blood_stock %}
-    <div class="section">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Blood Group</th>
-                    <th>Units Available</th>
-                    <th>Last Updated</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for stock in blood_stock %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ stock.blood_group }}</td>
-                    <td>{{ stock.units }}</td>
-                    <td>{{ stock.updated_at|date:"Y-m-d H:i" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-        <p>No blood added yet.</p>
-    {% endif %}
-</div>
-
-<script>
-function toggleProfile() {
-    var dropdown = document.getElementById("profileDropdown");
-    dropdown.classList.toggle("show");
-}
-
-window.onclick = function(event) {
-    var dropdown = document.getElementById("profileDropdown");
-    var icon = document.querySelector(".profile-icon");
-    if (!icon.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.classList.remove("show");
-    }
-};
-</script>
-
-<style>
-/* Body & Font */
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #FAFAFA;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 220px;
-    background-color: #8B0000;
-    color: white;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    padding-top: 20px;
-    z-index: 50;
-}
-
-.sidebar a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 12px 25px;
-    margin: 8px 0;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 15px;
-    transition: 0.2s;
-}
-
-.sidebar a:hover {
-    background-color: #00897B;
-    padding-left: 30px;
-}
-
-/* Profile container */
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-    position: relative;
-}
-
-.profile-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #FAFAFA;
-    color: #8B0000;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.profile-dropdown {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    color: #2f3640;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    min-width: 180px;
-    z-index: 100;
-    text-align: center;
-    padding-bottom: 10px;
-}
-
-.profile-dropdown.show {
-    max-height: 500px;
-    opacity: 1;
-}
-
-.profile-dropdown p {
-    margin: 10px 15px;
-    font-weight: 500;
-}
-
-.profile-dropdown a {
-    display: block;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-top: 1px solid #ddd;
-    color: #2f3640;
-}
-
-.logout-link {
-    color: #8B0000;
-    padding: 8px 16px;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-
-.logout-link:hover {
-    transform: scale(1.07);
-    background-color: #eee4e4;
-}
-
-/* Topbar */
-.topbar {
-    position: fixed;
-    left: 220px;
-    right: 0;
-    top: 0;
-    height: 60px;
-    background-color: #8B0000;
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 30px;
-    font-size: 1.5em;
-    font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 90;
-}
-
-/* Notification icon */
-.topbar-icons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.notification-icon {
-    color: #fff;
-    font-size: 20px;
-    position: relative;
-    transition: transform 0.2s;
-}
-.notification-icon:hover {
-    transform: scale(1.12);
-    color: #ffd9d9;
-}
-.notif-count {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    background-color: #FF3B30;
-    color: #fff;
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: 600;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 4px rgba(0,0,0,0.2);
-}
-
-/* Main content */
-.main-content {
-    margin-left: 220px;
-    padding: 140px 40px 40px 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-sizing: border-box;
-    min-height: calc(100vh - 140px);
-}
-
-/* Page heading */
-.main-content h1 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 28px;
-    color: #8B0000;
-    text-align: center;
-}
-
-/* Table section */
-.section {
-    width: 100%;
-    max-width: 900px;
-    background: white;
-    border-radius: 12px;
-    padding: 25px 35px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-    font-size: 15px;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #eef4ff;
-}
-
-/* Messages */
-p.message {
-    text-align: center;
-    color: green;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-p{
- text-align:center;
- color:#555;
-}
-</style>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 {% endblock %}

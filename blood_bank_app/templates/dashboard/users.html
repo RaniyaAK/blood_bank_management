@@ -1,48 +1,17 @@
-{% extends "master.html" %}
-{% load static %}
+{% extends 'dashboard/admin_base.html' %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Manage Users{% endblock %}
+{% block page_title %}All Registered Users{% endblock %}
 
-{% block content %}
-
-<div class="sidebar">
-    <div class="profile-container">
-        <div class="profile-icon" onclick="toggleProfile()">
-            {{ request.user.username|slice:":1"|upper }}
-        </div>
-        <div class="profile-dropdown" id="profileDropdown">
-            <p><strong>{{ request.user.username }}</strong></p>
-            <p>{{ request.user.email }}</p>
-            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
-        </div>
-    </div>
-
-    <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-    <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
-    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
-    <a href="{% url 'manage_requests' %}"><i class="fa-solid fa-droplet"></i> Manage Requests</a>
-
-</div>
-
-<div class="topbar">
-    <span>Admin Dashboard</span>
-
-
-    <div class="topbar-icons">
-        <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
-            <i class="fa-solid fa-bell"></i>
-
-            {% if unread_notifications_count > 0 %}
-              <span class="notif-count">{{ unread_notifications_count }}</span>
-            {% endif %}
-
-        </a>
-    </div>
-
-</div>
-
+{% block content_admin %}
 <div class="section">
-    <h2>All Registered Users</h2>
+    <!-- Display messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <p class="message">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
     <table class="styled-table">
         <thead>
             <tr>
@@ -71,163 +40,14 @@
     </table>
 </div>
 
-<script>
-function toggleProfile() {
-    var dropdown = document.getElementById("profileDropdown");
-    dropdown.classList.toggle("show");
-}
-window.onclick = function(event) {
-    var dropdown = document.getElementById("profileDropdown");
-    var icon = document.querySelector(".profile-icon");
-    if (!icon.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.classList.remove("show");
-    }
-};
-</script>
-
 <style>
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #FAFAFA;
+/* Section styling */
+.section {
+    margin-left: 10px;
+    padding: 20px 40px 40px;
 }
-
-/* Sidebar */
-.sidebar {
-    width: 220px;
-    background-color: #8B0000;
-    color: white;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    padding-top: 20px;
-    z-index: 50;
-}
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-    position: relative;
-}
-.profile-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #FAFAFA;
-    color: #8B0000;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.profile-dropdown {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    color: #2f3640;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    min-width: 180px;
-    z-index: 100;
-    text-align: center;
-    padding-bottom: 10px;
-}
-.profile-dropdown.show {
-    max-height: 500px;
-    opacity: 1;
-}
-.profile-dropdown p { margin: 10px 15px; font-weight: 500; }
-.profile-dropdown a { display: block; padding: 10px 15px; text-decoration: none; border-top: 1px solid #ddd; color:#333; }
-.logout-link { color: #333; padding: 8px 16px; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; white-space: nowrap; }
-.logout-link:hover { transform: scale(1.07); background-color: #eee4e4; color: #8B0000; }
-
-.sidebar a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    text-decoration: none;
-    padding: 12px 25px;
-    margin: 8px 0;
-    border-radius: 6px;
-    transition: 0.2s;
-    font-weight: 500;
-    font-size: 15px;
-}
-.sidebar a:hover { background-color:#00897B; padding-left: 30px; }
-
-/* Topbar */
-.topbar {
-    position: fixed;
-    left: 220px; 
-    right: 0;
-    top: 0;
-    height: 60px;
-    background-color: #8B0000; 
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 30px;
-    font-size: 1.5em;
-    font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 90;
-}
-.topbar-icons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.notification-icon {
-    color: #fff;
-    font-size: 20px; /* smaller bell */
-    position: relative;
-    transition: transform 0.2s;
-}
-
-.notification-icon:hover {
-    transform: scale(1.12);
-    color: #ffd9d9;
-}
-
-/* 🔴 Notification count circle (fixed to be perfectly round) */
-.notif-count {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    background-color: #FF3B30;
-    color: #fff;
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: 600;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 4px rgba(0,0,0,0.2);
-}
-
 
 /* Table Styling */
-.section {
-    margin-left: 240px;
-    padding: 100px 40px 40px;
-}
-
 .styled-table {
     width: 100%;
     border-collapse: collapse;
@@ -235,46 +55,62 @@ body, html {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
 }
 
+/* Table header (no hover) */
 .styled-table thead {
-    background-color: #8B0000;
-    color: #fff;
+    background-color: #8B0000; /* maroon background */
+    color: #fff; /* white font */
     text-transform: uppercase;
     font-size: 14px;
 }
 
 .styled-table th, .styled-table td {
     padding: 14px 18px;
-    text-align: left;
+    text-align: center;
 }
 
+/* Table body rows with hover effect like Manage Requests */
 .styled-table tbody tr {
     border-bottom: 1px solid #ddd;
     transition: background 0.3s;
 }
 
 .styled-table tbody tr:hover {
-    background-color: #f9f2f2;
+    background-color: #eef4ff; /* Manage Requests hover color */
 }
 
+/* Last row bottom border */
 .styled-table tbody tr:last-of-type {
     border-bottom: 3px solid #8B0000;
 }
 
+/* Column with colspan */
 .styled-table td[colspan] {
     text-align: center;
     color: #888;
     font-style: italic;
 }
 
+/* Messages */
+p.message {
+    text-align: center;
+    color: green;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-    .section { margin-left: 0; padding: 80px 20px; }
-    .styled-table th, .styled-table td { font-size: 13px; padding: 10px; }
+    .section {
+        margin-left: 0;
+        padding: 80px 20px;
+    }
+    .styled-table th, .styled-table td {
+        font-size: 13px;
+        padding: 10px;
+    }
 }
 </style>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 {% endblock %}

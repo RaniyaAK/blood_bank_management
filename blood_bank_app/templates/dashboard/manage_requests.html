@@ -1,356 +1,161 @@
-{% extends "master.html" %}
-{% load static %}
+{% extends 'dashboard/admin_base.html' %}
 
 {% block title %}Manage Requests{% endblock %}
+{% block page_title %}Manage Requests{% endblock %}
 
-{% block content %}
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="profile-container">
-    <div class="profile-icon" onclick="toggleProfile()">
-      {{ request.user.username|slice:":1"|upper }}
-    </div>
-    <div class="profile-dropdown" id="profileDropdown">
-      <p><strong>{{ request.user.username }}</strong></p>
-      <p>{{ request.user.email }}</p>
-      <a href="{% url 'logout' %}" class="logout-link">Logout</a>
-    </div>
-  </div>
+{% block content_admin %}
 
-  <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-  <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
-  <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood Stock</a>
-  <a href="{% url 'manage_requests' %}" class="active"><i class="fa-solid fa-hand-holding-droplet"></i> Manage Requests</a>
-</div>
-
-<!-- Topbar -->
-<div class="topbar">
-  <span>Admin Dashboard</span>
-  <div class="topbar-icons">
-    <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
-      <i class="fa-solid fa-bell"></i>
-      {% if unread_notifications_count > 0 %}
-      <span class="notif-count">{{ unread_notifications_count }}</span>
-      {% endif %}
-    </a>
-  </div>
-</div>
-
-<!-- Main Content -->
-<div class="main-content">
-
-  <!-- 🏥 Hospital Requests -->
-  <h3 class="section-title">🏥 Hospital Requests</h3>
-  <table class="styled-table">
+<!-- 🏥 Hospital Requests -->
+<h3 class="section-title">🏥 Hospital Requests</h3>
+<table class="styled-table">
     <thead>
-      <tr>
-        <th>Hospital</th>
-        <th>Blood Group</th>
-        <th>Units</th>
-        <th>Urgency</th>
-        <th>Required Date</th>
-        <th>Status</th>
-        <th>Requested On</th>
-        <th>Action</th>
-      </tr>
+        <tr>
+            <th>Hospital</th>
+            <th>Blood Group</th>
+            <th>Units</th>
+            <th>Urgency</th>
+            <th>Required Date</th>
+            <th>Status</th>
+            <th>Requested On</th>
+            <th>Action</th>
+        </tr>
     </thead>
     <tbody>
-      {% for req in hospital_requests %}
-      <tr>
-        <td>{{ req.hospital.username }}</td>
-        <td>{{ req.blood_group }}</td>
-        <td>{{ req.units }}</td>
-        <td class="{% if req.urgency == 'High' %}urgency-high{% elif req.urgency == 'Medium' %}urgency-medium{% else %}urgency-low{% endif %}">
-          {{ req.urgency }}
-        </td>
-        <td>{{ req.required_date }}</td>
-        <td>
-          <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
-            {{ req.status }}
-          </span>
-        </td>
-        <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-        <td>
-          {% if req.status == 'Pending' %}
-            {% if req.required_date < today %}
-              <em>Expired</em>
-            {% else %}
-              <a href="{% url 'approve_hospital_request' req.id %}" class="btn-approve">Approve</a>
-              <a href="{% url 'reject_hospital_request' req.id %}" class="btn-reject">Reject</a>
-            {% endif %}
-          {% else %}
-            <em>------</em>
-          {% endif %}
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="8" class="text-center">No hospital requests found.</td></tr>
-      {% endfor %}
+        {% for req in hospital_requests %}
+        <tr>
+            <td>{{ req.hospital.username }}</td>
+            <td>{{ req.blood_group }}</td>
+            <td>{{ req.units }}</td>
+            <td class="{% if req.urgency == 'High' %}urgency-high{% elif req.urgency == 'Medium' %}urgency-medium{% else %}urgency-low{% endif %}">
+                {{ req.urgency }}
+            </td>
+            <td>{{ req.required_date }}</td>
+            <td>
+                <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
+                    {{ req.status }}
+                </span>
+            </td>
+            <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                {% if req.status == 'Pending' %}
+                    {% if req.required_date < today %}
+                        <em>Expired</em>
+                    {% else %}
+                        <a href="{% url 'approve_hospital_request' req.id %}" class="btn-approve">Approve</a>
+                        <a href="{% url 'reject_hospital_request' req.id %}" class="btn-reject">Reject</a>
+                    {% endif %}
+                {% else %}
+                    <em>------</em>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-center">No hospital requests found.</td></tr>
+        {% endfor %}
     </tbody>
-  </table>
+</table>
 
-  <!-- 🩸 Donor Requests -->
-  <h3 class="section-title">🩸 Donor Requests</h3>
-  <table class="styled-table">
+<!-- 🩸 Donor Requests -->
+<h3 class="section-title">🩸 Donor Requests</h3>
+<table class="styled-table">
     <thead>
-      <tr>
-        <th>Donor</th>
-        <th>Blood Group</th>
-        <th>Status</th>
-        <th>Requested On</th>
-        <th>Action</th>
-      </tr>
+        <tr>
+            <th>Donor</th>
+            <th>Blood Group</th>
+            <th>Status</th>
+            <th>Requested On</th>
+            <th>Action</th>
+        </tr>
     </thead>
     <tbody>
-      {% for req in donor_requests %}
-      <tr>
-        <td>{{ req.donor.username }}</td>
-        <td>{{ req.blood_group }}</td>
-        <td>
-          <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
-            {{ req.status }}
-          </span>
-        </td>
-        <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-        <td>
-          {% if req.status == 'Pending' %}
-          <a href="{% url 'approve_donor_request' req.id %}" class="btn-approve">Approve</a>
-          <a href="{% url 'reject_donor_request' req.id %}" class="btn-reject">Reject</a>
-          {% else %}
-          <em>------</em>
-          {% endif %}
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="5" class="text-center">No donor requests found.</td></tr>
-      {% endfor %}
+        {% for req in donor_requests %}
+        <tr>
+            <td>{{ req.donor.username }}</td>
+            <td>{{ req.blood_group }}</td>
+            <td>
+                <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
+                    {{ req.status }}
+                </span>
+            </td>
+            <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                {% if req.status == 'Pending' %}
+                    <a href="{% url 'approve_donor_request' req.id %}" class="btn-approve">Approve</a>
+                    <a href="{% url 'reject_donor_request' req.id %}" class="btn-reject">Reject</a>
+                {% else %}
+                    <em>------</em>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">No donor requests found.</td></tr>
+        {% endfor %}
     </tbody>
-  </table>
+</table>
 
-  <!-- 💉 Recipient Requests -->
-  <h3 class="section-title">💉 Recipient Requests</h3>
-  <table class="styled-table">
+<!-- 💉 Recipient Requests -->
+<h3 class="section-title">💉 Recipient Requests</h3>
+<table class="styled-table">
     <thead>
-      <tr>
-        <th>Recipient</th>
-        <th>Blood Group</th>
-        <th>Units</th>
-        <th>Required Date</th>
-        <th>Status</th>
-        <th>Requested On</th>
-        <th>Action</th>
-      </tr>
+        <tr>
+            <th>Recipient</th>
+            <th>Blood Group</th>
+            <th>Units</th>
+            <th>Required Date</th>
+            <th>Status</th>
+            <th>Requested On</th>
+            <th>Action</th>
+        </tr>
     </thead>
     <tbody>
-      {% for req in recipient_requests %}
-      <tr>
-        <td>{{ req.recipient.username }}</td>
-        <td>{{ req.blood_group }}</td>
-        <td>{{ req.units }}</td>
-        <td>{{ req.required_date }}</td>
-        <td>
-          <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
-            {{ req.status }}
-          </span>
-        </td>
-        <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-        <td>
-          {% if req.status == 'Pending' %}
-            {% if req.required_date < today %}
-              <em>Expired</em>
-            {% else %}
-              <a href="{% url 'approve_recipient_request' req.id %}" class="btn-approve">Approve</a>
-              <a href="{% url 'reject_recipient_request' req.id %}" class="btn-reject">Reject</a>
-            {% endif %}
-          {% else %}
-            <em>------</em>
-          {% endif %}
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="7" class="text-center">No recipient requests found.</td></tr>
-      {% endfor %}
+        {% for req in recipient_requests %}
+        <tr>
+            <td>{{ req.recipient.username }}</td>
+            <td>{{ req.blood_group }}</td>
+            <td>{{ req.units }}</td>
+            <td>{{ req.required_date }}</td>
+            <td>
+                <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
+                    {{ req.status }}
+                </span>
+            </td>
+            <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                {% if req.status == 'Pending' %}
+                    {% if req.required_date < today %}
+                        <em>Expired</em>
+                    {% else %}
+                        <a href="{% url 'approve_recipient_request' req.id %}" class="btn-approve">Approve</a>
+                        <a href="{% url 'reject_recipient_request' req.id %}" class="btn-reject">Reject</a>
+                    {% endif %}
+                {% else %}
+                    <em>------</em>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center">No recipient requests found.</td></tr>
+        {% endfor %}
     </tbody>
-  </table>
+</table>
 
-</div>
-
-<!-- JS for profile dropdown -->
-<script>
-function toggleProfile() {
-  var dropdown = document.getElementById("profileDropdown");
-  dropdown.classList.toggle("show");
-}
-window.onclick = function(event) {
-  var dropdown = document.getElementById("profileDropdown");
-  var icon = document.querySelector(".profile-icon");
-  if (!icon.contains(event.target) && !dropdown.contains(event.target)) {
-    dropdown.classList.remove("show");
-  }
-};
-</script>
-
-<!-- Styles -->
+<!-- Custom Styles -->
 <style>
-body, html {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #FAFAFA;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 220px;
-  background-color: #8B0000;
-  color: white;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  padding-top: 20px;
-  z-index: 50;
-}
-.sidebar a {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 12px 20px;
-  font-size: 15px;
-}
-.sidebar a:hover, .sidebar a.active {
-  background-color: #A52A2A;
-  border-left: 4px solid white;
-}
-
-/* Topbar */
-.topbar {
-  position: fixed;
-  left: 220px;
-  right: 0;
-  top: 0;
-  height: 60px;
-  background-color: #8B0000;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 30px;
-  font-size: 1.4em;
-  font-weight: 600;
-  z-index: 90;
-}
-
-/* Main Content */
-.main-content {
-  margin-left: 220px;
-  padding: 70px 40px 40px 40px;
-  min-height: calc(100vh - 60px);
-}
-
-/* Section Title */
+/* Section headings */
 .section-title {
-  color: #8B0000;
-  margin-bottom: 10px;
-  font-size: 18px;
-  margin-top: 15px;
+    color: #8B0000; /* Maroon */
+    margin-bottom: 10px;
+    margin-top: 20px;
+    font-size: 18px;
 }
 
-/* Table */
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 40px;
-  background-color: #fff;
-  text-align: center;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+/* Table header color */
+.styled-table thead th {
+    background-color: #8B0000; /* Maroon background */
+    color: #fff; /* White font */
+    text-transform: uppercase;
+    font-size: 14px;
 }
-.styled-table th {
-  background-color: #8B0000;
-  color: white;
-  padding: 12px;
-}
-.styled-table td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-.styled-table tr:hover { background-color: #f9f9f9; }
-
-/* Urgency colors */
-.urgency-high { color: red; font-weight: bold; }
-.urgency-medium { color: #e6b800; font-weight: bold; }
-.urgency-low { color: #28a745; font-weight: bold; }
-
-/* Status badges */
-.badge {
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-weight: 600;
-}
-.badge.approved { background-color: #28a745; color: white; }
-.badge.pending { background-color: #ffc107; color: black; }
-.badge.rejected { background-color: #dc3545; color: white; }
-
-/* Buttons */
-.btn-approve, .btn-reject {
-  padding: 6px 12px;
-  text-decoration: none;
-  color: white;
-  border-radius: 6px;
-  font-weight: 500;
-}
-.btn-approve { background-color: #28a745; }
-.btn-approve:hover { background-color: #218838; }
-.btn-reject { background-color: #dc3545; }
-.btn-reject:hover { background-color: #c82333; }
-
-/* Notification bubble */
-.notif-count {
-  background-color: yellow;
-  color: black;
-  border-radius: 50%;
-  font-size: 0.7em;
-  padding: 2px 6px;
-  position: relative;
-  top: -10px;
-  right: 10px;
-}
-
-/* Profile icon */
-.profile-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
-.profile-icon {
-  width: 50px;
-  height: 50px;
-  background-color: white;
-  color: #8B0000;
-  border-radius: 50%;
-  font-weight: bold;
-  line-height: 50px;
-  margin: 0 auto;
-  cursor: pointer;
-}
-.profile-dropdown {
-  display: none;
-  background-color: white;
-  color: black;
-  text-align: center;
-  border-radius: 8px;
-  padding: 10px;
-  margin: 10px;
-}
-.profile-dropdown.show { display: block; }
-.logout-link {
-  color: #8B0000;
-  text-decoration: none;
-  font-weight: bold;
-}
-.logout-link:hover { text-decoration: underline; }
 </style>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}

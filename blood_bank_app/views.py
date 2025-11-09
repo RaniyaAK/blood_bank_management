@@ -688,13 +688,13 @@ def hospital_add_blood_stock(request):
 
 def hospital_blood_stock_chart(request):
     stock_data = (
-        BloodStock.objects.values('bloodgroup')
+        BloodStock.objects.values('blood_group')
         .annotate(total_units=Sum('unit'))
-        .order_by('bloodgroup')
+        .order_by('blood_group')
     )
 
     # Prepare data
-    labels = [entry['bloodgroup'] for entry in stock_data]
+    labels = [entry['blood_group'] for entry in stock_data]
     values = [entry['total_units'] for entry in stock_data]
 
     print("Labels:", labels)
@@ -832,7 +832,7 @@ def reject_donor_request(request, request_id):
 
 
 # ✅ Recipient Requests
-# ✅ Recipient Requests (Clean version without messages)
+
 @login_required
 def approve_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
