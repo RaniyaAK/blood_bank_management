@@ -222,14 +222,27 @@ def recipient(request):
     return render(request, 'recipient.html', {'recipient': recipient_profile})
 
 
+@login_required
 def donor(request):
-    """Donor dashboard"""
-    try:
-        donor_profile = DonorDetails.objects.get(user=request.user)
-    except DonorDetails.DoesNotExist:
-        donor_profile = None
+    """Donor dashboard with editable profile in side panel"""
+    donor_profile = DonorDetails.objects.filter(user=request.user).first()
 
-    return render(request, 'donor.html', {'donor': donor_profile})
+    if request.method == 'POST':
+        # Form submission from side panel
+        form = DonorDetailsForm(request.POST, request.FILES, instance=donor_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+          # reload page to see updated info
+    else:
+        form = DonorDetailsForm(instance=donor_profile)
+
+    return render(request, 'donor.html', {
+        'donor': donor_profile,
+        'form': form,
+    })
+
+
 
 
 # --- Dashboards ---
@@ -364,20 +377,23 @@ def donor_details_form(request):
     return render(request, 'donor/donor_details_form.html', {'form': form})
 
 
+from django.http import JsonResponse
+
 @login_required
 def donor_details_edit(request):
-    """Edit profile"""
-    donor = get_object_or_404(DonorDetails, user=request.user )
+    donor = get_object_or_404(DonorDetails, user=request.user)
 
     if request.method == 'POST':
         form = DonorDetailsForm(request.POST, request.FILES, instance=donor)
         if form.is_valid():
             form.save()
-            return redirect('donor')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
     else:
         form = DonorDetailsForm(instance=donor)
 
     return render(request, 'donor/donor_details_edit.html', {'form': form, 'donor': donor})
+
 
 
 def calculate_age(dob):
