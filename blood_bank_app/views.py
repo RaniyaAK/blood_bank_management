@@ -106,7 +106,6 @@ def user_login(request):
             if user is not None:
                 login(request, user)
 
-                # Ensure Profile exists
                 profile, created = Profile.objects.get_or_create(
                     user=user,
                     defaults={'role': 'admin' if user.is_superuser else 'recipient'}
@@ -211,15 +210,28 @@ def hospital(request):
 
 
 
+
 @login_required
 def recipient(request):
-    """Recipient dashboard"""
-    try:
-        recipient_profile = RecipientDetails.objects.get(user=request.user)
-    except RecipientDetails.DoesNotExist:
-        recipient_profile = None
+    """Recipient dashboard with editable profile in side panel"""
+    recipient_profile = RecipientDetails.objects.filter(user=request.user).first()
 
-    return render(request, 'recipient.html', {'recipient': recipient_profile})
+    if recipient_profile:
+        if request.method == 'POST':
+            form = RecipientDetailsForm(request.POST, request.FILES, instance=recipient_profile)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Profile updated successfully!")
+        else:
+            form = RecipientDetailsForm(instance=recipient_profile)
+    else:
+        recipient_profile = None
+        form = None  
+
+    return render(request, 'recipient.html', {
+        'recipient': recipient_profile,
+        'form': form,
+    })
 
 
 @login_required
@@ -228,12 +240,10 @@ def donor(request):
     donor_profile = DonorDetails.objects.filter(user=request.user).first()
 
     if request.method == 'POST':
-        # Form submission from side panel
         form = DonorDetailsForm(request.POST, request.FILES, instance=donor_profile)
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully!")
-          # reload page to see updated info
     else:
         form = DonorDetailsForm(instance=donor_profile)
 
@@ -254,7 +264,6 @@ def admin_dashboard(request):
     hospitals_count = Profile.objects.filter(role='hospital').count()
     blood_units_count = BloodStock.objects.aggregate(total_units=Sum('unit'))['total_units'] or 0
 
-    # ✅ Fetch unread notification count
     unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
     context = {
@@ -271,7 +280,6 @@ def admin_dashboard(request):
 def blood_stock_dashboard(request):
     blood_stock = BloodStock.objects.all().order_by('-added_at')
 
-    # ✅ Fetch unread notification count
     unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
     context = {
@@ -283,7 +291,6 @@ def blood_stock_dashboard(request):
 
 @login_required
 def users(request):
-    # exclude superusers and staff/admin users
     all_users = User.objects.filter(is_superuser=False, is_staff=False).order_by('-date_joined')
 
     user_data = []
@@ -305,7 +312,6 @@ def users(request):
             "date_joined": user.date_joined,  # ✅ Add joined date here
         })
 
-    # ✅ Fetch unread notification count
     unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
     return render(request, 'dashboard/users.html', {
@@ -319,7 +325,6 @@ def admin_notifications(request):
     notifications = AdminNotification.objects.all().order_by('-created_at')
     unread_notifications = notifications.filter(is_read=False)
 
-    # Mark all as read when the page is visited
     unread_notifications.update(is_read=True)
 
     context = {
@@ -438,7 +443,6 @@ def donor_eligibility_test_form(request):
             from datetime import date  # ✅ ensure date is imported
             age = calculate_age(dob)
 
-            # ✅ Eligibility checks
             if age < 18 or age > 60:
                 passed = False
                 reasons.append("You must be between 18 and 60 years old to donate blood.")
@@ -469,7 +473,6 @@ def donor_eligibility_test_form(request):
             donor.is_eligible = passed
             donor.save()
 
-            # Save reasons in session for display on result page
             request.session['eligibility_reasons'] = reasons
 
             return redirect(
