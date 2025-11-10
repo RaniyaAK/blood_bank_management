@@ -72,20 +72,26 @@ class DonorDetails(models.Model):
     def __str__(self):
         return self.name
 
-
 class RecipientDetails(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
-    email = models.EmailField(unique=True, null=True, blank=True)   
+    email = models.EmailField(unique=True, null=True, blank=True)
     address = models.TextField()
-    gender = models.CharField(max_length=10)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)  # ✅ Added choices
     dob = models.DateField()
     blood_group = models.CharField(max_length=5)
     photo = models.ImageField(upload_to='recipient_photos/')
 
     def __str__(self):
         return self.name
+
 
 
 class DonorRequestAppointment(models.Model):
