@@ -258,10 +258,17 @@ def admin_dashboard(request):
 def blood_stock_dashboard(request):
     blood_stock = BloodStock.objects.all().order_by('-added_at')
 
-    return render(request, 'dashboard/blood_stock_dashboard.html', {
-        'blood_stock': blood_stock
-    })
+    # ✅ Fetch unread notification count
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
+    context = {
+        'blood_stock': blood_stock,
+        'unread_notifications_count': unread_notifications_count,  # ✅ Pass to template
+    }
+    return render(request, 'dashboard/blood_stock_dashboard.html', context)
+
+
+@login_required
 def users(request):
     # exclude superusers and staff/admin users
     all_users = User.objects.filter(is_superuser=False, is_staff=False).order_by('-date_joined')
@@ -285,7 +292,13 @@ def users(request):
             "date_joined": user.date_joined,  # ✅ Add joined date here
         })
 
-    return render(request, 'dashboard/users.html', {"user_data": user_data})
+    # ✅ Fetch unread notification count
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
+
+    return render(request, 'dashboard/users.html', {
+        "user_data": user_data,
+        "unread_notifications_count": unread_notifications_count,  # ✅ Pass to template
+    })
 
 
 @login_required

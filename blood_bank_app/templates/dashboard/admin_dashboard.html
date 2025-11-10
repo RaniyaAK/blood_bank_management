@@ -1,246 +1,57 @@
-{% extends "master.html" %}
-
-{% load static %}
+{% extends 'dashboard/admin_base.html' %}
 
 {% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
 
-{% block content %}
+{% block content_admin %}
 
-<div class="sidebar">
-    <div class="profile-container">
-        <div class="profile-icon" onclick="toggleProfile()">
-            {{ request.user.username|slice:":1"|upper }}
-        </div>
-        <div class="profile-dropdown" id="profileDropdown">
-            <p><strong>{{ request.user.username }}</strong></p>
-            <p>{{ request.user.email }}</p>
-            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
-        </div>
+<div class="cards">
+    <!-- 🩸 Total Donors -->
+    <div class="card red">
+        <i class="fa-solid fa-hand-holding-medical icon"></i>
+        <h2>{{ donors_count }}</h2>
+        <p>Total Donors Registered</p>
     </div>
 
-    <a href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-    <a href="{% url 'users' %}"><i class="fa-solid fa-hospital"></i> Users</a>
-    <a href="{% url 'blood_stock_dashboard' %}"><i class="fa-solid fa-droplet"></i> Blood stock</a>
-    <a href="{% url 'manage_requests' %}" class="active"><i class="fa-solid fa-hand-holding-droplet"></i> Manage Requests</a>
-</div>
+    <!-- 👤 Total Recipients -->
+    <div class="card red">
+        <i class="fa-solid fa-user icon"></i>
+        <h2>{{ recipients_count }}</h2>
+        <p>Total Recipients Registered</p>
+    </div>
 
-<div class="topbar">
-    <span>Admin Dashboard</span>
-    <div class="topbar-icons">
-        <a href="{% url 'admin_notifications' %}" class="notification-icon" title="Notifications">
-            <i class="fa-solid fa-bell"></i>
-            {% if unread_notifications_count > 0 %}
-                <span class="notif-count">{{ unread_notifications_count }}</span>
-            {% endif %}
-        </a>
+    <!-- 🏥 Total Hospitals -->
+    <div class="card red">
+        <i class="fa-solid fa-hospital icon"></i>
+        <h2>{{ hospitals_count }}</h2>
+        <p>Total Hospitals Registered</p>
+    </div>
+
+    <!-- 💉 Available Blood Units -->
+    <div class="card red">
+        <i class="fa-solid fa-droplet icon"></i>
+        <h2>{{ blood_units_count }}</h2>
+        <p>Available Blood Units</p>
     </div>
 </div>
-
-<div class="main-content">
-    <div class="cards">
-        <!-- Total Donors -->
-        <div class="card red">
-            <i class="fa-solid fa-hand-holding-medical icon"></i>
-            <h2>{{ donors_count }}</h2>
-            <p>Total Donors Registered</p>
-        </div>
-
-        <!-- Total Recipients -->
-        <div class="card red">
-            <i class="fa-solid fa-user icon"></i>
-            <h2>{{ recipients_count }}</h2>
-            <p>Total Recipients Registered</p>
-        </div>
-
-        <!-- Total Hospitals -->
-        <div class="card red">
-            <i class="fa-solid fa-hospital icon"></i>
-            <h2>{{ hospitals_count }}</h2>
-            <p>Total Hospitals Registered</p>
-        </div>
-
-        <!-- Available Blood Units -->
-        <div class="card red">
-            <i class="fa-solid fa-droplet icon"></i>
-            <h2>{{ blood_units_count }}</h2>
-            <p>Available Blood Units</p>
-        </div>
-
-        
-    </div>
-</div>
-
-<script>
-function toggleProfile() {
-    var dropdown = document.getElementById("profileDropdown");
-    dropdown.classList.toggle("show");
-}
-window.onclick = function(event) {
-    var dropdown = document.getElementById("profileDropdown");
-    var icon = document.querySelector(".profile-icon");
-    if (!icon.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.classList.remove("show");
-    }
-};
-</script>
 
 <style>
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #FAFAFA;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 220px;
-    background-color: #8B0000;
-    color: white;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    padding-top: 20px;
-    z-index: 50;
-}
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-    position: relative;
-}
-.profile-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #FAFAFA;
-    color: #8B0000;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.profile-dropdown {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    color: #2f3640;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    min-width: 180px;
-    z-index: 100;
-    text-align: center;
-    padding-bottom: 10px;
-}
-.profile-dropdown.show {
-    max-height: 500px;
-    opacity: 1;
-}
-.profile-dropdown p { margin: 10px 15px; font-weight: 500; }
-.profile-dropdown a { display: block; padding: 10px 15px; text-decoration: none; border-top: 1px solid #ddd; color:#333; }
-.logout-link { color: #333; padding: 8px 16px; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; white-space: nowrap; }
-.logout-link:hover { transform: scale(1.07); background-color: #eee4e4; color: #8B0000; }
-
-.sidebar a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    text-decoration: none;
-    padding: 12px 25px;
-    margin: 8px 0;
-    border-radius: 6px;
-    transition: 0.2s;
-    font-weight: 500;
-    font-size: 15px;
-}
-.sidebar a:hover { background-color:#00897B; padding-left: 30px; }
-
-/* Topbar */
-.topbar {
-    position: fixed;
-    left: 220px; 
-    right: 0;
-    top: 0;
-    height: 60px;
-    background-color: #8B0000; 
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 30px;
-    font-size: 1.5em;
-    font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 90;
-}
-
-/* Notification icon */
-.topbar-icons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.notification-icon {
-    color: #fff;
-    font-size: 20px;
-    position: relative;
-    transition: transform 0.2s;
-}
-.notification-icon:hover {
-    transform: scale(1.12);
-    color: #ffd9d9;
-}
-.notif-count {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    background-color: #FF3B30;
-    color: #fff;
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: 600;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 4px rgba(0,0,0,0.2);
-}
-
-/* Main content */
-.main-content { 
-    margin-left: 220px; 
-    padding: 80px 40px 20px 40px; 
-}
-
-/* Cards */
 .cards {
     display: flex;
     flex-wrap: wrap;
     gap: 25px;
     justify-content: center;
     align-items: center;
+    margin-top: 20px;
 }
 
+/* Card Styling */
 .card.red {
     background: linear-gradient(135deg, #8B0000, #b30000);
 }
 .card.red:hover {
     background: linear-gradient(135deg, #b30000, #8B0000);
 }
-
 .card {
     border-radius: 12px;
     padding: 25px 40px;
@@ -254,13 +65,9 @@ body, html {
 .card .icon { font-size: 36px; margin-bottom: 15px; color: #fff; }
 .card h2, .card p { color: #fff; margin: 0; font-weight: 500; }
 
-/* Responsive */
 @media (max-width: 768px) {
-    .main-content { padding: 100px 20px 20px 20px; }
     .cards { flex-direction: column; align-items: center; }
 }
 </style>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 {% endblock %}
