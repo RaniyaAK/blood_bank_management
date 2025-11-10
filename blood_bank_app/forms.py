@@ -99,7 +99,7 @@ class RecipientDetailsForm(forms.ModelForm):
 class HospitalDetailsForm(forms.ModelForm):
     class Meta:
         model = HospitalDetails
-        fields = ['name', 'code','email', 'location', 'phone_number', 'since', 'photo']
+        fields = ['name', 'code','email', 'location', 'phone_number', 'since']
 
         widgets = {
             'since': forms.DateInput(attrs={'type': 'date'}),

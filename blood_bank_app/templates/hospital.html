@@ -9,12 +9,8 @@
     <!-- 🔹 Header -->
     <div class="top-bar">
         <div class="left-section">
-            <a href="{% url 'hospital_details_edit' %}">
-                {% if hospital.photo %}
-                    <img src="{{ hospital.photo.url }}" alt="{{ hospital.name }}" class="profile-img">
-                {% else %}
-                    <img src="{% static 'default_profile.png' %}" alt="Profile" class="profile-img">
-                {% endif %}
+            <a href="{% url 'hospital_details_edit' %}" class="profile-icon-link">
+                <i class="fa-solid fa-circle-user profile-icon"></i>
             </a>
             <h1>{{ hospital.name }}</h1>
         </div>
@@ -88,7 +84,7 @@ body {
     box-sizing: border-box;
 }
 
-/* ✅ Left Section (Profile + Name) */
+/* ✅ Left Section (Profile Icon + Name) */
 .left-section {
     display: flex;
     align-items: center;
@@ -101,17 +97,19 @@ body {
     font-weight: 600;
 }
 
-/* Profile Image */
-.profile-img {
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    border: 2px solid #ffb3b3;
-    object-fit: cover;
-    transition: transform 0.3s ease;
+/* Profile Icon */
+.profile-icon-link {
+    text-decoration: none;
+    color: #fff;
 }
-.profile-img:hover {
+.profile-icon {
+    font-size: 52px;
+    color: #ffb3b3;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.profile-icon:hover {
     transform: scale(1.1);
+    color: #ffffff;
 }
 
 /* Right Icons */

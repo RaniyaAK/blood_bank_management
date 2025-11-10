@@ -51,7 +51,6 @@ class HospitalDetails(models.Model):
     since = models.DateField()
     phone_number = models.CharField(max_length=15, validators=[hospital_phone_validator])
     location = models.TextField()
-    photo = models.ImageField(upload_to='hospital_photos/')
 
     def __str__(self):
         return self.name
