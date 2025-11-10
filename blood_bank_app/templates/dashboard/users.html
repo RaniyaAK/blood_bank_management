@@ -47,7 +47,7 @@
     padding: 20px 40px 40px;
 }
 
-/* Table Styling */
+/* Table Styling (matching Manage Requests page) */
 .styled-table {
     width: 100%;
     border-collapse: collapse;
@@ -58,27 +58,31 @@
     text-align: center;
 }
 
-/* Table header (no hover) */
-.styled-table thead {
-    background-color: #8B0000; /* maroon background */
-    color: #fff; /* white font */
+/* Table header (Maroon, no hover) */
+.styled-table thead th {
+    background-color: #8B0000; /* Maroon background */
+    color: #fff; /* White font */
     text-transform: uppercase;
     font-size: 14px;
 }
 
+/* Table cells */
 .styled-table th, .styled-table td {
     padding: 14px 18px;
     text-align: center;
 }
 
-/* Table body rows with hover effect like Manage Requests */
-.styled-table tbody tr {
-    border-bottom: 1px solid #ddd;
-    transition: background 0.3s;
+/* Alternate row colors (like Manage Requests) */
+.styled-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.styled-table tbody tr:nth-child(odd) {
+    background-color: #fff;
 }
 
+/* Hover effect for rows only (not header) */
 .styled-table tbody tr:hover {
-    background-color: #eef4ff; /* Manage Requests hover color */
+    background-color: #eef4ff;
 }
 
 /* Last row bottom border */

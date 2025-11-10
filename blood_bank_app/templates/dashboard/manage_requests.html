@@ -156,6 +156,19 @@
     text-transform: uppercase;
     font-size: 14px;
 }
+
+/* Alternate row styling */
+.styled-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.styled-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+/* Hover effect for rows */
+.styled-table tbody tr:hover {
+    background-color: #ffe6e6; /* light red on hover */
+}
 </style>
 
 {% endblock %}
