@@ -1,11 +1,11 @@
 {% extends 'dashboard/admin_base.html' %}
 
 {% block title %}Manage Requests{% endblock %}
+
 {% block page_title %}Manage Requests{% endblock %}
 
 {% block content_admin %}
 
-<!-- 🏥 Hospital Requests -->
 <h3 class="section-title">🏥 Hospital Requests</h3>
 <table class="styled-table">
     <thead>
@@ -55,7 +55,6 @@
     </tbody>
 </table>
 
-<!-- 🩸 Donor Requests -->
 <h3 class="section-title">🩸 Donor Requests</h3>
 <table class="styled-table">
     <thead>
@@ -93,7 +92,6 @@
     </tbody>
 </table>
 
-<!-- 💉 Recipient Requests -->
 <h3 class="section-title">💉 Recipient Requests</h3>
 <table class="styled-table">
     <thead>
@@ -139,25 +137,21 @@
     </tbody>
 </table>
 
-<!-- Custom Styles -->
 <style>
-/* Section headings */
 .section-title {
-    color: #8B0000; /* Maroon */
+    color: #8B0000; 
     margin-bottom: 10px;
     margin-top: 20px;
     font-size: 18px;
 }
 
-/* Table header color */
 .styled-table thead th {
-    background-color: #8B0000; /* Maroon background */
-    color: #fff; /* White font */
+    background-color: #8B0000; 
+    color: #fff; 
     text-transform: uppercase;
     font-size: 14px;
 }
 
-/* Alternate row styling */
 .styled-table tbody tr:nth-child(even) {
     background-color: #f9f9f9;
 }
@@ -165,9 +159,8 @@
     background-color: #ffffff;
 }
 
-/* Hover effect for rows */
 .styled-table tbody tr:hover {
-    background-color: #ffe6e6; /* light red on hover */
+    background-color: #ffe6e6;
 }
 </style>
 

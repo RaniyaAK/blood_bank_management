@@ -1,11 +1,12 @@
 {% extends 'dashboard/admin_base.html' %}
 
 {% block title %}Manage Users{% endblock %}
+
 {% block page_title %}All Registered Users{% endblock %}
 
 {% block content_admin %}
+
 <div class="section">
-    <!-- Display messages -->
     {% if messages %}
         {% for message in messages %}
             <p class="message">{{ message }}</p>
@@ -41,13 +42,8 @@
 </div>
 
 <style>
-/* Section styling */
-.section {
-    margin-left: 10px;
-    padding: 20px 40px 40px;
-}
 
-/* Table Styling (matching Manage Requests page) */
+
 .styled-table {
     width: 100%;
     border-collapse: collapse;
@@ -58,21 +54,18 @@
     text-align: center;
 }
 
-/* Table header (Maroon, no hover) */
 .styled-table thead th {
-    background-color: #8B0000; /* Maroon background */
-    color: #fff; /* White font */
+    background-color: #8B0000; 
+    color: #fff; 
     text-transform: uppercase;
     font-size: 14px;
 }
 
-/* Table cells */
 .styled-table th, .styled-table td {
     padding: 14px 18px;
     text-align: center;
 }
 
-/* Alternate row colors (like Manage Requests) */
 .styled-table tbody tr:nth-child(even) {
     background-color: #f9f9f9;
 }
@@ -80,24 +73,21 @@
     background-color: #fff;
 }
 
-/* Hover effect for rows only (not header) */
 .styled-table tbody tr:hover {
-    background-color: #eef4ff;
+    background-color: #ffe6e6;
 }
 
-/* Last row bottom border */
+
 .styled-table tbody tr:last-of-type {
     border-bottom: 3px solid #8B0000;
 }
 
-/* Column with colspan */
 .styled-table td[colspan] {
     text-align: center;
     color: #888;
     font-style: italic;
 }
 
-/* Messages */
 p.message {
     text-align: center;
     color: green;
@@ -105,7 +95,6 @@ p.message {
     margin-bottom: 20px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .section {
         margin-left: 0;
