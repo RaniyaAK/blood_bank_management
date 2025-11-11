@@ -77,7 +77,7 @@
             <div class="field-error">{{ error }}</div>
         {% endfor %}
 
-        <button type="submit" class="save-btn" id="saveBtn">Save Changes</button>
+        <button type="submit" class="save-btn">Save Changes</button>
     </form>
 </div>
 
@@ -240,7 +240,6 @@ body {
     font-size: 14px;
 }
 .field-error { color: red; font-size: 12px; }
-
 .save-btn {
     background-color: #b30000;
     color: #fff;
@@ -251,26 +250,8 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
 }
 .save-btn:hover { background-color: #8b0000; }
-
-/* Spinner */
-.loader {
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top: 3px solid #fff;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
 
 @media (max-width: 768px) {
     .top-bar { flex-direction: column; gap: 20px; }
@@ -286,7 +267,6 @@ const profilePanel = document.getElementById('profilePanel');
 const closePanel = document.getElementById('closePanel');
 const overlay = document.getElementById('overlay');
 const editForm = document.getElementById('editForm');
-const saveBtn = document.getElementById('saveBtn');
 
 // Open side panel
 profileBtn.addEventListener('click', () => {
@@ -304,35 +284,22 @@ function closeSidePanel() {
 closePanel.addEventListener('click', closeSidePanel);
 overlay.addEventListener('click', closeSidePanel);
 
-// AJAX form submission with spinner and below 1 sec delay (0.3s)
+// AJAX form submission
 editForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
-    const originalText = saveBtn.innerHTML;
 
-    // Show spinner + text
-    saveBtn.innerHTML = '<div class="loader"></div><span>Saving...</span>';
-    saveBtn.disabled = true;
-
-    const delay = new Promise(resolve => setTimeout(resolve, 300)); // 0.3 sec delay
-    const fetchRequest = fetch("{% url 'recipient_details_edit' %}", {
+    fetch("{% url 'recipient_details_edit' %}", {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData
-    }).then(response => response.json());
-
-    Promise.all([delay, fetchRequest])
-        .then(([_, data]) => {
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
-            if (!data.success) alert('Error saving data.');
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
-            alert('Error saving data.');
-        });
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) { alert('Profile updated successfully!'); }
+        else { alert('Error saving data.'); }
+    })
+    .catch(err => console.error('Error:', err));
 });
 </script>
 

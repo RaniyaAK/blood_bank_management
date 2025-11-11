@@ -190,23 +190,44 @@ def user_logout(request):
 #   __________________________________________________________________________________________________________________________
 
 # pages
+from django.http import JsonResponse
+
 @login_required
 def hospital(request):
-    """Hospital dashboard"""
-    try:
-        hospital_profile = HospitalDetails.objects.get(user=request.user)
-    except HospitalDetails.DoesNotExist:
-        hospital_profile = None
+    """Hospital dashboard with editable profile form (AJAX compatible, no photo)"""
+    hospital_profile = HospitalDetails.objects.filter(user=request.user).first()
 
-    # ✅ Count unread hospital notifications
     unread_notifications_count = HospitalNotification.objects.filter(
         hospital=request.user, is_read=False
     ).count()
 
+    if hospital_profile:
+        if request.method == 'POST':
+            form = HospitalDetailsForm(request.POST, request.FILES, instance=hospital_profile)
+            if form.is_valid():
+                form.save()
+
+                # ✅ For AJAX save (spinner update)
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({'success': True})
+
+                return redirect('hospital')
+            else:
+                # ❌ Send form errors if AJAX
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'errors': form.errors})
+        else:
+            form = HospitalDetailsForm(instance=hospital_profile)
+    else:
+        hospital_profile = None
+        form = HospitalDetailsForm()
+
     return render(request, 'hospital.html', {
         'hospital': hospital_profile,
-        'unread_notifications_count': unread_notifications_count
+        'form': form,
+        'unread_notifications_count': unread_notifications_count,
     })
+
 
 
 
@@ -251,8 +272,6 @@ def donor(request):
         'donor': donor_profile,
         'form': form,
     })
-
-
 
 
 # --- Dashboards ---
@@ -687,19 +706,33 @@ def hospital_details_form(request):
     return render(request, 'hospital/hospital_details_form.html', {'form': form})
 
 
+from django.http import JsonResponse
+
+@login_required
 def hospital_details_edit(request):
-    """Edit profile"""
+    """Edit hospital profile (AJAX and normal form submission supported)"""
     hospital = get_object_or_404(HospitalDetails, user=request.user)
 
     if request.method == 'POST':
         form = HospitalDetailsForm(request.POST, request.FILES, instance=hospital)
         if form.is_valid():
             form.save()
+
+            # ✅ For AJAX request (spinner update)
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            
+            # ✅ Normal submission
             return redirect('hospital')
+        else:
+            # ❌ Return errors for AJAX form submission
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = HospitalDetailsForm(instance=hospital)
 
     return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
+
 
 
 def hospital_blood_request_form(request):
