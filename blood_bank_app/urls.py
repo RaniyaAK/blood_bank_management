@@ -3,6 +3,8 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import recipient_notifications_mark_read
+from .views import hospital_notifications_mark_read
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -59,8 +61,6 @@ urlpatterns = [
 
     # path('dashboard/add_blood/', views.add_blood, name='add_blood'),
 
-
-
 # passwords
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('reset_password/<str:email>/', views.reset_password, name='reset_password'),
@@ -78,6 +78,11 @@ urlpatterns = [
 
     path('approve_recipient_request/<int:request_id>/', views.approve_recipient_request, name='approve_recipient_request'),
     path('reject_recipient_request/<int:request_id>/', views.reject_recipient_request, name='reject_recipient_request'),
+
+    path('recipient/notifications/mark-read/', recipient_notifications_mark_read, name='recipient_notifications_mark_read'),
+    path('hospital/notifications/mark-read/', hospital_notifications_mark_read, name='hospital_notifications_mark_read'),
+
+
 ]
 
 

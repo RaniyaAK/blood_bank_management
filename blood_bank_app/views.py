@@ -21,8 +21,11 @@ from .forms import RecipientBloodRequestForm
 
 from .models import Profile
 from .models import BloodStock
-from .models import RecipientDetails, Profile, BloodStock,HospitalDetails,DonorEligibilityTest
+from .models import HospitalDetails
 from .models import DonorDetails
+from .models import RecipientDetails
+
+
 from .models import HospitalDetails
 from .models import AdminNotification
 
@@ -36,6 +39,7 @@ from .models import (
     HospitalNotification,
     RecipientNotification
 )
+from django.http import JsonResponse
 
 
 
@@ -596,12 +600,6 @@ def recipient_details_form(request):
     return render(request, 'recipient/recipient_details_form.html', {'form': form})
 
 
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render, redirect
-from .models import RecipientDetails
-from .forms import RecipientDetailsForm
-
 @login_required
 def recipient_details_edit(request):
     """Edit recipient profile (AJAX or normal request)"""
@@ -629,16 +627,20 @@ def recipient_details_edit(request):
 
 
 
-
 @login_required
 def recipient_notifications(request):
-    sample_notifications = [
-        {"title": "Blood Donation Request Approved", "message": "Your recent donation request has been approved.", "created_at": "2025-10-24 12:30"},
-        {"title": "Blood Camp Reminder", "message": "There is a blood camp scheduled at City Hospital tomorrow.", "created_at": "2025-10-23 15:10"},
-        {"title": "Thank You!", "message": "Thank you for your recent donation. You’ve saved lives!", "created_at": "2025-10-22 09:45"},
-    ]
-    
-    return render(request, "recipient/recipient_notifications.html", {"notifications": sample_notifications})
+    recipient_user = request.user
+    notifications = RecipientNotification.objects.filter(
+        recipient=recipient_user
+    ).order_by('-created_at')
+
+    # Mark all unread notifications as read immediately
+    notifications.filter(is_read=False).update(is_read=True)
+
+    return render(request, "recipient/recipient_notifications.html", {
+        "notifications": notifications
+    })
+
 
 
 def received_history(request):
@@ -685,19 +687,6 @@ def recipient_blood_request_form(request):
     return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
 
 
-@login_required
-def recipient_notifications(request):
-    recipient_user = request.user
-    notifications = RecipientNotification.objects.filter(
-        recipient=recipient_user
-    ).order_by('-created_at')
-
-    # ✅ Mark all unread notifications as read
-    notifications.filter(is_read=False).update(is_read=True)
-
-    return render(request, 'recipient/recipient_notifications.html', {
-        'notifications': notifications,
-    })
 
 
 # ____________________________________________________________________________________________________________________
@@ -979,3 +968,24 @@ def reject_recipient_request(request, request_id):
     )
 
     return redirect('manage_requests')
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def recipient_notifications_mark_read(request):
+    if request.method == "POST":
+        # Mark all unread notifications for this recipient as read
+        request.user.recipientnotification_set.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"success": True})
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def hospital_notifications_mark_read(request):
+    if request.method == "POST":
+        # Mark all unread notifications for this hospital as read
+        request.user.hospitalnotification_set.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"success": True})
+
