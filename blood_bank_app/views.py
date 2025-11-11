@@ -41,10 +41,6 @@ from .models import (
 )
 from django.http import JsonResponse
 
-
-
-
-
 def home(request):
     return render(request, 'home.html')
 
@@ -197,7 +193,6 @@ def user_logout(request):
 #   __________________________________________________________________________________________________________________________
 
 # pages
-from django.http import JsonResponse
 
 @login_required
 def hospital(request):
@@ -433,8 +428,6 @@ def donor_details_edit(request):
     return render(request, 'donor/donor_details_edit.html', {'form': form, 'donor': donor})
 
 
-
-
 def calculate_age(dob):
     today = date.today()
     return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
@@ -628,7 +621,6 @@ def recipient_details_edit(request):
     return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
 
 
-
 @login_required
 def recipient_notifications(request):
     recipient_user = request.user
@@ -715,7 +707,6 @@ def hospital_details_form(request):
     return render(request, 'hospital/hospital_details_form.html', {'form': form})
 
 
-from django.http import JsonResponse
 
 @login_required
 def hospital_details_edit(request):
@@ -743,7 +734,6 @@ def hospital_details_edit(request):
     return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
 
 
-
 def hospital_blood_request_form(request):
     if request.method == 'POST':
         form = HospitalBloodRequestForm(request.POST)
@@ -768,7 +758,6 @@ def hospital_blood_request_form(request):
         form = HospitalBloodRequestForm()
 
     return render(request, 'hospital/hospital_blood_request_form.html', {'form': form})
-
 
 
 def hospital_add_blood_stock(request):
