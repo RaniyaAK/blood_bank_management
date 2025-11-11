@@ -242,14 +242,24 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 .save-btn:hover { background-color: #8b0000; }
 
-/* Spinner Animation */
-.spin {
-    display: inline-block;
+/* White Spinner */
+.loader {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
     animation: spin 1s linear infinite;
 }
+
+/* Spinner Animation */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -287,17 +297,17 @@ function closeSidePanel() {
 closePanel.addEventListener('click', closeSidePanel);
 overlay.addEventListener('click', closeSidePanel);
 
-// AJAX form submission with spinner for minimum 1 second
+// AJAX form submission with spinner delay below 1 sec (0.3s)
 editForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
     const originalText = saveBtn.innerHTML;
 
-    // Show spinning emoji
-    saveBtn.innerHTML = '<span class="spin">🔄</span>';
+    // Show spinner + text
+    saveBtn.innerHTML = '<div class="loader"></div><span>Saving...</span>';
     saveBtn.disabled = true;
 
-    const delay = new Promise(resolve => setTimeout(resolve, 200));
+    const delay = new Promise(resolve => setTimeout(resolve, 300)); // 🔹 only 0.3 sec
     const fetchRequest = fetch("{% url 'donor_details_edit' %}", {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
