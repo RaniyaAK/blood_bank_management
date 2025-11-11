@@ -382,22 +382,29 @@ def donor_details_form(request):
     return render(request, 'donor/donor_details_form.html', {'form': form})
 
 
-from django.http import JsonResponse
-
 @login_required
 def donor_details_edit(request):
+    """Edit donor profile (supports both AJAX and normal form)"""
     donor = get_object_or_404(DonorDetails, user=request.user)
 
     if request.method == 'POST':
         form = DonorDetailsForm(request.POST, request.FILES, instance=donor)
         if form.is_valid():
             form.save()
+
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({'success': True})
+            
+            return redirect('donor')
+        else:
+          
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = DonorDetailsForm(instance=donor)
 
     return render(request, 'donor/donor_details_edit.html', {'form': form, 'donor': donor})
+
 
 
 
@@ -440,7 +447,6 @@ def donor_eligibility_test_form(request):
             on_medication = form.cleaned_data.get('on_medication')
             had_surgery_recently = form.cleaned_data.get('had_surgery_recently')
 
-            from datetime import date  # ✅ ensure date is imported
             age = calculate_age(dob)
 
             if age < 18 or age > 60:
@@ -569,20 +575,38 @@ def recipient_details_form(request):
     return render(request, 'recipient/recipient_details_form.html', {'form': form})
 
 
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render, redirect
+from .models import RecipientDetails
+from .forms import RecipientDetailsForm
+
 @login_required
 def recipient_details_edit(request):
-    """Edit profile"""
+    """Edit recipient profile (AJAX or normal request)"""
     recipient = get_object_or_404(RecipientDetails, user=request.user)
 
     if request.method == 'POST':
         form = RecipientDetailsForm(request.POST, request.FILES, instance=recipient)
         if form.is_valid():
             form.save()
+
+            # ✅ For AJAX (used in dashboard side panel)
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            
+            # ✅ For normal form submission
             return redirect('recipient')
+        else:
+            # ❌ Handle form errors for AJAX
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = RecipientDetailsForm(instance=recipient)
 
     return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
+
+
 
 
 @login_required
