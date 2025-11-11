@@ -8,10 +8,10 @@
 
     <!-- 🔹 Header -->
     <div class="top-bar">
-
-        <!-- ✅ Profile Icon (Left Side) -->
         <div class="left-section">
-            <img id="profileBtn" src="{% if recipient.photo %}{{ recipient.photo.url }}{% else %}{% static 'default_profile.png' %}{% endif %}" alt="Profile" class="profile-img">
+            <img id="profileBtn"
+                 src="{% if recipient.photo %}{{ recipient.photo.url }}{% else %}{% static 'default_profile.png' %}{% endif %}"
+                 alt="Profile" class="profile-img">
         </div>
 
         <!-- 🔹 Icons (Right Side) -->
@@ -19,7 +19,6 @@
             <a href="{% url 'recipient_notifications' %}" class="icon-btn" title="Notifications">
                 <i class="fa fa-bell"></i>
             </a>
-
             <a href="{% url 'logout' %}" class="logout-btn" title="Logout">Logout</a>
         </div>
     </div>
@@ -27,39 +26,46 @@
     <!-- 🔹 Main Content -->
     <div class="content-area">
         <div class="recipient-actions">
-
-            <!-- Search Blood Availability -->
             <a href="{% url 'search_blood' %}" class="action-card">
                 <i class="fa-solid fa-magnifying-glass icon-red"></i>
                 <span>Search Blood Availability</span>
             </a>
-
-            <!-- Request Blood -->
             <a href="{% url 'recipient_blood_request_form' %}" class="action-card">
                 <i class="fa-solid fa-droplet icon-red"></i>
                 <span>Request Blood</span>
             </a>
-
-            <!-- Blood Received History -->
             <a href="{% url 'received_history' %}" class="action-card">
                 <i class="fa-solid fa-file-lines icon-red"></i>
                 <span>Blood Received History</span>
             </a>
-
         </div>
     </div>
 </div>
 
-<!-- 🔹 Dim Overlay -->
+<!-- 🔹 Overlay -->
 <div id="overlay" class="overlay"></div>
 
-<!-- 🔹 Hidden Side Panel -->
+<!-- 🔹 Side Panel -->
 <div id="profilePanel" class="side-panel">
     <div class="panel-header">
         <span>Edit Profile</span>
         <span id="closePanel" class="close-btn">&times;</span>
     </div>
 
+    <!-- 🔹 Profile Circle -->
+    <div class="photo-wrapper">
+        <div class="profile-photo">
+            <img id="photoPreview"
+                 src="{% if recipient.photo %}{{ recipient.photo.url }}{% else %}{% static 'default_profile.png' %}{% endif %}"
+                 alt="Profile Photo">
+            <label for="id_photo" class="edit-icon">
+                <i class="fas fa-pencil-alt"></i>
+            </label>
+            <input type="file" id="id_photo" name="photo" accept="image/*" class="file-hidden" onchange="previewPhoto(this)">
+        </div>
+    </div>
+
+    <!-- 🔹 Form -->
     <form id="editForm" method="POST" enctype="multipart/form-data" class="edit-form">
         {% csrf_token %}
         {% for field in form %}
@@ -77,7 +83,7 @@
             <div class="field-error">{{ error }}</div>
         {% endfor %}
 
-        <button type="submit" class="save-btn">Save Changes</button>
+        <button type="submit" class="save-btn" id="saveBtn">Save Changes</button>
     </form>
 </div>
 
@@ -122,7 +128,7 @@ body {
 }
 .left-section .profile-img:hover { transform: scale(1.1); }
 
-/* Icons on right */
+/* Icons */
 .icon-container {
     display: flex;
     align-items: center;
@@ -145,13 +151,13 @@ body {
 }
 .logout-btn:hover { background: #fff; color: #8b0000; }
 
-/* Main Content */
+/* Main */
 .content-area {
     flex: 1;
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
 }
 .recipient-actions {
     display: grid;
@@ -160,8 +166,6 @@ body {
     width: 100%;
     max-width: 900px;
 }
-
-/* Cards */
 .action-card {
     text-decoration: none;
     background: #fff;
@@ -180,9 +184,7 @@ body {
     transform: translateY(-8px);
     box-shadow: 0 10px 25px rgba(179, 0, 0, 0.4);
 }
-.icon-red { color: #b30000; font-size: 42px; margin-bottom: 15px; transition: color 0.3s ease; }
-.action-card:hover .icon-red { color: #d11a1a; }
-.action-card span { font-size: 18px; }
+.icon-red { color: #b30000; font-size: 42px; margin-bottom: 15px; }
 
 /* 🔹 Side Panel */
 .side-panel {
@@ -192,12 +194,14 @@ body {
     width: 320px;
     height: 100vh;
     background: #fff;
-    box-shadow: 5px 0 20px rgba(0,0,0,0.2);
+    box-shadow: 5px 0 25px rgba(0,0,0,0.25);
     overflow-y: auto;
     transition: left 0.4s ease;
     z-index: 1001;
-    padding: 20px 25px;
+    padding: 20px 35px 20px 30px;
     display: none;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 .side-panel.active { display: block; left: 0; }
 
@@ -216,7 +220,7 @@ body {
 }
 .overlay.active { opacity: 1; pointer-events: all; }
 
-/* Panel Header */
+/* Header */
 .panel-header {
     display: flex;
     justify-content: space-between;
@@ -224,10 +228,46 @@ body {
     font-size: 20px;
     font-weight: 600;
     color: #b30000;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
-.close-btn { font-size: 28px; cursor: pointer; color: #b30000; transition: 0.2s; }
+.close-btn {
+    font-size: 26px;
+    cursor: pointer;
+    color: #b30000;
+    transition: 0.2s;
+}
 .close-btn:hover { color: #7a0000; }
+
+/* Profile Circle */
+.photo-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+.profile-photo {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+.profile-photo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #b30000;
+}
+.profile-photo .edit-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+}
+.profile-photo .edit-icon i { color: #b30000; font-size: 13px; }
+.file-hidden { display: none; }
 
 /* Form */
 .edit-form { display: flex; flex-direction: column; gap: 15px; }
@@ -240,6 +280,8 @@ body {
     font-size: 14px;
 }
 .field-error { color: red; font-size: 12px; }
+
+/* Button */
 .save-btn {
     background-color: #b30000;
     color: #fff;
@@ -250,8 +292,23 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 .save-btn:hover { background-color: #8b0000; }
+
+/* Spinner */
+.loader {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 @media (max-width: 768px) {
     .top-bar { flex-direction: column; gap: 20px; }
@@ -267,15 +324,16 @@ const profilePanel = document.getElementById('profilePanel');
 const closePanel = document.getElementById('closePanel');
 const overlay = document.getElementById('overlay');
 const editForm = document.getElementById('editForm');
+const saveBtn = document.getElementById('saveBtn');
 
-// Open side panel
+// Open
 profileBtn.addEventListener('click', () => {
     overlay.classList.add('active');
     profilePanel.style.display = 'block';
     setTimeout(() => profilePanel.classList.add('active'), 10);
 });
 
-// Close side panel
+// Close
 function closeSidePanel() {
     profilePanel.classList.remove('active');
     overlay.classList.remove('active');
@@ -284,26 +342,45 @@ function closeSidePanel() {
 closePanel.addEventListener('click', closeSidePanel);
 overlay.addEventListener('click', closeSidePanel);
 
-// AJAX form submission
+// Preview image
+function previewPhoto(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = e => document.getElementById('photoPreview').src = e.target.result;
+        reader.readAsDataURL(file);
+    }
+}
+
+// AJAX + loader
 editForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<div class="loader"></div><span>Saving...</span>';
+    saveBtn.disabled = true;
 
-    fetch("{% url 'recipient_details_edit' %}", {
+    const delay = new Promise(res => setTimeout(res, 300));
+    const req = fetch("{% url 'recipient_details_edit' %}", {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) { alert('Profile updated successfully!'); }
-        else { alert('Error saving data.'); }
-    })
-    .catch(err => console.error('Error:', err));
+    }).then(r => r.json());
+
+    Promise.all([delay, req])
+        .then(([_, data]) => {
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+            if (!data.success) alert('Error saving data.');
+            else closeSidePanel();
+        })
+        .catch(() => {
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+            alert('Error saving data.');
+        });
 });
 </script>
 
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 {% endblock %}
