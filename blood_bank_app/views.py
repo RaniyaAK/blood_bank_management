@@ -43,6 +43,8 @@ from django.http import JsonResponse
 
 
 
+
+
 def home(request):
     return render(request, 'home.html')
 
@@ -969,9 +971,6 @@ def reject_recipient_request(request, request_id):
 
     return redirect('manage_requests')
 
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-
 @login_required
 def recipient_notifications_mark_read(request):
     if request.method == "POST":
@@ -979,8 +978,6 @@ def recipient_notifications_mark_read(request):
         request.user.recipientnotification_set.filter(is_read=False).update(is_read=True)
     return JsonResponse({"success": True})
 
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def hospital_notifications_mark_read(request):
