@@ -34,6 +34,7 @@ from .models import (
     RecipientBloodRequest,
     DonorRequestAppointment,
     HospitalNotification,
+    RecipientNotification
 )
 
 
@@ -228,14 +229,15 @@ def hospital(request):
         'unread_notifications_count': unread_notifications_count,
     })
 
-
-
-
-
 @login_required
 def recipient(request):
     """Recipient dashboard with editable profile in side panel"""
     recipient_profile = RecipientDetails.objects.filter(user=request.user).first()
+
+    # ✅ Get unread notifications count
+    unread_notifications_count = RecipientNotification.objects.filter(
+        recipient=request.user, is_read=False
+    ).count()
 
     if recipient_profile:
         if request.method == 'POST':
@@ -252,8 +254,8 @@ def recipient(request):
     return render(request, 'recipient.html', {
         'recipient': recipient_profile,
         'form': form,
+        'unread_notifications_count': unread_notifications_count,  # ✅ Added
     })
-
 
 @login_required
 def donor(request):
@@ -682,6 +684,22 @@ def recipient_blood_request_form(request):
 
     return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
 
+
+@login_required
+def recipient_notifications(request):
+    recipient_user = request.user
+    notifications = RecipientNotification.objects.filter(
+        recipient=recipient_user
+    ).order_by('-created_at')
+
+    # ✅ Mark all unread notifications as read
+    notifications.filter(is_read=False).update(is_read=True)
+
+    return render(request, 'recipient/recipient_notifications.html', {
+        'notifications': notifications,
+    })
+
+
 # ____________________________________________________________________________________________________________________
 
 # Hospital 
@@ -921,11 +939,9 @@ def reject_donor_request(request, request_id):
 
 
 # ✅ Recipient Requests
-
 @login_required
 def approve_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
-
     recipient_request.status = 'Approved'
     recipient_request.save()
 
@@ -935,13 +951,18 @@ def approve_recipient_request(request, request_id):
         message=f"Recipient request from {recipient_request.recipient.username} approved."
     )
 
+    # ✅ Notify recipient
+    RecipientNotification.objects.create(
+        recipient=recipient_request.recipient,
+        message=f"Your blood request for {recipient_request.blood_group} ({recipient_request.units} units) has been approved."
+    )
+
     return redirect('manage_requests')
 
 
 @login_required
 def reject_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
-
     recipient_request.status = 'Rejected'
     recipient_request.save()
 
@@ -949,6 +970,12 @@ def reject_recipient_request(request, request_id):
     AdminNotification.objects.create(
         user=request.user,
         message=f"Recipient request from {recipient_request.recipient.username} rejected."
+    )
+
+    # ✅ Notify recipient
+    RecipientNotification.objects.create(
+        recipient=recipient_request.recipient,
+        message=f"Your blood request for {recipient_request.blood_group} ({recipient_request.units} units) has been rejected."
     )
 
     return redirect('manage_requests')
