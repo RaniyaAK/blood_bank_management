@@ -641,8 +641,6 @@ def recipient_notifications(request):
         "notifications": notifications
     })
 
-
-
 def received_history(request):
     return render(request, 'recipient/received_history.html')
 
@@ -820,6 +818,10 @@ def hospital_notifications_mark_read(request):
         # Mark all unread notifications for this hospital as read
         request.user.hospitalnotification_set.filter(is_read=False).update(is_read=True)
     return JsonResponse({"success": True})
+
+
+def hospital_blood_received_history(request):
+    return render(request, 'hospital/hospital_blood_received_history.html')
 
 # ______________________________________________________________________________________________________________________________
 

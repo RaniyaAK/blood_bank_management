@@ -1,4 +1,5 @@
 {% extends 'master.html' %}
+
 {% load static %}
 
 {% block title %}Hospital Dashboard{% endblock %}
@@ -30,7 +31,7 @@
     <div class="content-area">
         <div class="hospital-actions">
 
-            <a href="#" class="action-card">
+            <a href="{% url 'hospital_blood_received_history' %}" class="action-card">
                 <i class="fa-solid fa-droplet icon-red"></i>
                 <span>Received History</span>
             </a>
