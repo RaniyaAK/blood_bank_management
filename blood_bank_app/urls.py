@@ -81,6 +81,8 @@ urlpatterns = [
 
     path('recipient/notifications/mark-read/', recipient_notifications_mark_read, name='recipient_notifications_mark_read'),
     path('hospital/notifications/mark-read/', hospital_notifications_mark_read, name='hospital_notifications_mark_read'),
+    path('dashboard/admin_notifications/mark-read/', views.admin_notifications_mark_read, name='admin_notifications_mark_read'),
+
 
 
 ]

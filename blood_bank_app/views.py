@@ -346,13 +346,15 @@ def users(request):
 def admin_notifications(request):
     notifications = AdminNotification.objects.all().order_by('-created_at')
     unread_notifications = notifications.filter(is_read=False)
-
-    unread_notifications.update(is_read=True)
+    read_notifications = notifications.filter(is_read=True)
 
     context = {
-        'notifications': notifications,
+        'unread_notifications': unread_notifications,
+        'read_notifications': read_notifications,
+        'unread_count': unread_notifications.count(),
     }
     return render(request, 'dashboard/admin_notifications.html', context)
+
 # ___________________________________________________________________________________________________________________
 
 
@@ -975,3 +977,8 @@ def hospital_notifications_mark_read(request):
         request.user.hospitalnotification_set.filter(is_read=False).update(is_read=True)
     return JsonResponse({"success": True})
 
+@login_required
+def admin_notifications_mark_read(request):
+    if request.method == "POST":
+        AdminNotification.objects.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"success": True})
