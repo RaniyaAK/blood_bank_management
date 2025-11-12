@@ -8,40 +8,47 @@
 <!-- 🔙 Back Button -->
 <a href="javascript:history.back()" class="back-arrow">&#8592; Back</a>
 
-<div class="notification-container">
-  <h1>Recipient Notifications</h1>
+<div class="notification-page">
+  <div class="notification-container">
 
-  {% if notifications %}
-    <ul class="notification-list">
-      {% for note in notifications %}
-        <li class="notification-item {% if not note.is_read %}unread{% endif %}">
-          <div class="message">{{ note.message }}</div>
-          <div class="timestamp">{{ note.created_at|date:"M d, Y - h:i A" }}</div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p class="no-notifications">No notifications available.</p>
-  {% endif %}
+    {% if notifications %}
+      <ul class="notification-list">
+        {% for note in notifications %}
+          <li class="notification-item {% if not note.is_read %}unread{% endif %}">
+            <div class="message">{{ note.message }}</div>
+            <div class="timestamp">{{ note.created_at|date:"M d, Y - h:i A" }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="no-notifications">No notifications available.</p>
+    {% endif %}
+  </div>
 </div>
 
 <style>
-  body {
-    font-family: "Poppins", sans-serif;
+  /* 🩸 General reset and scroll fix */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
     background: linear-gradient(180deg, #5c0000 0%, #8b0000 100%);
-    margin: 0;
-    padding: 0;
+    font-family: "Poppins", sans-serif;
   }
 
+  /* 🔙 Back Arrow */
   .back-arrow {
-    position: absolute;
+    position: fixed;
     top: 20px;
     left: 20px;
-    font-size: 18px;
+    font-size: 20px;
     color: #fff;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
+    z-index: 9999;
   }
 
   .back-arrow:hover {
@@ -49,24 +56,42 @@
     text-decoration: underline;
   }
 
-  .notification-container {
-    max-width: 700px;
-    margin: 80px auto;
-    background: #fff;
-    padding: 30px 40px;
-    border-radius: 14px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  /* 📦 Page Wrapper */
+  .notification-page {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
   }
 
+  /* 📬 White Notification Box */
+
+  .notification-container {
+    width: 90%;
+    max-width: 700px;
+    background: #fff;
+    padding: 20px 40px 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    margin: 20px auto; /* Reduced top & bottom space */
+    box-sizing: border-box;
+}
+
+
+  /* 🩸 Heading */
   h1 {
     text-align: center;
     color: #b30000;
     margin-bottom: 25px;
+    font-size: 26px;
+    font-weight: 600;
   }
 
+  /* 📋 Notification List */
   .notification-list {
     list-style: none;
     padding: 0;
+    margin: 0;
   }
 
   .notification-item {
@@ -100,6 +125,18 @@
     text-align: center;
     color: #555;
     font-size: 16px;
+  }
+
+  /* 📱 Responsive */
+  @media (max-width: 600px) {
+    .notification-container {
+      padding: 35px 25px;
+      margin: 80px 10px;
+    }
+
+    h1 {
+      font-size: 22px;
+    }
   }
 </style>
 

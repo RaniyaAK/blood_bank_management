@@ -24,9 +24,6 @@ from .models import BloodStock
 from .models import HospitalDetails
 from .models import DonorDetails
 from .models import RecipientDetails
-
-
-from .models import HospitalDetails
 from .models import AdminNotification
 
 from datetime import date
@@ -40,6 +37,7 @@ from .models import (
     RecipientNotification
 )
 from django.http import JsonResponse
+
 
 def home(request):
     return render(request, 'home.html')
@@ -134,7 +132,6 @@ def user_login(request):
 
 def roles(request):
     return render(request, 'roles.html')
-
 
 
 # passwords
@@ -354,6 +351,13 @@ def admin_notifications(request):
         'unread_count': unread_notifications.count(),
     }
     return render(request, 'dashboard/admin_notifications.html', context)
+
+
+@login_required
+def admin_notifications_mark_read(request):
+    if request.method == "POST":
+        AdminNotification.objects.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"success": True})
 
 # ___________________________________________________________________________________________________________________
 
@@ -682,8 +686,12 @@ def recipient_blood_request_form(request):
 
     return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
 
-
-
+@login_required
+def recipient_notifications_mark_read(request):
+    if request.method == "POST":
+        # Mark all unread notifications for this recipient as read
+        request.user.recipientnotification_set.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"success": True})
 
 # ____________________________________________________________________________________________________________________
 
@@ -806,6 +814,12 @@ def hospital_notifications(request):
 
     return render(request, 'hospital/hospital_notifications.html', {'notifications': notifications})
 
+@login_required
+def hospital_notifications_mark_read(request):
+    if request.method == "POST":
+        # Mark all unread notifications for this hospital as read
+        request.user.hospitalnotification_set.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"success": True})
 
 # ______________________________________________________________________________________________________________________________
 
@@ -937,7 +951,6 @@ def reject_recipient_request(request, request_id):
     recipient_request.save()
 
 
-
     # ✅ Notify recipient
     RecipientNotification.objects.create(
         recipient=recipient_request.recipient,
@@ -946,23 +959,8 @@ def reject_recipient_request(request, request_id):
 
     return redirect('manage_requests')
 
-@login_required
-def recipient_notifications_mark_read(request):
-    if request.method == "POST":
-        # Mark all unread notifications for this recipient as read
-        request.user.recipientnotification_set.filter(is_read=False).update(is_read=True)
-    return JsonResponse({"success": True})
 
 
-@login_required
-def hospital_notifications_mark_read(request):
-    if request.method == "POST":
-        # Mark all unread notifications for this hospital as read
-        request.user.hospitalnotification_set.filter(is_read=False).update(is_read=True)
-    return JsonResponse({"success": True})
 
-@login_required
-def admin_notifications_mark_read(request):
-    if request.method == "POST":
-        AdminNotification.objects.filter(is_read=False).update(is_read=True)
-    return JsonResponse({"success": True})
+
+
