@@ -839,8 +839,6 @@ def manage_requests(request):
 
 # -------------------- APPROVE / REJECT REQUESTS --------------------
 
-
-# ✅ Hospital Requests
 # ✅ Hospital Requests
 @login_required
 def approve_hospital_request(request, request_id):
@@ -849,11 +847,6 @@ def approve_hospital_request(request, request_id):
     hospital_request.status = 'Approved'
     hospital_request.save()
 
-    # Notify admin (optional, for log)
-    AdminNotification.objects.create(
-        user=request.user,
-        message=f"Hospital request from {hospital_request.hospital.username} has been approved."
-    )
 
     # ✅ Notify hospital user
     HospitalNotification.objects.create(
@@ -872,11 +865,7 @@ def reject_hospital_request(request, request_id):
     hospital_request.status = 'Rejected'
     hospital_request.save()
 
-    # Notify admin (optional)
-    AdminNotification.objects.create(
-        user=request.user,
-        message=f"Hospital request from {hospital_request.hospital.username} has been rejected."
-    )
+
 
     # ✅ Notify hospital user
     HospitalNotification.objects.create(
@@ -886,7 +875,6 @@ def reject_hospital_request(request, request_id):
 
     # ❌ Removed messages.error
     return redirect('manage_requests')
-
 
 
 # ✅ Donor Requests (No date restriction)
@@ -928,10 +916,10 @@ def approve_recipient_request(request, request_id):
     recipient_request.save()
 
     # Notify admin/log
-    AdminNotification.objects.create(
-        user=request.user,
-        message=f"Recipient request from {recipient_request.recipient.username} approved."
-    )
+    # AdminNotification.objects.create(
+    #     user=request.user,
+    #     message=f"Recipient request from {recipient_request.recipient.username} approved."
+    # )
 
     # ✅ Notify recipient
     RecipientNotification.objects.create(
@@ -948,11 +936,7 @@ def reject_recipient_request(request, request_id):
     recipient_request.status = 'Rejected'
     recipient_request.save()
 
-    # Notify admin/log
-    AdminNotification.objects.create(
-        user=request.user,
-        message=f"Recipient request from {recipient_request.recipient.username} rejected."
-    )
+
 
     # ✅ Notify recipient
     RecipientNotification.objects.create(
