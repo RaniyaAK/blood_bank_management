@@ -29,6 +29,7 @@ urlpatterns = [
     path('hospital/hospital_blood_stock_chart/', views.hospital_blood_stock_chart, name='hospital_blood_stock_chart'),
     path('hospital/hospital_blood_request_form/', views.hospital_blood_request_form, name='hospital_blood_request_form'),
     path('hospital/hospital_blood_received_history/', views.hospital_blood_received_history, name='hospital_blood_received_history'),
+    path('hospital/hospital_blood_request_status/', views.hospital_blood_request_status, name='hospital_blood_request_status'),
 
 # donor
     path('donor/', views.donor, name='donor'),

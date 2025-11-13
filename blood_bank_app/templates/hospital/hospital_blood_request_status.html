@@ -1,0 +1,174 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block title %}Blood Request Status{% endblock %}
+
+{% block content %}
+
+<!-- 🔙 Back Button -->
+<a href="javascript:history.back()" class="back-arrow">&#8592; Back</a>
+
+<div class="notification-page">
+  <div class="notification-container">
+
+    <h1>Blood Request Status</h1>
+
+    {% if blood_requests %}
+      <table class="request-table">
+        <thead>
+          <tr>
+            <th>Date Requested</th>
+            <th>Blood Group</th>
+            <th>Units Required</th>
+            <th>Urgency</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in blood_requests %}
+            <tr>
+              <td>{{ req.created_at|date:"M d, Y" }}</td>
+              <td>{{ req.blood_group }}</td>
+              <td>{{ req.units }}</td>
+              <td>{{ req.urgency }}</td>
+              <td>
+                {% if req.status == 'Pending' %}
+                  <span class="status pending">{{ req.status }}</span>
+                {% elif req.status == 'Approved' %}
+                  <span class="status approved">{{ req.status }}</span>
+                {% elif req.status == 'Rejected' %}
+                  <span class="status rejected">{{ req.status }}</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="no-notifications">No blood requests submitted yet.</p>
+    {% endif %}
+
+  </div>
+</div>
+
+<style>
+  /* 🩸 General reset and scroll fix */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
+    background: linear-gradient(180deg, #5c0000 0%, #8b0000 100%);
+    font-family: "Poppins", sans-serif;
+  }
+
+  /* 🔙 Back Arrow */
+  .back-arrow {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    z-index: 9999;
+  }
+
+  .back-arrow:hover {
+    color: #f1f1f1;
+    text-decoration: underline;
+  }
+
+  /* 📦 Page Wrapper */
+  .notification-page {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 10px; /* ensures white box top visible below back arrow */
+  }
+
+  /* 📬 White Content Box */
+  .notification-container {
+    width: 90%;
+    max-width: 900px;
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 14px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    margin: 20px auto;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  /* 🩸 Heading */
+  h1 {
+    text-align: center;
+    color: #b30000;
+    margin-bottom: 25px;
+    font-size: 26px;
+    font-weight: 600;
+  }
+
+  /* 📋 Table */
+  .request-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .request-table th, .request-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    font-size: 15px;
+  }
+
+  .request-table th {
+    background-color: #b30000;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .status.pending {
+    color: #ffc107;
+    font-weight: 600;
+  }
+
+  .status.approved {
+    color: #007a00;
+    font-weight: 600;
+  }
+
+  .status.rejected {
+    color:  #d11a1a;
+    font-weight: 600;
+  }
+
+  .no-notifications {
+    text-align: center;
+    color: #555;
+    font-size: 16px;
+    margin-top: 20px;
+  }
+
+  /* 📱 Responsive */
+  @media (max-width: 768px) {
+    .notification-container {
+      padding: 25px 20px;
+    }
+
+    h1 {
+      font-size: 22px;
+    }
+
+    .request-table th, .request-table td {
+      font-size: 13px;
+      padding: 10px;
+    }
+  }
+</style>
+
+{% endblock %}

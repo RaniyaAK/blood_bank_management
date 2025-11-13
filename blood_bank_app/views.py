@@ -965,4 +965,15 @@ def reject_recipient_request(request, request_id):
 
 
 
+@login_required
+def hospital_blood_request_status(request):
+    # Get hospital object
+    hospital = get_object_or_404(HospitalDetails, user=request.user)
+
+    # Get all blood requests for this hospital
+    blood_requests = HospitalBloodRequest.objects.filter(hospital=request.user).order_by('-created_at')
+
+    return render(request, "hospital/hospital_blood_request_status.html", {
+        "blood_requests": blood_requests
+    })
 
