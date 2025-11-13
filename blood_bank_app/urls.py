@@ -20,8 +20,6 @@ urlpatterns = [
     path('dashboard/admin_notifications/', views.admin_notifications, name='admin_notifications'),
     path('dashboard/manage_requests/', views.manage_requests, name='manage_requests'),
 
-
-
 # hospital
     path('hospital/', views.hospital, name='hospital'),
     path('hospital_registration_form/', views.hospital_details_form, name='hospital_details_form'),
@@ -31,7 +29,6 @@ urlpatterns = [
     path('hospital/hospital_blood_stock_chart/', views.hospital_blood_stock_chart, name='hospital_blood_stock_chart'),
     path('hospital/hospital_blood_request_form/', views.hospital_blood_request_form, name='hospital_blood_request_form'),
     path('hospital/hospital_blood_received_history/', views.hospital_blood_received_history, name='hospital_blood_received_history'),
-
 
 # donor
     path('donor/', views.donor, name='donor'),
@@ -46,8 +43,6 @@ urlpatterns = [
     path('donor/donor_eligibility_test_form/', views.donor_eligibility_test_form, name='donor_eligibility_test_form'),
     path('donor/donor_eligibility_result/', views.donor_eligibility_result, name='donor_eligibility_result'),
 
-
-
 # recipient
     path('recipient/', views.recipient, name='recipient'),
 
@@ -58,7 +53,6 @@ urlpatterns = [
     path('recipient/received_history/', views.received_history, name='received_history'),
     path('recipient/recipient_blood_request_form/', views.recipient_blood_request_form, name='recipient_blood_request_form'),
     path('recipient/search_blood/', views.search_blood, name='search_blood'),
-
 
     # path('dashboard/add_blood/', views.add_blood, name='add_blood'),
 
@@ -81,13 +75,10 @@ urlpatterns = [
     path('reject_recipient_request/<int:request_id>/', views.reject_recipient_request, name='reject_recipient_request'),
 
     path('recipient/notifications/mark-read/', recipient_notifications_mark_read, name='recipient_notifications_mark_read'),
-    path('hospital/notifications/mark-read/', hospital_notifications_mark_read, name='hospital_notifications_mark_read'),
+    path('hospital/hospital_notifications/mark-read/', hospital_notifications_mark_read, name='hospital_notifications_mark_read'),
     path('dashboard/admin_notifications/mark-read/', views.admin_notifications_mark_read, name='admin_notifications_mark_read'),
 
-
-
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
