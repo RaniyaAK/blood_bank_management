@@ -41,6 +41,10 @@
                 <i class="fa-solid fa-file-lines icon-red"></i>
                 <span>Blood Received History</span>
             </a>
+            <a href="{% url 'recipient_blood_request_status' %}" class="action-card">
+                <i class="fa-solid fa-hourglass-half icon-red"></i>
+                <span>Request Status</span>
+            </a>
         </div>
     </div>
 </div>
@@ -87,6 +91,7 @@
         {% endfor %}
 
         <button type="submit" class="save-btn" id="saveBtn">Save Changes</button>
+
     </form>
 </div>
 

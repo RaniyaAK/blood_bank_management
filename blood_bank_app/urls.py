@@ -54,6 +54,7 @@ urlpatterns = [
     path('recipient/received_history/', views.received_history, name='received_history'),
     path('recipient/recipient_blood_request_form/', views.recipient_blood_request_form, name='recipient_blood_request_form'),
     path('recipient/search_blood/', views.search_blood, name='search_blood'),
+    path('recipient/recipient_blood_request_status/', views.recipient_blood_request_status, name='recipient_blood_request_status'),
 
     # path('dashboard/add_blood/', views.add_blood, name='add_blood'),
 

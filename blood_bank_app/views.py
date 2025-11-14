@@ -660,6 +660,8 @@ def search_blood(request):
     })
 
 
+
+
 @login_required
 def recipient_blood_request_form(request):
     if request.method == 'POST':
@@ -977,3 +979,16 @@ def hospital_blood_request_status(request):
         "blood_requests": blood_requests
     })
 
+
+
+@login_required
+def recipient_blood_request_status(request):
+    # Get hospital object
+    recipient = get_object_or_404(RecipientDetails, user=request.user)
+
+    # Get all blood requests for this hospital
+    blood_requests = RecipientBloodRequest.objects.filter(recipient=request.user).order_by('-created_at')
+
+    return render(request, "recipient/recipient_blood_request_status.html", {
+        "blood_requests": blood_requests
+    })
