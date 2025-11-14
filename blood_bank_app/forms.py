@@ -144,7 +144,6 @@ class DonorEligibilityTestForm(forms.ModelForm):
             'gender',
             'dob',
             'weight',
-            'hemoglobin_level',
             'last_donation_date',
             'has_disease',
             'on_medication',
@@ -160,7 +159,6 @@ class DonorEligibilityTestForm(forms.ModelForm):
                 format='%Y-%m-%d'
             ),
             'weight': forms.NumberInput(attrs={'min': 40, 'max': 150, 'class': 'form-control', 'placeholder': 'Weight in kg'}),
-            'hemoglobin_level': forms.NumberInput(attrs={'step': '0.1', 'class': 'form-control', 'placeholder': 'Hemoglobin in g/dL'}),
             'gender': forms.Select(attrs={'class': 'form-control'}),
         }
 

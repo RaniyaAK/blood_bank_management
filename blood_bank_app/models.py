@@ -124,7 +124,6 @@ class DonorEligibilityTest(models.Model):
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     dob = models.DateField(verbose_name="Date of Birth")
     weight = models.FloatField(help_text="Weight must be at least 50 kg.")
-    hemoglobin_level = models.FloatField(help_text="Hemoglobin level in g/dL.")
     last_donation_date = models.DateField(null=True, blank=True, help_text="Leave blank if this is your first donation.")
 
     # Basic health questions
