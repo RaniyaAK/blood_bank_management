@@ -1,7 +1,7 @@
 {% extends 'master.html' %}
 {% load static %}
 
-{% block title %}Recipient Blood Request Form{% endblock %}
+{% block title %}Blood Request Form{% endblock %}
 
 {% block content %}
 
@@ -22,21 +22,29 @@
     {% csrf_token %}
     {{ form.non_field_errors }}
 
-    <label for="id_blood_group">Blood Group:</label>
+<label for="id_blood_group">Blood Group:</label>
     {{ form.blood_group }}
-    {{ form.blood_group.errors }}
+    {% for error in form.blood_group.errors %}
+      <p class="error-message">{{ error }}</p>
+    {% endfor %}
 
     <label for="id_units">Units Required:</label>
     {{ form.units }}
-    {{ form.units.errors }}
+    {% for error in form.units.errors %}
+      <p class="error-message">{{ error }}</p>
+    {% endfor %}    
 
     <label for="id_required_date">Required Date:</label>
     {{ form.required_date }}
-    {{ form.required_date.errors }}
+    {% for error in form.required_date.errors %}
+      <p class="error-message">{{ error }}</p>
+    {% endfor %}
 
     <label for="id_urgency">Urgency Level:</label>
     {{ form.urgency }}
-    {{ form.urgency.errors }}
+    {% for error in form.urgency.errors %}
+      <p class="error-message">{{ error }}</p>
+    {% endfor %}
 
     <div class="btn-container">
       <button type="reset" class="cancel-btn">Cancel</button>
