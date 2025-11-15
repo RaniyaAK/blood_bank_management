@@ -216,7 +216,12 @@ class HospitalBloodRequestForm(forms.ModelForm):
             'urgency': forms.Select(attrs={'class': 'form-control'}),
         }
 
-    # ✅ Backend validation — ensure required_date isn’t in the past
+    def clean_units(self):
+        units = self.cleaned_data.get('units')
+        if units is None or units <= 0:
+            raise ValidationError("Units must be greater than zero.")
+        return units        
+
     def clean_required_date(self):
         required_date = self.cleaned_data.get('required_date')
         if required_date and required_date < date.today():
@@ -239,12 +244,18 @@ class RecipientBloodRequestForm(forms.ModelForm):
             'required_date': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date',
-                'min': date.today().strftime('%Y-%m-%d'),  # ✅ restricts to future dates in UI
+                'min': date.today().strftime('%Y-%m-%d'), 
             }),
             'urgency': forms.Select(attrs={'class': 'form-control'}),
         }
 
-    # ✅ Backend validation — prevents past dates being submitted manually
+    def clean_units(self):
+        units = self.cleaned_data.get('units')
+        if units is None or units <= 0:
+            raise ValidationError("Units must be greater than zero.")
+        return units
+
+    
     def clean_required_date(self):
         required_date = self.cleaned_data.get('required_date')
         if required_date and required_date < date.today():

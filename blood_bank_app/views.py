@@ -980,7 +980,6 @@ def hospital_blood_request_status(request):
     })
 
 
-
 @login_required
 def recipient_blood_request_status(request):
     # Get hospital object

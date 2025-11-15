@@ -1,249 +1,184 @@
-from django.core.validators import RegexValidator
-from django.db import models
+from django import forms
+from datetime import date
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-
-
-# Phone validators
-hospital_phone_validator = RegexValidator(
-    regex=r'^(\+\d{1,3})?(\d{7}|\d{10})$',
-    message="Enter a valid phone number"
+from .models import (
+    Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails,
+    DonorRequestAppointment, DonorEligibilityTest,
+    RecipientBloodRequest, HospitalBloodRequest
 )
 
-donor_recipient_phone_validator = RegexValidator(
-    regex=r'^(\+\d{1,3})?\d{10}$',
-    message="Enter a valid phone number."
-)
+# ------------------------------
+# User & Authentication Forms
+# ------------------------------
+class UserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput) 
+    confirm_password = forms.CharField(widget=forms.PasswordInput)
+    role = forms.ChoiceField(choices=Profile.ROLE_CHOICES)
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    ROLE_CHOICES = (
-        ('hospital', 'Hospital'),
-        ('donor', 'Donor'),
-        ('recipient', 'Recipient'),
-    )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='recipient')
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+        help_texts = {'username': None}
 
-    def __str__(self):
-        return f"{self.user} ({self.role})"
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+        if password != confirm_password:
+            raise forms.ValidationError("Passwords do not match")
+        return cleaned_data
 
 
-class BloodStock(models.Model):
+class LoginForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)
+
+
+# ------------------------------
+# Blood Stock Form
+# ------------------------------
+class BloodStockForm(forms.ModelForm):
+    class Meta:
+        model = BloodStock
+        fields = ['blood_group', 'unit']
+        widgets = {
+            'blood_group': forms.Select(attrs={'class': 'form-control'}),
+            'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }
+
+
+# ------------------------------
+# Donor & Recipient Details Forms
+# ------------------------------
+class DonorDetailsForm(forms.ModelForm):
     BLOOD_GROUP_CHOICES = [
         ('A+', 'A+'), ('A-', 'A-'),
         ('B+', 'B+'), ('B-', 'B-'),
         ('AB+', 'AB+'), ('AB-', 'AB-'),
         ('O+', 'O+'), ('O-', 'O-'),
     ]
-    
-    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
-    unit = models.PositiveIntegerField()
-    added_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.blood_group} - {self.unit} units"
-
-
-class HospitalDetails(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True, null=True, blank=True)   
-    code = models.CharField(max_length=50)
-    since = models.DateField()
-    phone_number = models.CharField(max_length=15, validators=[hospital_phone_validator])
-    location = models.TextField()
-
-    def __str__(self):
-        return self.name
-
-
-class DonorDetails(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True, null=True, blank=True)   
-    phone_number = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
-    address = models.TextField()
-    age = models.PositiveIntegerField(null=True, blank=True) 
-    blood_group = models.CharField(max_length=5)
-    photo = models.ImageField(upload_to='donor_photos/')
-    
-    is_eligible = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name
-
-class RecipientDetails(models.Model):
-    GENDER_CHOICES = [
-        ('Male', 'Male'),
-        ('Female', 'Female'),
-        ('Other', 'Other'),
-    ]
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
-    email = models.EmailField(unique=True, null=True, blank=True)
-    address = models.TextField()
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)  # ✅ Added choices
-    dob = models.DateField()
-    blood_group = models.CharField(max_length=5)
-    photo = models.ImageField(upload_to='recipient_photos/')
-
-    def __str__(self):
-        return self.name
-
-
-
-class DonorRequestAppointment(models.Model):
-    STATUS_CHOICES = [
-        ('Pending', 'Pending'),
-        ('Approved', 'Approved'),
-        ('Rejected', 'Rejected'),
-    ]
-
-    donor = models.ForeignKey(User, on_delete=models.CASCADE)
-    preferred_date = models.DateField()
-    preferred_time = models.TimeField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ Added
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.donor.username} - {self.preferred_date} {self.preferred_time}"
-
-
-class DonorEligibilityTest(models.Model):
-    GENDER_CHOICES = [
-        ('Male', 'Male'),
-        ('Female', 'Female'),
-        ('Other', 'Other'),
-    ]
-
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True, related_name='eligibility_tests'
-    )
-
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    dob = models.DateField(verbose_name="Date of Birth")
-    weight = models.FloatField(help_text="Weight must be at least 50 kg.")
-    last_donation_date = models.DateField(null=True, blank=True, help_text="Leave blank if this is your first donation.")
-
-    # Basic health questions
-    has_disease = models.BooleanField(default=False, help_text="Do you currently have any infectious or chronic disease?")
-    on_medication = models.BooleanField(default=False, help_text="Are you currently on any medication?")
-    had_surgery_recently = models.BooleanField(default=False, help_text="Have you undergone any surgery recently?")
-
-    passed = models.BooleanField(default=False)
-    test_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        user_display = self.user.username if self.user else "Anonymous"
-        status = "Passed ✅" if self.passed else "Failed ❌"
-        return f"{user_display} - {status}"
+    blood_group = forms.ChoiceField(choices=BLOOD_GROUP_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:
-        verbose_name = "Donor Eligibility Test"
-        verbose_name_plural = "Donor Eligibility Tests"
-        ordering = ['-test_date']
+        model = DonorDetails
+        fields = ['name', 'address', 'email', 'phone_number', 'age', 'blood_group', 'photo']
+        widgets = {
+            'age': forms.NumberInput(attrs={'min': 18, 'max': 65, 'placeholder': 'Enter your age'}),
+            'address': forms.Textarea(attrs={'rows': 3}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
+        }
+        labels = {'phone_number': 'Contact Number'}
 
-class HospitalBloodRequest(models.Model):
+
+class RecipientDetailsForm(forms.ModelForm):
     BLOOD_GROUP_CHOICES = [
         ('A+', 'A+'), ('A-', 'A-'),
         ('B+', 'B+'), ('B-', 'B-'),
         ('AB+', 'AB+'), ('AB-', 'AB-'),
         ('O+', 'O+'), ('O-', 'O-'),
     ]
-
-    URGENCY_LEVEL_CHOICES = [
-        ('High', 'High'),
-        ('Medium', 'Medium'),
-        ('Low', 'Low'),
-    ]
-
-    STATUS_CHOICES = [
-        ('Pending', 'Pending'),
-        ('Approved', 'Approved'),
-        ('Rejected', 'Rejected'),
-    ]
-
-    hospital = models.ForeignKey(User, on_delete=models.CASCADE)
-    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
-    units = models.PositiveIntegerField()
-    required_date = models.DateField()
-    urgency = models.CharField(max_length=10, choices=URGENCY_LEVEL_CHOICES)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ Added
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Request by {self.hospital.username} - {self.blood_group} ({self.units} units)"
-
-    
-
-class AdminNotification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # ✅ added
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Admin Notification for {self.user.username if self.user else 'admin'} - {self.message[:50]}"
-
-
-class RecipientBloodRequest(models.Model):
-    BLOOD_GROUP_CHOICES = [
-        ('A+', 'A+'), ('A-', 'A-'),
-        ('B+', 'B+'), ('B-', 'B-'),
-        ('AB+', 'AB+'), ('AB-', 'AB-'),
-        ('O+', 'O+'), ('O-', 'O-'),
-    ]
-
-    URGENCY_LEVEL_CHOICES = [
-        ('High', 'High'),
-        ('Medium', 'Medium'),
-        ('Low', 'Low'),
-    ]
-
-    STATUS_CHOICES = [
-        ('Pending', 'Pending'),
-        ('Approved', 'Approved'),
-        ('Rejected', 'Rejected'),
-    ]
-
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
-    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
-    units = models.PositiveIntegerField()
-    required_date = models.DateField()
-    urgency = models.CharField(max_length=10, choices=URGENCY_LEVEL_CHOICES)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ Added
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Request by {self.recipient.username} - {self.blood_group} ({self.units} units)"
-    
-
-class HospitalNotification(models.Model):
-    hospital = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hospital_notifications')
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Notification for {self.hospital.username} - {self.message[:50]}"
-        
-    class Meta:
-        ordering = ['-created_at']
-        verbose_name_plural = "Hospital Notifications"  
-    
-    
-class RecipientNotification(models.Model):
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipient_notifications')
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Notification for {self.recipient.username} - {self.message[:50]}"
+    blood_group = forms.ChoiceField(choices=BLOOD_GROUP_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:
-        ordering = ['-created_at']
-        verbose_name_plural = "Recipient Notifications"
+        model = RecipientDetails
+        fields = ['name', 'address','email', 'phone_number', 'gender', 'dob', 'blood_group', 'photo']
+        widgets = {
+            'dob': forms.DateInput(attrs={'type': 'date'}),
+            'address': forms.Textarea(attrs={'rows': 3}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
+        }
+        labels = {'phone_number': 'Contact Number'}
 
-    
+
+class HospitalDetailsForm(forms.ModelForm):
+    class Meta:
+        model = HospitalDetails
+        fields = ['name', 'code','email', 'location', 'phone_number', 'since']
+        widgets = {
+            'since': forms.DateInput(attrs={'type': 'date'}),
+            'location': forms.Textarea(attrs={'rows': 3}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
+        }
+        labels = {
+            'name':'Hospital Name',
+            'code': 'Hospital Code',
+            'phone_number': 'Contact Number'
+        }
+
+
+# ------------------------------
+# Donor Appointment & Eligibility Forms
+# ------------------------------
+class DonorRequestAppointmentForm(forms.ModelForm):
+    class Meta:
+        model = DonorRequestAppointment
+        fields = ['preferred_date', 'preferred_time']
+        widgets = {
+            'preferred_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'preferred_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['preferred_date'].widget.attrs['min'] = date.today().isoformat()
+
+    def clean_preferred_date(self):
+        preferred_date = self.cleaned_data.get('preferred_date')
+        if preferred_date and preferred_date < date.today():
+            raise ValidationError("You cannot select a past date.")
+        return preferred_date
+
+
+class DonorEligibilityTestForm(forms.ModelForm):
+    class Meta:
+        model = DonorEligibilityTest
+        fields = [
+            'gender', 'dob', 'weight', 'last_donation_date',
+            'has_disease', 'on_medication', 'had_surgery_recently'
+        ]
+        widgets = {
+            'dob': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'last_donation_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'weight': forms.NumberInput(attrs={'min': 40, 'max': 150, 'class': 'form-control', 'placeholder': 'Weight in kg'}),
+            'gender': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+
+# ------------------------------
+# Blood Request Forms (Hospital & Recipient)
+# ------------------------------
+class HospitalBloodRequestForm(forms.ModelForm):
+    class Meta:
+        model = HospitalBloodRequest
+        fields = ['blood_group', 'units', 'required_date', 'urgency']
+        widgets = {
+            'blood_group': forms.Select(attrs={'class': 'form-control'}),
+            'units': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'placeholder': 'Enter number of units needed'}),
+            'required_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'min': date.today().isoformat()}),
+            'urgency': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def clean_required_date(self):
+        required_date = self.cleaned_data.get('required_date')
+        if required_date and required_date < date.today():
+            raise ValidationError("Required date cannot be in the past.")
+        return required_date
+
+
+class RecipientBloodRequestForm(forms.ModelForm):
+    class Meta:
+        model = RecipientBloodRequest
+        fields = ['blood_group', 'units', 'required_date', 'urgency']
+        widgets = {
+            'blood_group': forms.Select(attrs={'class': 'form-control'}),
+            'units': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'placeholder': 'Enter number of units needed'}),
+            'required_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'min': date.today().isoformat()}),
+            'urgency': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def clean_required_date(self):
+        required_date = self.cleaned_data.get('required_date')
+        if required_date and required_date < date.today():
+            raise ValidationError("Required date cannot be in the past.")
+        return required_date
