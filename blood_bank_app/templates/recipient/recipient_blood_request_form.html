@@ -4,6 +4,47 @@
 {% block title %}Recipient Blood Request Form{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="back-arrow">&#8592; Back</a>
+
+<div class="form-container">
+  <h2>Recipient Blood Request Form</h2>
+
+  {% if messages %}
+    {% for message in messages %}
+      <p class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+        {{ message }}
+      </p>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <label for="id_blood_group">Blood Group:</label>
+    {{ form.blood_group }}
+    {{ form.blood_group.errors }}
+
+    <label for="id_units">Units Required:</label>
+    {{ form.units }}
+    {{ form.units.errors }}
+
+    <label for="id_required_date">Required Date:</label>
+    {{ form.required_date }}
+    {{ form.required_date.errors }}
+
+    <label for="id_urgency">Urgency Level:</label>
+    {{ form.urgency }}
+    {{ form.urgency.errors }}
+
+    <div class="btn-container">
+      <button type="reset" class="cancel-btn">Cancel</button>
+      <button type="submit" class="submit-btn">Submit Request</button>
+    </div>
+  </form>
+</div>
+
 <style>
   body {
     font-family: "Poppins", sans-serif;
@@ -12,7 +53,6 @@
     padding: 0;
   }
 
-  /* 🔙 Back Arrow — outside the form */
   .back-arrow {
     position: absolute;
     top: 20px;
@@ -117,44 +157,4 @@
   }
 </style>
 
-<!-- 🔙 Back Arrow outside form -->
-<a href="javascript:history.back()" class="back-arrow">&#8592; Back</a>
-
-<div class="form-container">
-  <h2>Recipient Blood Request Form</h2>
-
-  {% if messages %}
-    {% for message in messages %}
-      <p class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
-        {{ message }}
-      </p>
-    {% endfor %}
-  {% endif %}
-
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-
-    <label for="id_blood_group">Blood Group:</label>
-    {{ form.blood_group }}
-    {{ form.blood_group.errors }}
-
-    <label for="id_units">Units Required:</label>
-    {{ form.units }}
-    {{ form.units.errors }}
-
-    <label for="id_required_date">Required Date:</label>
-    {{ form.required_date }}
-    {{ form.required_date.errors }}
-
-    <label for="id_urgency">Urgency Level:</label>
-    {{ form.urgency }}
-    {{ form.urgency.errors }}
-
-    <div class="btn-container">
-      <button type="reset" class="cancel-btn">Cancel</button>
-      <button type="submit" class="submit-btn">Submit Request</button>
-    </div>
-  </form>
-</div>
 {% endblock %}
