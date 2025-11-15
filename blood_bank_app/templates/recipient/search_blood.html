@@ -22,7 +22,6 @@
                 <tr>
                     <th>Blood Group</th>
                     <th>Units Available</th>
-                    <th>Hospital Name</th>
                     <th>Added Date</th>
                 </tr>
             </thead>
@@ -31,7 +30,6 @@
                 <tr>
                     <td>{{ blood.bloodgroup }}</td>
                     <td>{{ blood.unit }}</td>
-                    <td>{{ blood.hospital_name|default:"-" }}</td>
                     <td>{{ blood.added_at|date:"Y-m-d H:i" }}</td>
                 </tr>
                 {% endfor %}
