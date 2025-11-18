@@ -31,7 +31,7 @@
               <td>{{ req.blood_group }}</td>
               <td>{{ req.units }}</td>
               <td>{{ req.urgency }}</td>
-              <td>{{ req.required_date }}</td>
+              <td>{{ req.required_date|date:"M d, Y" }}</td>
               <td>
                 {% if req.status == 'Pending' %}
                   <span class="status pending">{{ req.status }}</span>
