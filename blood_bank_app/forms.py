@@ -200,7 +200,7 @@ class HospitalAddBloodStockForm(forms.ModelForm):
 class HospitalBloodRequestForm(forms.ModelForm):
     class Meta:
         model = HospitalBloodRequest
-        fields = ['blood_group', 'units', 'required_date', 'urgency']  # ✅ no 'status'
+        fields = ['blood_group', 'units', 'required_date', 'urgency']  
         widgets = {
             'blood_group': forms.Select(attrs={'class': 'form-control'}),
             'units': forms.NumberInput(attrs={

@@ -854,7 +854,7 @@ def manage_requests(request):
 
 # -------------------- APPROVE / REJECT REQUESTS --------------------
 
-# ✅ Hospital Requests
+#  Hospital Requests
 @login_required
 def approve_hospital_request(request, request_id):
     hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
@@ -863,13 +863,11 @@ def approve_hospital_request(request, request_id):
     hospital_request.save()
 
 
-    # ✅ Notify hospital user
     HospitalNotification.objects.create(
         hospital=hospital_request.hospital,
         message="Your blood request has been approved."
     )
 
-    # ❌ Removed messages.success
     return redirect('manage_requests')
 
 
@@ -882,17 +880,15 @@ def reject_hospital_request(request, request_id):
 
 
 
-    # ✅ Notify hospital user
     HospitalNotification.objects.create(
         hospital=hospital_request.hospital,
         message="Your blood request has been rejected."
     )
 
-    # ❌ Removed messages.error
     return redirect('manage_requests')
 
 
-# ✅ Donor Requests (No date restriction)
+#  Donor Requests (No date restriction)
 @login_required
 def approve_donor_request(request, request_id):
     donor_request = get_object_or_404(DonorRequestAppointment, id=request_id)
@@ -923,7 +919,7 @@ def reject_donor_request(request, request_id):
     return redirect('manage_requests')
 
 
-# ✅ Recipient Requests
+#  Recipient Requests
 @login_required
 def approve_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
