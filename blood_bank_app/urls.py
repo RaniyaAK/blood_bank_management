@@ -12,6 +12,10 @@ urlpatterns = [
     path('register/',views.register,name='register'),
     path('logout/', views.user_logout, name='logout'),
 
+# passwords
+    path('forgot_password/', views.forgot_password, name='forgot_password'),
+    path('reset_password/<str:email>/', views.reset_password, name='reset_password'),
+
 
 # dashboard
     path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
@@ -25,6 +29,7 @@ urlpatterns = [
     path('hospital_registration_form/', views.hospital_details_form, name='hospital_details_form'),
     path('hospital/hospital_details_edit/', views.hospital_details_edit, name='hospital_details_edit'),
     path('hospital/notifications/', views.hospital_notifications, name='hospital_notifications'),
+
     path('hospital/hospital_add_blood_stock/', views.hospital_add_blood_stock, name='hospital_add_blood_stock'),
     path('hospital/hospital_blood_stock_chart/', views.hospital_blood_stock_chart, name='hospital_blood_stock_chart'),
     path('hospital/hospital_blood_request_form/', views.hospital_blood_request_form, name='hospital_blood_request_form'),
@@ -38,7 +43,6 @@ urlpatterns = [
     path('donor/notifications/', views.donor_notifications, name='donor_notifications'),
 
     path('donor/donation_history/', views.donation_history, name='donation_history'),
-
     path('donor/donor_request_appointment/', views.donor_request_appointment, name='donor_request_appointment'),
     path('donor/donor_request_appointment_form/', views.donor_request_appointment_form, name='donor_request_appointment_form'),
     path('donor/donor_eligibility_test_form/', views.donor_eligibility_test_form, name='donor_eligibility_test_form'),
@@ -56,28 +60,23 @@ urlpatterns = [
     path('recipient/search_blood/', views.search_blood, name='search_blood'),
     path('recipient/recipient_blood_request_status/', views.recipient_blood_request_status, name='recipient_blood_request_status'),
 
-    # path('dashboard/add_blood/', views.add_blood, name='add_blood'),
-
-# passwords
-    path('forgot_password/', views.forgot_password, name='forgot_password'),
-    path('reset_password/<str:email>/', views.reset_password, name='reset_password'),
-
+# path('dashboard/add_blood/', views.add_blood, name='add_blood'),
     path('donor/add/', views.donor_create, name='donor_add'),
     path('donor/edit/<int:donor_id>/', views.donor_edit, name='donor_edit'),
 
 
-    # ✅ Manage Requests Actions
+# Manage Requests
     path('approve_hospital_request/<int:request_id>/', views.approve_hospital_request, name='approve_hospital_request'),
     path('reject_hospital_request/<int:request_id>/', views.reject_hospital_request, name='reject_hospital_request'),
+    path('hospital/hospital_notifications/mark-read/', hospital_notifications_mark_read, name='hospital_notifications_mark_read'),
+    
+    path('approve_recipient_request/<int:request_id>/', views.approve_recipient_request, name='approve_recipient_request'),
+    path('reject_recipient_request/<int:request_id>/', views.reject_recipient_request, name='reject_recipient_request'),
+    path('recipient/notifications/mark-read/', recipient_notifications_mark_read, name='recipient_notifications_mark_read'),
 
     path('approve_donor_request/<int:request_id>/', views.approve_donor_request, name='approve_donor_request'),
     path('reject_donor_request/<int:request_id>/', views.reject_donor_request, name='reject_donor_request'),
 
-    path('approve_recipient_request/<int:request_id>/', views.approve_recipient_request, name='approve_recipient_request'),
-    path('reject_recipient_request/<int:request_id>/', views.reject_recipient_request, name='reject_recipient_request'),
-
-    path('recipient/notifications/mark-read/', recipient_notifications_mark_read, name='recipient_notifications_mark_read'),
-    path('hospital/hospital_notifications/mark-read/', hospital_notifications_mark_read, name='hospital_notifications_mark_read'),
     path('dashboard/admin_notifications/mark-read/', views.admin_notifications_mark_read, name='admin_notifications_mark_read'),
 
 ]

@@ -660,8 +660,6 @@ def search_blood(request):
     })
 
 
-
-
 @login_required
 def recipient_blood_request_form(request):
     if request.method == 'POST':
@@ -671,7 +669,6 @@ def recipient_blood_request_form(request):
             blood_request.recipient = request.user
             blood_request.save()
 
-            # ✅ Notify admin
             admin_user = User.objects.filter(is_superuser=True).first()
             if admin_user:
                 AdminNotification.objects.create(
