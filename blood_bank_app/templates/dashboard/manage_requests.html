@@ -29,12 +29,32 @@
                 {{ req.urgency }}
             </td>
             <td>{{ req.required_date }}</td>
+
+            <!-- ✅ UPDATED STATUS LOGIC -->
             <td>
-                <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
-                    {{ req.status }}
-                </span>
+                {% if req.status == 'Approved' and req.required_date == today %}
+                    <span class="badge completed">Completed</span>
+
+                {% elif req.required_date < today and req.status == 'Pending' %}
+                    <span class="badge expired">Expired</span>
+
+                {% else %}
+                    <span class="badge 
+                        {% if req.status == 'Approved' %}
+                            approved
+                        {% elif req.status == 'Pending' %}
+                            pending
+                        {% else %}
+                            rejected
+                        {% endif %}
+                    ">
+                        {{ req.status }}
+                    </span>
+                {% endif %}
             </td>
+
             <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+
             <td>
                 {% if req.status == 'Pending' %}
                     {% if req.required_date < today %}
@@ -70,12 +90,15 @@
         <tr>
             <td>{{ req.donor.username }}</td>
             <td>{{ req.blood_group }}</td>
+
             <td>
                 <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
                     {{ req.status }}
                 </span>
             </td>
+
             <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+
             <td>
                 {% if req.status == 'Pending' %}
                     <a href="{% url 'approve_donor_request' req.id %}" class="btn-approve">Approve</a>
@@ -111,12 +134,32 @@
             <td>{{ req.blood_group }}</td>
             <td>{{ req.units }}</td>
             <td>{{ req.required_date }}</td>
+
+            <!-- ✅ UPDATED STATUS LOGIC -->
             <td>
-                <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
-                    {{ req.status }}
-                </span>
+                {% if req.status == 'Approved' and req.required_date == today %}
+                    <span class="badge completed">Completed</span>
+
+                {% elif req.required_date < today and req.status == 'Pending' %}
+                    <span class="badge expired">Expired</span>
+
+                {% else %}
+                    <span class="badge 
+                        {% if req.status == 'Approved' %}
+                            approved
+                        {% elif req.status == 'Pending' %}
+                            pending
+                        {% else %}
+                            rejected
+                        {% endif %}
+                    ">
+                        {{ req.status }}
+                    </span>
+                {% endif %}
             </td>
+
             <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+
             <td>
                 {% if req.status == 'Pending' %}
                     {% if req.required_date < today %}
@@ -144,7 +187,6 @@
     font-size: 18px;
 }
 
-/* Table */
 .styled-table thead th {
     background-color: #8B0000;
     color: #fff;
@@ -159,8 +201,7 @@
 }
 .styled-table tbody tr:hover {
     background-color: #ffe6e6;
- }
-
+}
 
 .badge {
     padding: 5px 10px;
@@ -171,20 +212,29 @@
 }
 .badge.approved {
     background-color: #28a745;
-}   
+}
 .badge.pending {
     background-color: #ffc107;
     color: #333;
-} 
+}
 .badge.rejected {
     background-color: #dc3545;
-}   
+}
 
+/* 🔹 New Status Colors */
+.badge.expired {
+    background-color: #6c757d;
+    color: white;
+}
+.badge.completed {
+    background-color: #0d6efd;
+    color: white;
+}
 
-/* 🔹 Urgency Colors */
-.urgency-high { color: #f51d32; font-weight: 750; }   
-.urgency-medium { color: #ffc107; font-weight: 600; } /* Yellow */
-.urgency-low { color: #28a745; font-weight: 600; }    /* Green */
+/* Urgency Colors */
+.urgency-high { color: #f51d32; font-weight: 750; }
+.urgency-medium { color: #ffc107; font-weight: 600; }
+.urgency-low { color: #28a745; font-weight: 600; }
 </style>
 
 {% endblock %}
