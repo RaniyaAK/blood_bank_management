@@ -32,15 +32,26 @@
               <td>{{ req.units }}</td>
               <td>{{ req.urgency }}</td>
               <td>{{ req.required_date|date:"M d, Y" }}</td>
+
+              <!-- ✅ UPDATED STATUS LOGIC -->
               <td>
-                {% if req.status == 'Pending' %}
-                  <span class="status pending">{{ req.status }}</span>
-                {% elif req.status == 'Approved' %}
-                  <span class="status approved">{{ req.status }}</span>
-                {% elif req.status == 'Rejected' %}
-                  <span class="status rejected">{{ req.status }}</span>
+                {% if req.status == 'Approved' and req.required_date == today %}
+                  <span class="status completed">Completed</span>
+
+                {% elif req.status == 'Pending' and req.required_date < today %}
+                  <span class="status expired">Expired</span>
+
+                {% else %}
+                  {% if req.status == 'Pending' %}
+                    <span class="status pending">{{ req.status }}</span>
+                  {% elif req.status == 'Approved' %}
+                    <span class="status approved">{{ req.status }}</span>
+                  {% elif req.status == 'Rejected' %}
+                    <span class="status rejected">{{ req.status }}</span>
+                  {% endif %}
                 {% endif %}
               </td>
+
             </tr>
           {% endfor %}
         </tbody>
@@ -53,7 +64,6 @@
 </div>
 
 <style>
-  /* 🩸 General reset and scroll fix */
   html, body {
     margin: 0 !important;
     padding: 0 !important;
@@ -64,7 +74,6 @@
     font-family: "Poppins", sans-serif;
   }
 
-  /* 🔙 Back Arrow */
   .back-arrow {
     position: fixed;
     top: 20px;
@@ -87,7 +96,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 10px; 
+    padding-top: 10px;
   }
 
   .notification-container {
@@ -98,7 +107,6 @@
     border-radius: 14px;
     box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
     margin: 20px auto;
-    box-sizing: border-box;
     text-align: center;
   }
 
@@ -140,8 +148,19 @@
   }
 
   .status.rejected {
-    color:  #d11a1a;
+    color: #d11a1a;
     font-weight: 600;
+  }
+
+  /* 🔹 NEW STATUS COLORS */
+  .status.completed {
+    color: #0d6efd;
+    font-weight: 700;
+  }
+
+  .status.expired {
+    color: #6c757d;
+    font-weight: 700;
   }
 
   .no-notifications {

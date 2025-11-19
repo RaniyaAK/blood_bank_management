@@ -62,7 +62,7 @@ def register(request):
             # ✅ Auto login
             auth_login(request, user)
 
-            # ✅ Redirect based on role + completion status
+            # ✅ Redirect based on role + status
             if role == 'donor':
                 # If donor details not yet filled → send to details form
                 if not DonorDetails.objects.filter(user=user).exists():
@@ -829,16 +829,16 @@ def hospital_blood_received_history(request):
 
 @login_required
 def manage_requests(request):
-    # 🏥 Hospital Requests
+    # Hospital Requests
     hospital_requests = HospitalBloodRequest.objects.all().order_by('-created_at')
 
-    # 🩸 Donor Requests
+    # Donor Requests
     donor_requests = DonorRequestAppointment.objects.all().order_by('-created_at')
 
-    # 💉 Recipient Requests
+    # Recipient Requests
     recipient_requests = RecipientBloodRequest.objects.all().order_by('-created_at')
 
-    # 🔔 Unread notifications count
+    # Unread notifications count
     unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
     context = {
@@ -958,29 +958,32 @@ def reject_recipient_request(request, request_id):
 
 
 
-
-
 @login_required
 def hospital_blood_request_status(request):
-    # Get hospital object
     hospital = get_object_or_404(HospitalDetails, user=request.user)
 
-    # Get all blood requests for this hospital
-    blood_requests = HospitalBloodRequest.objects.filter(hospital=request.user).order_by('-created_at')
+    blood_requests = HospitalBloodRequest.objects.filter(
+        hospital=request.user
+    ).order_by('-created_at')
+
+    today = date.today() 
 
     return render(request, "hospital/hospital_blood_request_status.html", {
-        "blood_requests": blood_requests
+        "blood_requests": blood_requests,
+        "today": today,   
     })
 
 
 @login_required
 def recipient_blood_request_status(request):
-    # Get hospital object
+   
     recipient = get_object_or_404(RecipientDetails, user=request.user)
 
-    # Get all blood requests for this hospital
     blood_requests = RecipientBloodRequest.objects.filter(recipient=request.user).order_by('-created_at')
 
     return render(request, "recipient/recipient_blood_request_status.html", {
         "blood_requests": blood_requests
     })
+
+
+
