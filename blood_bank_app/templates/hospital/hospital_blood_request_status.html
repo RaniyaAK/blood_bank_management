@@ -33,22 +33,18 @@
               <td>{{ req.urgency }}</td>
               <td>{{ req.required_date|date:"M d, Y" }}</td>
 
-              <!-- ✅ UPDATED STATUS LOGIC -->
+              <!-- ✅ Simplified Status Logic -->
               <td>
-                {% if req.status == 'Approved' and req.required_date == today %}
-                  <span class="status completed">Completed</span>
-
-                {% elif req.status == 'Pending' and req.required_date < today %}
-                  <span class="status expired">Expired</span>
-
-                {% else %}
-                  {% if req.status == 'Pending' %}
-                    <span class="status pending">{{ req.status }}</span>
-                  {% elif req.status == 'Approved' %}
-                    <span class="status approved">{{ req.status }}</span>
-                  {% elif req.status == 'Rejected' %}
-                    <span class="status rejected">{{ req.status }}</span>
-                  {% endif %}
+                {% if req.status == 'Pending' %}
+                  <span class="status pending">{{ req.status }}</span>
+                {% elif req.status == 'Approved' %}
+                  <span class="status approved">{{ req.status }}</span>
+                {% elif req.status == 'Rejected' %}
+                  <span class="status rejected">{{ req.status }}</span>
+                {% elif req.status == 'Completed' %}
+                  <span class="status completed">{{ req.status }}</span>
+                {% elif req.status == 'Expired' %}
+                  <span class="status expired">{{ req.status }}</span>
                 {% endif %}
               </td>
 
@@ -152,7 +148,6 @@
     font-weight: 600;
   }
 
-  /* 🔹 NEW STATUS COLORS */
   .status.completed {
     color: #0d6efd;
     font-weight: 700;

@@ -818,9 +818,28 @@ def hospital_notifications_mark_read(request):
         request.user.hospitalnotification_set.filter(is_read=False).update(is_read=True)
     return JsonResponse({"success": True})
 
+from datetime import date
 
+@login_required
 def hospital_blood_received_history(request):
-    return render(request, 'hospital/hospital_blood_received_history.html')
+    today = date.today()
+
+    # ✅ Update all approved requests where required_date <= today to Completed
+    HospitalBloodRequest.objects.filter(
+        hospital=request.user,
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    # ✅ Fetch all completed requests
+    completed_requests = HospitalBloodRequest.objects.filter(
+        hospital=request.user,
+        status='Completed'
+    ).order_by('-created_at')
+
+    return render(request, 'hospital/hospital_blood_received_history.html', {
+        "completed_requests": completed_requests
+    })
 
 # ______________________________________________________________________________________________________________________________
 
@@ -957,16 +976,28 @@ def reject_recipient_request(request, request_id):
     return redirect('manage_requests')
 
 
-
 @login_required
 def hospital_blood_request_status(request):
     hospital = get_object_or_404(HospitalDetails, user=request.user)
+    today = date.today()
+
+    # ✅ Mark approved requests with past required_date as Completed
+    HospitalBloodRequest.objects.filter(
+        hospital=request.user,
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    # ✅ Mark pending requests with past required_date as Expired
+    HospitalBloodRequest.objects.filter(
+        hospital=request.user,
+        status='Pending',
+        required_date__lt=today
+    ).update(status='Expired')
 
     blood_requests = HospitalBloodRequest.objects.filter(
         hospital=request.user
     ).order_by('-created_at')
-
-    today = date.today() 
 
     return render(request, "hospital/hospital_blood_request_status.html", {
         "blood_requests": blood_requests,
@@ -976,17 +1007,21 @@ def hospital_blood_request_status(request):
 
 @login_required
 def recipient_blood_request_status(request):
-   
     recipient = get_object_or_404(RecipientDetails, user=request.user)
+    today = date.today()
 
-    blood_requests = RecipientBloodRequest.objects.filter(recipient=request.user).order_by('-created_at')
+    # ✅ Mark pending requests with past required_date as Expired
+    RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Pending',
+        required_date__lt=today
+    ).update(status='Expired')
 
-    today = date.today() 
+    blood_requests = RecipientBloodRequest.objects.filter(
+        recipient=request.user
+    ).order_by('-created_at')
 
     return render(request, "recipient/recipient_blood_request_status.html", {
         "blood_requests": blood_requests,
         "today": today, 
     })
-
-
-
