@@ -981,8 +981,11 @@ def recipient_blood_request_status(request):
 
     blood_requests = RecipientBloodRequest.objects.filter(recipient=request.user).order_by('-created_at')
 
+    today = date.today() 
+
     return render(request, "recipient/recipient_blood_request_status.html", {
-        "blood_requests": blood_requests
+        "blood_requests": blood_requests,
+        "today": today, 
     })
 
 
