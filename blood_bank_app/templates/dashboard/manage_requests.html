@@ -30,24 +30,18 @@
             </td>
             <td>{{ req.required_date }}</td>
 
-            <!-- ✅ UPDATED STATUS LOGIC -->
+            <!-- ✅ STATUS DISPLAY -->
             <td>
-                {% if req.status == 'Approved' and req.required_date == today %}
+                {% if req.status == 'Completed' %}
                     <span class="badge completed">Completed</span>
-
-                {% elif req.required_date < today and req.status == 'Pending' %}
+                {% elif req.status == 'Expired' %}
                     <span class="badge expired">Expired</span>
-
                 {% else %}
                     <span class="badge 
-                        {% if req.status == 'Approved' %}
-                            approved
-                        {% elif req.status == 'Pending' %}
-                            pending
-                        {% else %}
-                            rejected
-                        {% endif %}
-                    ">
+                        {% if req.status == 'Approved' %}approved
+                        {% elif req.status == 'Pending' %}pending
+                        {% else %}rejected
+                        {% endif %}">
                         {{ req.status }}
                     </span>
                 {% endif %}
@@ -92,7 +86,13 @@
             <td>{{ req.blood_group }}</td>
 
             <td>
-                <span class="badge {% if req.status == 'Approved' %}approved{% elif req.status == 'Pending' %}pending{% else %}rejected{% endif %}">
+                <span class="badge 
+                    {% if req.status == 'Approved' %}approved
+                    {% elif req.status == 'Pending' %}pending
+                    {% elif req.status == 'Completed' %}completed
+                    {% elif req.status == 'Expired' %}expired
+                    {% else %}rejected
+                    {% endif %}">
                     {{ req.status }}
                 </span>
             </td>
@@ -135,24 +135,17 @@
             <td>{{ req.units }}</td>
             <td>{{ req.required_date }}</td>
 
-            <!-- ✅ UPDATED STATUS LOGIC -->
             <td>
-                {% if req.status == 'Approved' and req.required_date == today %}
+                {% if req.status == 'Completed' %}
                     <span class="badge completed">Completed</span>
-
-                {% elif req.required_date < today and req.status == 'Pending' %}
+                {% elif req.status == 'Expired' %}
                     <span class="badge expired">Expired</span>
-
                 {% else %}
                     <span class="badge 
-                        {% if req.status == 'Approved' %}
-                            approved
-                        {% elif req.status == 'Pending' %}
-                            pending
-                        {% else %}
-                            rejected
-                        {% endif %}
-                    ">
+                        {% if req.status == 'Approved' %}approved
+                        {% elif req.status == 'Pending' %}pending
+                        {% else %}rejected
+                        {% endif %}">
                         {{ req.status }}
                     </span>
                 {% endif %}
@@ -193,15 +186,9 @@
     text-transform: uppercase;
     font-size: 14px;
 }
-.styled-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-.styled-table tbody tr:nth-child(odd) {
-    background-color: #ffffff;
-}
-.styled-table tbody tr:hover {
-    background-color: #ffe6e6;
-}
+.styled-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
+.styled-table tbody tr:nth-child(odd) { background-color: #ffffff; }
+.styled-table tbody tr:hover { background-color: #ffe6e6; }
 
 .badge {
     padding: 5px 10px;
@@ -210,26 +197,13 @@
     color: white;
     font-size: 13px;
 }
-.badge.approved {
-    background-color: #28a745;
-}
-.badge.pending {
-    background-color: #ffc107;
-    color: #333;
-}
-.badge.rejected {
-    background-color: #dc3545;
-}
+.badge.approved { background-color: #28a745; }
+.badge.pending { background-color: #ffc107; color: #333; }
+.badge.rejected { background-color: #dc3545; }
 
-/* 🔹 New Status Colors */
-.badge.expired {
-    background-color: #6c757d;
-    color: white;
-}
-.badge.completed {
-    background-color: #0d6efd;
-    color: white;
-}
+/* ✅ Corrected colors */
+.badge.completed { background-color: #0d6efd; color: white; } /* Blue */
+.badge.expired { background-color: #6c757d; color: white; }     /* Grey */
 
 /* Urgency Colors */
 .urgency-high { color: #f51d32; font-weight: 750; }

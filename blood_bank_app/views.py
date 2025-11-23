@@ -846,29 +846,54 @@ def hospital_blood_received_history(request):
 
 # -------------------- MANAGE REQUESTS (Dashboard) --------------------
 
-@login_required
+# views.py
+from datetime import date
+from django.shortcuts import render
+from .models import (
+    HospitalBloodRequest,
+    DonorRequestAppointment,
+    RecipientBloodRequest,
+)
+
 def manage_requests(request):
-    # Hospital Requests
-    hospital_requests = HospitalBloodRequest.objects.all().order_by('-created_at')
+    today = date.today()
 
-    # Donor Requests
-    donor_requests = DonorRequestAppointment.objects.all().order_by('-created_at')
+    # Update statuses in DB
+    HospitalBloodRequest.objects.filter(
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
 
-    # Recipient Requests
-    recipient_requests = RecipientBloodRequest.objects.all().order_by('-created_at')
+    HospitalBloodRequest.objects.filter(
+        status='Pending',
+        required_date__lt=today
+    ).update(status='Expired')
 
-    # Unread notifications count
-    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
+    RecipientBloodRequest.objects.filter(
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    RecipientBloodRequest.objects.filter(
+        status='Pending',
+        required_date__lt=today
+    ).update(status='Expired')
+
+    # Fetch requests ordered by newest first
+    hospital_requests = HospitalBloodRequest.objects.order_by('-created_at')
+    recipient_requests = RecipientBloodRequest.objects.order_by('-created_at')
+    donor_requests = DonorRequestAppointment.objects.order_by('-created_at')
 
     context = {
         'hospital_requests': hospital_requests,
         'donor_requests': donor_requests,
         'recipient_requests': recipient_requests,
-        'unread_notifications_count': unread_notifications_count,
-        'today': date.today(),  # ✅ Added — used in template for expiry check
+        'today': today
     }
 
     return render(request, 'dashboard/manage_requests.html', context)
+
+
 
 
 # -------------------- APPROVE / REJECT REQUESTS --------------------
@@ -1010,7 +1035,14 @@ def recipient_blood_request_status(request):
     recipient = get_object_or_404(RecipientDetails, user=request.user)
     today = date.today()
 
-    # ✅ Mark pending requests with past required_date as Expired
+    # Mark approved requests as Completed
+    RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    # Mark pending requests as Expired
     RecipientBloodRequest.objects.filter(
         recipient=request.user,
         status='Pending',
@@ -1025,3 +1057,4 @@ def recipient_blood_request_status(request):
         "blood_requests": blood_requests,
         "today": today, 
     })
+

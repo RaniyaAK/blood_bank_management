@@ -162,7 +162,10 @@ class HospitalBloodRequest(models.Model):
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
+        ('Completed', 'Completed'),
+        ('Expired', 'Expired'),
     ]
+        
 
     hospital = models.ForeignKey(User, on_delete=models.CASCADE)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
@@ -205,7 +208,10 @@ class RecipientBloodRequest(models.Model):
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
+        ('Completed', 'Completed'),
+        ('Expired', 'Expired'),
     ]
+
 
     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
