@@ -16,20 +16,22 @@
             <table class="request-table">
                 <thead>
                     <tr>
+                        <th>Requested Date</th>
                         <th>Blood Group</th>
                         <th>Units</th>
                         <th>Urgency</th>
-                        <th>Requested Date</th>
                         <th>Completed Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in completed_requests %}
+                    
                         <tr>
+                            <td>{{ r.created_at|date:"M d, Y" }}</td>
                             <td>{{ r.blood_group }}</td>
                             <td>{{ r.units }}</td>
                             <td>{{ r.urgency }}</td>
-                            <td>{{ r.created_at|date:"M d, Y" }}</td>
+                            
                             <td>{{ r.updated_at|date:"M d, Y" }}</td>
                         </tr>
                     {% endfor %}

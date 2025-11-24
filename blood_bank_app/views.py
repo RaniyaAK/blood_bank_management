@@ -281,7 +281,7 @@ def admin_dashboard(request):
     donors_count = Profile.objects.filter(role='donor').count()
     recipients_count = Profile.objects.filter(role='recipient').count()
     hospitals_count = Profile.objects.filter(role='hospital').count()
-    blood_units_count = BloodStock.objects.aggregate(total_units=Sum('unit'))['total_units'] or 0
+    blood_units_count = BloodStock.objects.aggregate(total_units=Sum('units'))['total_units'] or 0
 
     unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
@@ -767,11 +767,14 @@ def hospital_blood_request_form(request):
     return render(request, 'hospital/hospital_blood_request_form.html', {'form': form})
 
 
+@login_required
 def hospital_add_blood_stock(request):
     if request.method == 'POST':
         form = BloodStockForm(request.POST)
         if form.is_valid():
-            form.save()
+            blood_stock = form.save(commit=False)
+            blood_stock.hospital = request.user  # 🔹 important
+            blood_stock.save()
             messages.success(request, 'Blood stock added successfully!')
             return redirect('hospital_add_blood_stock')
     else:
@@ -780,25 +783,36 @@ def hospital_add_blood_stock(request):
     return render(request, 'hospital/hospital_add_blood_stock.html', {'form': form})
 
 
+
+from django.shortcuts import render
+from django.db.models import Sum
+import json
+from django.shortcuts import render
+from django.db.models import Sum
+import json
+from .models import HospitalBloodStock
+
 def hospital_blood_stock_chart(request):
+    # Use request.user directly since HospitalBloodStock links to User
+    hospital_user = request.user
+
+    # Filter stock for this hospital
     stock_data = (
-        BloodStock.objects.values('blood_group')
-        .annotate(total_units=Sum('unit'))
+        HospitalBloodStock.objects.filter(hospital=hospital_user)
+        .values('blood_group')
+        .annotate(total_units=Sum('units'))
         .order_by('blood_group')
     )
 
-    # Prepare data
+    # Prepare chart data
     labels = [entry['blood_group'] for entry in stock_data]
     values = [entry['total_units'] for entry in stock_data]
 
-    print("Labels:", labels)
-    print("Values:", values)
-
-    # Pass data to template
     context = {
         'labels': json.dumps(labels),
         'values': json.dumps(values),
     }
+
     return render(request, 'hospital/hospital_blood_stock_chart.html', context)
 
 @login_required
@@ -846,54 +860,29 @@ def hospital_blood_received_history(request):
 
 # -------------------- MANAGE REQUESTS (Dashboard) --------------------
 
-# views.py
-from datetime import date
-from django.shortcuts import render
-from .models import (
-    HospitalBloodRequest,
-    DonorRequestAppointment,
-    RecipientBloodRequest,
-)
-
+@login_required
 def manage_requests(request):
-    today = date.today()
+    # Hospital Requests
+    hospital_requests = HospitalBloodRequest.objects.all().order_by('-created_at')
 
-    # Update statuses in DB
-    HospitalBloodRequest.objects.filter(
-        status='Approved',
-        required_date__lte=today
-    ).update(status='Completed')
+    # Donor Requests
+    donor_requests = DonorRequestAppointment.objects.all().order_by('-created_at')
 
-    HospitalBloodRequest.objects.filter(
-        status='Pending',
-        required_date__lt=today
-    ).update(status='Expired')
+    # Recipient Requests
+    recipient_requests = RecipientBloodRequest.objects.all().order_by('-created_at')
 
-    RecipientBloodRequest.objects.filter(
-        status='Approved',
-        required_date__lte=today
-    ).update(status='Completed')
-
-    RecipientBloodRequest.objects.filter(
-        status='Pending',
-        required_date__lt=today
-    ).update(status='Expired')
-
-    # Fetch requests ordered by newest first
-    hospital_requests = HospitalBloodRequest.objects.order_by('-created_at')
-    recipient_requests = RecipientBloodRequest.objects.order_by('-created_at')
-    donor_requests = DonorRequestAppointment.objects.order_by('-created_at')
+    # Unread notifications count
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
     context = {
         'hospital_requests': hospital_requests,
         'donor_requests': donor_requests,
         'recipient_requests': recipient_requests,
-        'today': today
+        'unread_notifications_count': unread_notifications_count,
+        'today': date.today(),  # ✅ Added — used in template for expiry check
     }
 
     return render(request, 'dashboard/manage_requests.html', context)
-
-
 
 
 # -------------------- APPROVE / REJECT REQUESTS --------------------
@@ -1035,14 +1024,7 @@ def recipient_blood_request_status(request):
     recipient = get_object_or_404(RecipientDetails, user=request.user)
     today = date.today()
 
-    # Mark approved requests as Completed
-    RecipientBloodRequest.objects.filter(
-        recipient=request.user,
-        status='Approved',
-        required_date__lte=today
-    ).update(status='Completed')
-
-    # Mark pending requests as Expired
+    # ✅ Mark pending requests with past required_date as Expired
     RecipientBloodRequest.objects.filter(
         recipient=request.user,
         status='Pending',
@@ -1057,4 +1039,3 @@ def recipient_blood_request_status(request):
         "blood_requests": blood_requests,
         "today": today, 
     })
-

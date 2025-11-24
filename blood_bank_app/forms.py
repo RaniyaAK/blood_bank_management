@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from .models import Profile, BloodStock, DonorDetails, RecipientDetails, HospitalDetails
 from .models import DonorRequestAppointment, DonorEligibilityTest
 from .models import RecipientBloodRequest
-from .models import HospitalBloodRequest
+from .models import HospitalBloodRequest,HospitalBloodStock
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -34,10 +34,10 @@ class LoginForm(forms.Form):
 class BloodStockForm(forms.ModelForm):
     class Meta:
         model = BloodStock
-        fields = ['blood_group', 'unit']
+        fields = ['blood_group', 'units']
         widgets = {
             'blood_group': forms.Select(attrs={'class': 'form-control'}),
-            'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'units': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
 class DonorDetailsForm(forms.ModelForm):
@@ -190,11 +190,11 @@ class DonorEligibilityTestForm(forms.ModelForm):
 
 class HospitalAddBloodStockForm(forms.ModelForm):
     class Meta:
-        model = BloodStock
-        fields = ['blood_group', 'unit']
+        model = HospitalBloodStock
+        fields = ['blood_group', 'units']
         widgets = {
             'blood_group': forms.Select(attrs={'class': 'form-control'}),
-            'unit': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'units': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
 class HospitalBloodRequestForm(forms.ModelForm):

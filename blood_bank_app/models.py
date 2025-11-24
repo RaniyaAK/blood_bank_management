@@ -36,11 +36,11 @@ class BloodStock(models.Model):
     ]
     
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
-    unit = models.PositiveIntegerField()
+    units = models.PositiveIntegerField()
     added_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.blood_group} - {self.unit} units"
+        return f"{self.blood_group} - {self.units} units"
 
 
 class HospitalDetails(models.Model):
@@ -251,5 +251,22 @@ class RecipientNotification(models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name_plural = "Recipient Notifications"
+
+class HospitalBloodStock(models.Model):
+    BLOOD_GROUP_CHOICES = [
+        ('A+', 'A+'), ('A-', 'A-'),
+        ('B+', 'B+'), ('B-', 'B-'),
+        ('AB+', 'AB+'), ('AB-', 'AB-'),
+        ('O+', 'O+'), ('O-', 'O-'),
+    ]
+
+    hospital = models.ForeignKey(User, on_delete=models.CASCADE)
+    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
+    units = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.hospital.username} - {self.blood_group}: {self.units} units"
+
+       
 
     
