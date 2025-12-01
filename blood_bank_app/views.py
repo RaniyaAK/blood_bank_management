@@ -37,7 +37,18 @@ from .models import (
     HospitalNotification,
     RecipientNotification
 )
+from django.db.models import F
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import BloodStockForm
+from .models import HospitalBloodStock
 
+from django.db.models import Sum
+import json
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import HospitalBloodStock
 
 def home(request):
     return render(request, 'home.html')
@@ -859,22 +870,29 @@ def hospital_add_blood_stock(request):
     if request.method == 'POST':
         form = BloodStockForm(request.POST)
         if form.is_valid():
-            blood_stock = form.save(commit=False)
-            blood_stock.hospital = request.user  
-            blood_stock.save()
-            messages.success(request, 'Blood stock added successfully!')
+            blood_group = form.cleaned_data['blood_group']
+            units = form.cleaned_data['units']
+
+            stock, created = HospitalBloodStock.objects.get_or_create(
+                hospital=request.user,
+                blood_group=blood_group,
+            )
+            stock.units = F('units') + units  
+            stock.save()
+
+            messages.success(request, f"{units} units of {blood_group} added successfully!")
             return redirect('hospital_add_blood_stock')
     else:
         form = BloodStockForm()
-    
+
     return render(request, 'hospital/hospital_add_blood_stock.html', {'form': form})
 
 
-def hospital_blood_stock_chart(request):
-    hospital_user = request.user
 
+@login_required
+def hospital_blood_stock_chart(request):
     stock_data = (
-        HospitalBloodStock.objects.filter(hospital=hospital_user)
+        HospitalBloodStock.objects.filter(hospital=request.user)
         .values('blood_group')
         .annotate(total_units=Sum('units'))
         .order_by('blood_group')
@@ -883,12 +901,12 @@ def hospital_blood_stock_chart(request):
     labels = [entry['blood_group'] for entry in stock_data]
     values = [entry['total_units'] for entry in stock_data]
 
-    context = {
+    return render(request, 'hospital/hospital_blood_stock_chart.html', {
         'labels': json.dumps(labels),
         'values': json.dumps(values),
-    }
+    })
 
-    return render(request, 'hospital/hospital_blood_stock_chart.html', context)
+
 
 @login_required
 def hospital_notifications(request):
@@ -899,6 +917,7 @@ def hospital_notifications(request):
     notifications.filter(is_read=False).update(is_read=True)
 
     return render(request, 'hospital/hospital_notifications.html', {'notifications': notifications})
+
 
 @login_required
 def hospital_notifications_mark_read(request):
@@ -925,6 +944,8 @@ def hospital_blood_received_history(request):
     return render(request, 'hospital/hospital_blood_received_history.html', {
         "completed_requests": completed_requests
     })
+
+
 @login_required
 def approve_hospital_request(request, request_id):
     hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)

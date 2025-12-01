@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# Phone validators
 hospital_phone_validator = RegexValidator(
     regex=r'^(\+\d{1,3})?(\d{7}|\d{10})$',
     message="Enter a valid phone number"
@@ -178,7 +177,6 @@ class HospitalBloodRequest(models.Model):
     def __str__(self):
         return f"Request by {self.hospital.username} - {self.blood_group} ({self.units} units)"
 
-    
 
 class AdminNotification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # ✅ added
