@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.urls import reverse
 from django.db.models import Sum
+from django.http import JsonResponse
 
-# from .forms import RecipientBloodRequestForm
 from .forms import HospitalBloodRequestForm
 from .forms import LoginForm, UserForm
 from .forms import BloodStockForm
@@ -25,6 +25,7 @@ from .models import HospitalDetails
 from .models import DonorDetails
 from .models import RecipientDetails
 from .models import AdminNotification
+from .models import HospitalBloodStock
 
 from datetime import date
 import json
@@ -36,16 +37,6 @@ from .models import (
     HospitalNotification,
     RecipientNotification
 )
-from django.http import JsonResponse
-
-
-from django.shortcuts import render
-from django.db.models import Sum
-import json
-from django.shortcuts import render
-from django.db.models import Sum
-import json
-from .models import HospitalBloodStock
 
 
 def home(request):
@@ -56,7 +47,6 @@ def register(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
-            # ✅ Create user
             user = User.objects.create_user(
                 username=form.cleaned_data['username'],
                 email=form.cleaned_data['email'],
@@ -64,16 +54,12 @@ def register(request):
             )
             user.save()
 
-            # ✅ Create profile with role
             role = form.cleaned_data['role']
             profile = Profile.objects.create(user=user, role=role)
 
-            # ✅ Auto login
             auth_login(request, user)
 
-            # ✅ Redirect based on role + status
             if role == 'donor':
-                # If donor details not yet filled → send to details form
                 if not DonorDetails.objects.filter(user=user).exists():
                     return redirect('donor_details_form')
                 else:
@@ -215,13 +201,11 @@ def hospital(request):
             if form.is_valid():
                 form.save()
 
-                # ✅ For AJAX save (spinner update)
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                     return JsonResponse({'success': True})
 
                 return redirect('hospital')
             else:
-                # ❌ Send form errors if AJAX
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                     return JsonResponse({'success': False, 'errors': form.errors})
         else:
@@ -241,7 +225,6 @@ def recipient(request):
     """Recipient dashboard with editable profile in side panel"""
     recipient_profile = RecipientDetails.objects.filter(user=request.user).first()
 
-    # ✅ Get unread notifications count
     unread_notifications_count = RecipientNotification.objects.filter(
         recipient=request.user, is_read=False
     ).count()
@@ -261,7 +244,7 @@ def recipient(request):
     return render(request, 'recipient.html', {
         'recipient': recipient_profile,
         'form': form,
-        'unread_notifications_count': unread_notifications_count,  # ✅ Added
+        'unread_notifications_count': unread_notifications_count,  
     })
 
 @login_required
@@ -299,7 +282,7 @@ def admin_dashboard(request):
         'recipients_count': recipients_count,
         'hospitals_count': hospitals_count,
         'blood_units_count': blood_units_count,
-        'unread_notifications_count': unread_notifications_count,  # ✅ Pass to template
+        'unread_notifications_count': unread_notifications_count,  
     }
     return render(request, 'dashboard/admin_dashboard.html', context)
 
@@ -337,14 +320,14 @@ def users(request):
             "name": user.username,
             "email": user.email,
             "role": role,
-            "date_joined": user.date_joined,  # ✅ Add joined date here
+            "date_joined": user.date_joined,  
         })
 
     unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
     return render(request, 'dashboard/users.html', {
         "user_data": user_data,
-        "unread_notifications_count": unread_notifications_count,  # ✅ Pass to template
+        "unread_notifications_count": unread_notifications_count,  
     })
 
 
@@ -522,7 +505,7 @@ def donor_eligibility_test_form(request):
             )
 
     else:
-        form = DonorEligibilityTestForm()  # initial GET
+        form = DonorEligibilityTestForm()  
 
     return render(request, 'donor/donor_eligibility_test_form.html', {
         'form': form,
@@ -538,7 +521,7 @@ def donor_eligibility_result(request):
     If Not Eligible -> show reasons and a button to retake the test.
     """
     status = request.GET.get('status', None)
-    reasons = request.session.pop('eligibility_reasons', [])  # consume reasons from session
+    reasons = request.session.pop('eligibility_reasons', [])  
     return render(request, 'donor/donor_eligibility_result.html', {
         'status': status,
         'reasons': reasons
@@ -561,11 +544,10 @@ def donor_request_appointment_form(request):
         form = DonorRequestAppointmentForm(request.POST)
         if form.is_valid():
             appointment = form.save(commit=False)
-            appointment.donor = request.user  # or donor
+            appointment.donor = request.user  
             appointment.save()
             messages.success(request, "Appointment booked successfully!")
-            return redirect('donor')  # or any success page you prefer
-    else:
+            return redirect('donor')  
         form = DonorRequestAppointmentForm()
 
     return render(request, 'donor/donor_request_appointment_form.html', {
@@ -587,360 +569,6 @@ def donor_notifications(request):
 
 def donation_history(request):
     return render(request, 'donor/donation_history.html')
-
-# ____________________________________________________________________________________________________________________________
-# Recipient 
-
-@login_required
-def recipient_details_form(request):
-    recipient = RecipientDetails.objects.filter(user=request.user).first()
-    if recipient:
-        return redirect('recipient')
-
-    if request.method == 'POST':
-        form = RecipientDetailsForm(request.POST, request.FILES)
-        if form.is_valid():
-            recipient = form.save(commit=False)  # don’t save yet
-            recipient.user = request.user       # link to logged-in user
-            recipient.save()                    # now save
-            return redirect('recipient')        # Redirect to dashboard/profile
-    else:
-        form = RecipientDetailsForm()
-
-    return render(request, 'recipient/recipient_details_form.html', {'form': form})
-
-
-@login_required
-def recipient_details_edit(request):
-    """Edit recipient profile (AJAX or normal request)"""
-    recipient = get_object_or_404(RecipientDetails, user=request.user)
-
-    if request.method == 'POST':
-        form = RecipientDetailsForm(request.POST, request.FILES, instance=recipient)
-        if form.is_valid():
-            form.save()
-
-            # ✅ For AJAX (used in dashboard side panel)
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': True})
-            
-            # ✅ For normal form submission
-            return redirect('recipient')
-        else:
-            # ❌ Handle form errors for AJAX
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'errors': form.errors})
-    else:
-        form = RecipientDetailsForm(instance=recipient)
-
-    return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
-
-
-@login_required
-def recipient_notifications(request):
-    recipient_user = request.user
-    notifications = RecipientNotification.objects.filter(
-        recipient=recipient_user
-    ).order_by('-created_at')
-
-    # Mark all unread notifications as read immediately
-    notifications.filter(is_read=False).update(is_read=True)
-
-    return render(request, "recipient/recipient_notifications.html", {
-        "notifications": notifications
-    })
-
-# def received_history(request):
-#     return render(request, 'recipient/received_history.html')
-@login_required
-def received_history(request):
-    today = date.today()
-
-    # 🔥 Update all approved requests whose required date has arrived
-    RecipientBloodRequest.objects.filter(
-        recipient=request.user,
-        status='Approved',
-        required_date__lte=today
-    ).update(status='Completed')
-
-    # 🔥 Fetch completed requests
-    completed_requests = RecipientBloodRequest.objects.filter(
-        recipient=request.user,
-        status='Completed'
-    ).order_by('-created_at')
-
-    return render(request, 'recipient/received_history.html', {
-        "recipient_completed_requests": completed_requests
-    })
-
-
-
-@login_required
-def search_blood(request):
-    query = request.GET.get('q', '').strip()
-    blood_stock = BloodStock.objects.all().order_by('-added_at')
-
-    if query:
-        # Filter by blood group (case-insensitive)
-        blood_stock = blood_stock.filter(bloodgroup__icontains=query)
-
-    return render(request, 'recipient/search_blood.html', {
-        'blood_stock': blood_stock,
-        'query': query,
-    })
-
-
-@login_required
-def recipient_blood_request_form(request):
-    if request.method == 'POST':
-        form = RecipientBloodRequestForm(request.POST)
-        if form.is_valid():
-            blood_request = form.save(commit=False)
-            blood_request.recipient = request.user
-            blood_request.save()
-
-            admin_user = User.objects.filter(is_superuser=True).first()
-            if admin_user:
-                AdminNotification.objects.create(
-                    user=admin_user,
-                    message=f"{request.user.username} requested {blood_request.units} units of {blood_request.blood_group} blood (Urgency: {blood_request.urgency})."
-                )
-
-            messages.success(request, "Blood request submitted successfully!")
-            form = RecipientBloodRequestForm()  # reset form
-    else:
-        form = RecipientBloodRequestForm()
-
-    return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
-
-@login_required
-def recipient_notifications_mark_read(request):
-    if request.method == "POST":
-        # Mark all unread notifications for this recipient as read
-        request.user.recipientnotification_set.filter(is_read=False).update(is_read=True)
-    return JsonResponse({"success": True})
-
-# ____________________________________________________________________________________________________________________
-
-# Hospital 
-@login_required
-def hospital_details_form(request):
-    try:
-        hospital = HospitalDetails.objects.get(user=request.user)
-        return redirect('hospital')  
-    except HospitalDetails.DoesNotExist:
-        pass
-
-    if request.method == 'POST':
-        form = HospitalDetailsForm(request.POST, request.FILES)
-        if form.is_valid():
-            hospital = form.save(commit=False)
-            hospital.user = request.user
-            hospital.save()
-            return redirect('hospital')
-    else:
-        form = HospitalDetailsForm()
-
-    return render(request, 'hospital/hospital_details_form.html', {'form': form})
-
-
-
-@login_required
-def hospital_details_edit(request):
-    """Edit hospital profile (AJAX and normal form submission supported)"""
-    hospital = get_object_or_404(HospitalDetails, user=request.user)
-
-    if request.method == 'POST':
-        form = HospitalDetailsForm(request.POST, request.FILES, instance=hospital)
-        if form.is_valid():
-            form.save()
-
-            # ✅ For AJAX request (spinner update)
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': True})
-            
-            # ✅ Normal submission
-            return redirect('hospital')
-        else:
-            # ❌ Return errors for AJAX form submission
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'errors': form.errors})
-    else:
-        form = HospitalDetailsForm(instance=hospital)
-
-    return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
-
-
-def hospital_blood_request_form(request):
-    if request.method == 'POST':
-        form = HospitalBloodRequestForm(request.POST)
-        if form.is_valid():
-            blood_request = form.save(commit=False)
-            blood_request.hospital = request.user
-            blood_request.save()
-
-            # ✅ Create Admin Notification after saving
-            admin_user = User.objects.filter(is_superuser=True).first()
-            if admin_user:
-                AdminNotification.objects.create(
-                    user=admin_user,
-                    message=f"{request.user.username} requested {blood_request.units} units of {blood_request.blood_group} blood."
-                )
-
-            messages.success(request, "Blood request submitted successfully!")
-
-            # ✅ Show success message and reset form (stay on same page)
-            form = HospitalBloodRequestForm()  # clears form fields
-    else:
-        form = HospitalBloodRequestForm()
-
-    return render(request, 'hospital/hospital_blood_request_form.html', {'form': form})
-
-
-@login_required
-def hospital_add_blood_stock(request):
-    if request.method == 'POST':
-        form = BloodStockForm(request.POST)
-        if form.is_valid():
-            blood_stock = form.save(commit=False)
-            blood_stock.hospital = request.user  # 🔹 important
-            blood_stock.save()
-            messages.success(request, 'Blood stock added successfully!')
-            return redirect('hospital_add_blood_stock')
-    else:
-        form = BloodStockForm()
-    
-    return render(request, 'hospital/hospital_add_blood_stock.html', {'form': form})
-
-
-def hospital_blood_stock_chart(request):
-    # Use request.user directly since HospitalBloodStock links to User
-    hospital_user = request.user
-
-    # Filter stock for this hospital
-    stock_data = (
-        HospitalBloodStock.objects.filter(hospital=hospital_user)
-        .values('blood_group')
-        .annotate(total_units=Sum('units'))
-        .order_by('blood_group')
-    )
-
-    # Prepare chart data
-    labels = [entry['blood_group'] for entry in stock_data]
-    values = [entry['total_units'] for entry in stock_data]
-
-    context = {
-        'labels': json.dumps(labels),
-        'values': json.dumps(values),
-    }
-
-    return render(request, 'hospital/hospital_blood_stock_chart.html', context)
-
-@login_required
-def hospital_notifications(request):
-    hospital_user = request.user
-    notifications = HospitalNotification.objects.filter(
-        hospital=hospital_user
-    ).order_by('-created_at')
-    notifications.filter(is_read=False).update(is_read=True)
-
-    return render(request, 'hospital/hospital_notifications.html', {'notifications': notifications})
-
-@login_required
-def hospital_notifications_mark_read(request):
-    if request.method == "POST":
-        # Mark all unread notifications for this hospital as read
-        request.user.hospitalnotification_set.filter(is_read=False).update(is_read=True)
-    return JsonResponse({"success": True})
-
-from datetime import date
-
-@login_required
-def hospital_blood_received_history(request):
-    today = date.today()
-
-    # ✅ Update all approved requests where required_date <= today to Completed
-    HospitalBloodRequest.objects.filter(
-        hospital=request.user,
-        status='Approved',
-        required_date__lte=today
-    ).update(status='Completed')
-
-    # ✅ Fetch all completed requests
-    completed_requests = HospitalBloodRequest.objects.filter(
-        hospital=request.user,
-        status='Completed'
-    ).order_by('-created_at')
-
-    return render(request, 'hospital/hospital_blood_received_history.html', {
-        "completed_requests": completed_requests
-    })
-
-# ______________________________________________________________________________________________________________________________
-
-
-# -------------------- MANAGE REQUESTS (Dashboard) --------------------
-
-@login_required
-def manage_requests(request):
-    # Hospital Requests
-    hospital_requests = HospitalBloodRequest.objects.all().order_by('-created_at')
-
-    # Donor Requests
-    donor_requests = DonorRequestAppointment.objects.all().order_by('-created_at')
-
-    # Recipient Requests
-    recipient_requests = RecipientBloodRequest.objects.all().order_by('-created_at')
-
-    # Unread notifications count
-    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
-
-    context = {
-        'hospital_requests': hospital_requests,
-        'donor_requests': donor_requests,
-        'recipient_requests': recipient_requests,
-        'unread_notifications_count': unread_notifications_count,
-        'today': date.today(),  # ✅ Added — used in template for expiry check
-    }
-
-    return render(request, 'dashboard/manage_requests.html', context)
-
-
-# -------------------- APPROVE / REJECT REQUESTS --------------------
-
-#  Hospital Requests
-@login_required
-def approve_hospital_request(request, request_id):
-    hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
-
-    hospital_request.status = 'Approved'
-    hospital_request.save()
-
-
-    HospitalNotification.objects.create(
-        hospital=hospital_request.hospital,
-        message="Your blood request has been approved."
-    )
-
-    return redirect('manage_requests')
-
-
-@login_required
-def reject_hospital_request(request, request_id):
-    hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
-
-    hospital_request.status = 'Rejected'
-    hospital_request.save()
-
-
-
-    HospitalNotification.objects.create(
-        hospital=hospital_request.hospital,
-        message="Your blood request has been rejected."
-    )
-
-    return redirect('manage_requests')
-
 
 #  Donor Requests (No date restriction)
 @login_required
@@ -972,8 +600,143 @@ def reject_donor_request(request, request_id):
     messages.error(request, "Donor appointment rejected.")
     return redirect('manage_requests')
 
+# ____________________________________________________________________________________________________________________________
+# Recipient 
 
-#  Recipient Requests
+@login_required
+def recipient_details_form(request):
+    recipient = RecipientDetails.objects.filter(user=request.user).first()
+    if recipient:
+        return redirect('recipient')
+
+    if request.method == 'POST':
+        form = RecipientDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipient = form.save(commit=False)  
+            recipient.user = request.user      
+            recipient.save()                   
+            return redirect('recipient')        
+    else:
+        form = RecipientDetailsForm()
+
+    return render(request, 'recipient/recipient_details_form.html', {'form': form})
+
+
+@login_required
+def recipient_details_edit(request):
+    """Edit recipient profile (AJAX or normal request)"""
+    recipient = get_object_or_404(RecipientDetails, user=request.user)
+
+    if request.method == 'POST':
+        form = RecipientDetailsForm(request.POST, request.FILES, instance=recipient)
+        if form.is_valid():
+            form.save()
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            
+            return redirect('recipient')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        form = RecipientDetailsForm(instance=recipient)
+
+    return render(request, 'recipient/recipient_details_edit.html', {'form': form, 'recipient': recipient})
+
+
+@login_required
+def recipient_notifications(request):
+    recipient_user = request.user
+    notifications = RecipientNotification.objects.filter(
+        recipient=recipient_user
+    ).order_by('-created_at')
+
+    notifications.filter(is_read=False).update(is_read=True)
+
+    return render(request, "recipient/recipient_notifications.html", {
+        "notifications": notifications
+    })
+
+@login_required
+def received_history(request):
+    today = date.today()
+
+    RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    completed_requests = RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Completed'
+    ).order_by('-created_at')
+
+    return render(request, 'recipient/received_history.html', {
+        "recipient_completed_requests": completed_requests
+    })
+
+
+@login_required
+def search_blood(request):
+    query = request.GET.get('q', '').strip()
+    blood_stock = BloodStock.objects.all().order_by('-added_at')
+
+    if query:
+        blood_stock = blood_stock.filter(bloodgroup__icontains=query)
+
+    return render(request, 'recipient/search_blood.html', {
+        'blood_stock': blood_stock,
+        'query': query,
+    })
+
+
+@login_required
+def recipient_blood_request_form(request):
+    if request.method == 'POST':
+        form = RecipientBloodRequestForm(request.POST)
+        if form.is_valid():
+            blood_request = form.save(commit=False)
+            blood_request.recipient = request.user
+            blood_request.save()
+
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                AdminNotification.objects.create(
+                    user=admin_user,
+                    message=f"{request.user.username} requested {blood_request.units} units of {blood_request.blood_group} blood (Urgency: {blood_request.urgency})."
+                )
+
+            messages.success(request, "Blood request submitted successfully!")
+            form = RecipientBloodRequestForm()  
+    else:
+        form = RecipientBloodRequestForm()
+
+    return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
+
+@login_required
+def recipient_notifications_mark_read(request):
+    if request.method == "POST":
+        request.user.recipientnotification_set.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"success": True})
+
+
+@login_required
+def reject_recipient_request(request, request_id):
+    recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
+    recipient_request.status = 'Rejected'
+    recipient_request.save()
+
+
+    RecipientNotification.objects.create(
+        recipient=recipient_request.recipient,
+        message=f"Your blood request for {recipient_request.blood_group} ({recipient_request.units} units) has been rejected."
+    )
+
+    return redirect('manage_requests')
+
+
 @login_required
 def approve_recipient_request(request, request_id):
     recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
@@ -986,7 +749,6 @@ def approve_recipient_request(request, request_id):
     #     message=f"Recipient request from {recipient_request.recipient.username} approved."
     # )
 
-    # ✅ Notify recipient
     RecipientNotification.objects.create(
         recipient=recipient_request.recipient,
         message=f"Your blood request for {recipient_request.blood_group} ({recipient_request.units} units) has been approved."
@@ -996,16 +758,198 @@ def approve_recipient_request(request, request_id):
 
 
 @login_required
-def reject_recipient_request(request, request_id):
-    recipient_request = get_object_or_404(RecipientBloodRequest, id=request_id)
-    recipient_request.status = 'Rejected'
-    recipient_request.save()
+def recipient_blood_request_status(request):
+    recipient = get_object_or_404(RecipientDetails, user=request.user)
+    today = date.today()
+
+    RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Pending',
+        required_date__lt=today
+    ).update(status='Expired')
+
+    blood_requests = RecipientBloodRequest.objects.filter(
+        recipient=request.user
+    ).order_by('-created_at')
+
+    return render(request, "recipient/recipient_blood_request_status.html", {
+        "blood_requests": blood_requests,
+    })
 
 
-    # ✅ Notify recipient
-    RecipientNotification.objects.create(
-        recipient=recipient_request.recipient,
-        message=f"Your blood request for {recipient_request.blood_group} ({recipient_request.units} units) has been rejected."
+# ____________________________________________________________________________________________________________________
+
+# Hospital 
+@login_required
+def hospital_details_form(request):
+    try:
+        hospital = HospitalDetails.objects.get(user=request.user)
+        return redirect('hospital')  
+    except HospitalDetails.DoesNotExist:
+        pass
+
+    if request.method == 'POST':
+        form = HospitalDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            hospital = form.save(commit=False)
+            hospital.user = request.user
+            hospital.save()
+            return redirect('hospital')
+    else:
+        form = HospitalDetailsForm()
+
+    return render(request, 'hospital/hospital_details_form.html', {'form': form})
+
+
+@login_required
+def hospital_details_edit(request):
+    """Edit hospital profile (AJAX and normal form submission supported)"""
+    hospital = get_object_or_404(HospitalDetails, user=request.user)
+
+    if request.method == 'POST':
+        form = HospitalDetailsForm(request.POST, request.FILES, instance=hospital)
+        if form.is_valid():
+            form.save()
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            
+            return redirect('hospital')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        form = HospitalDetailsForm(instance=hospital)
+
+    return render(request, 'hospital/hospital_details_edit.html', {'form': form, 'hospital': hospital})
+
+
+def hospital_blood_request_form(request):
+    if request.method == 'POST':
+        form = HospitalBloodRequestForm(request.POST)
+        if form.is_valid():
+            blood_request = form.save(commit=False)
+            blood_request.hospital = request.user
+            blood_request.save()
+
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                AdminNotification.objects.create(
+                    user=admin_user,
+                    message=f"{request.user.username} requested {blood_request.units} units of {blood_request.blood_group} blood."
+                )
+
+            messages.success(request, "Blood request submitted successfully!")
+
+            form = HospitalBloodRequestForm() 
+    else:
+        form = HospitalBloodRequestForm()
+
+    return render(request, 'hospital/hospital_blood_request_form.html', {'form': form})
+
+
+@login_required
+def hospital_add_blood_stock(request):
+    if request.method == 'POST':
+        form = BloodStockForm(request.POST)
+        if form.is_valid():
+            blood_stock = form.save(commit=False)
+            blood_stock.hospital = request.user  
+            blood_stock.save()
+            messages.success(request, 'Blood stock added successfully!')
+            return redirect('hospital_add_blood_stock')
+    else:
+        form = BloodStockForm()
+    
+    return render(request, 'hospital/hospital_add_blood_stock.html', {'form': form})
+
+
+def hospital_blood_stock_chart(request):
+    hospital_user = request.user
+
+    stock_data = (
+        HospitalBloodStock.objects.filter(hospital=hospital_user)
+        .values('blood_group')
+        .annotate(total_units=Sum('units'))
+        .order_by('blood_group')
+    )
+
+    labels = [entry['blood_group'] for entry in stock_data]
+    values = [entry['total_units'] for entry in stock_data]
+
+    context = {
+        'labels': json.dumps(labels),
+        'values': json.dumps(values),
+    }
+
+    return render(request, 'hospital/hospital_blood_stock_chart.html', context)
+
+@login_required
+def hospital_notifications(request):
+    hospital_user = request.user
+    notifications = HospitalNotification.objects.filter(
+        hospital=hospital_user
+    ).order_by('-created_at')
+    notifications.filter(is_read=False).update(is_read=True)
+
+    return render(request, 'hospital/hospital_notifications.html', {'notifications': notifications})
+
+@login_required
+def hospital_notifications_mark_read(request):
+    if request.method == "POST":
+        request.user.hospitalnotification_set.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"success": True})
+
+
+@login_required
+def hospital_blood_received_history(request):
+    today = date.today()
+
+    HospitalBloodRequest.objects.filter(
+        hospital=request.user,
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    completed_requests = HospitalBloodRequest.objects.filter(
+        hospital=request.user,
+        status='Completed'
+    ).order_by('-created_at')
+
+    return render(request, 'hospital/hospital_blood_received_history.html', {
+        "completed_requests": completed_requests
+    })
+@login_required
+def approve_hospital_request(request, request_id):
+    hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
+
+    hospital_request.status = 'Approved'
+    hospital_request.save()
+
+    HospitalNotification.objects.create(
+        hospital=hospital_request.hospital,
+        message="Your blood request has been approved."
+    )
+
+    return redirect('manage_requests')
+
+
+@login_required
+def reject_hospital_request(request, request_id):
+    hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
+
+    hospital_request.status = 'Rejected'
+    hospital_request.save()
+
+    HospitalNotification.objects.create(
+        hospital=hospital_request.hospital,
+        message="Your blood request has been rejected."
     )
 
     return redirect('manage_requests')
@@ -1016,14 +960,12 @@ def hospital_blood_request_status(request):
     hospital = get_object_or_404(HospitalDetails, user=request.user)
     today = date.today()
 
-    # ✅ Mark approved requests with past required_date as Completed
     HospitalBloodRequest.objects.filter(
         hospital=request.user,
         status='Approved',
         required_date__lte=today
     ).update(status='Completed')
 
-    # ✅ Mark pending requests with past required_date as Expired
     HospitalBloodRequest.objects.filter(
         hospital=request.user,
         status='Pending',
@@ -1039,29 +981,27 @@ def hospital_blood_request_status(request):
         "today": today,   
     })
 
+# ______________________________________________________________________________________________________________________________
+
+# -------------------- MANAGE REQUESTS (Dashboard) --------------------
+
 @login_required
-def recipient_blood_request_status(request):
-    recipient = get_object_or_404(RecipientDetails, user=request.user)
-    today = date.today()
+def manage_requests(request):
+    hospital_requests = HospitalBloodRequest.objects.all().order_by('-created_at')
 
-    # 🔥 Convert Approved + required_date passed or today → Completed
-    RecipientBloodRequest.objects.filter(
-        recipient=request.user,
-        status='Approved',
-        required_date__lte=today
-    ).update(status='Completed')
+    donor_requests = DonorRequestAppointment.objects.all().order_by('-created_at')
 
-    # 🔥 Convert Pending + required_date passed → Expired
-    RecipientBloodRequest.objects.filter(
-        recipient=request.user,
-        status='Pending',
-        required_date__lt=today
-    ).update(status='Expired')
+    recipient_requests = RecipientBloodRequest.objects.all().order_by('-created_at')
 
-    blood_requests = RecipientBloodRequest.objects.filter(
-        recipient=request.user
-    ).order_by('-created_at')
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
-    return render(request, "recipient/recipient_blood_request_status.html", {
-        "blood_requests": blood_requests,
-    })
+    context = {
+        'hospital_requests': hospital_requests,
+        'donor_requests': donor_requests,
+        'recipient_requests': recipient_requests,
+        'unread_notifications_count': unread_notifications_count,
+        'today': date.today(),  
+    }
+
+    return render(request, 'dashboard/manage_requests.html', context)
+
