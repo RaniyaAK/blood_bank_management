@@ -35,22 +35,21 @@
 
               <!-- ⭐ UPDATED STATUS LOGIC ⭐ -->
               <td>
-                {% if req.status == 'Approved' and req.required_date == today %}
+                {% if req.status|lower == 'completed' %}
                   <span class="status completed">Completed</span>
-
-                {% elif req.status == 'Pending' and req.required_date < today %}
+                {% elif req.status|lower == 'expired' %}
                   <span class="status expired">Expired</span>
-
+                {% elif req.status|lower == 'pending' %}
+                  <span class="status pending">Pending</span>
+                {% elif req.status|lower == 'approved' %}
+                  <span class="status approved">Approved</span>
+                {% elif req.status|lower == 'rejected' %}
+                  <span class="status rejected">Rejected</span>
                 {% else %}
-                  {% if req.status == 'Pending' %}
-                    <span class="status pending">{{ req.status }}</span>
-                  {% elif req.status == 'Approved' %}
-                    <span class="status approved">{{ req.status }}</span>
-                  {% elif req.status == 'Rejected' %}
-                    <span class="status rejected">{{ req.status }}</span>
-                  {% endif %}
+                  <span class="status unknown">{{ req.status }}</span>
                 {% endif %}
               </td>
+
 
             </tr>
           {% endfor %}

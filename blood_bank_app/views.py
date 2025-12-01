@@ -1039,13 +1039,19 @@ def hospital_blood_request_status(request):
         "today": today,   
     })
 
-
 @login_required
 def recipient_blood_request_status(request):
     recipient = get_object_or_404(RecipientDetails, user=request.user)
     today = date.today()
 
-    # ✅ Mark pending requests with past required_date as Expired
+    # 🔥 Convert Approved + required_date passed or today → Completed
+    RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    # 🔥 Convert Pending + required_date passed → Expired
     RecipientBloodRequest.objects.filter(
         recipient=request.user,
         status='Pending',
@@ -1058,5 +1064,4 @@ def recipient_blood_request_status(request):
 
     return render(request, "recipient/recipient_blood_request_status.html", {
         "blood_requests": blood_requests,
-        "today": today, 
     })
