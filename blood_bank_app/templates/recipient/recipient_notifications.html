@@ -29,110 +29,115 @@
 </div>
 
 <style>
-html, body {
+  /* 🩸 General reset and scroll fix */
+  html, body {
     margin: 0 !important;
     padding: 0 !important;
-    height: 100%;
-    font-family: "Poppins", sans-serif;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
     background: linear-gradient(180deg, #5c0000 0%, #8b0000 100%);
-}
+    font-family: "Poppins", sans-serif;
+  }
 
-/* 🔙 Back Arrow */
-.back-arrow {
+  /* 🔙 Back Arrow */
+  .back-arrow {
     position: fixed;
-    top: 15px;
-    left: 15px;
+    top: 20px;
+    left: 20px;
     font-size: 20px;
     color: #fff;
     text-decoration: none;
     font-weight: 500;
+    transition: color 0.3s ease;
     z-index: 9999;
-}
-.back-arrow:hover {
-    color: #f1f1f1;
-}
+  }
 
-/* 📦 Page Wrapper */
-.notification-page {
+  .back-arrow:hover {
+    color: #f1f1f1;
+    text-decoration: underline;
+  }
+
+  /* 📦 Page Wrapper */
+  .notification-page {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 10px 0; /* reduced padding from top */
-}
+  }
 
-/* 📬 White Notification Box */
-.notification-container {
-    width: 95%;
+  /* 📬 White Notification Box */
+  .notification-container {
+    width: 90%;
     max-width: 700px;
     background: #fff;
-    padding: 25px 25px; /* reduced padding */
+    padding: 20px 40px 20px;
     border-radius: 14px;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.15);
-    margin: 10px 0; /* reduced margin top/bottom */
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    margin: 20px auto;
     box-sizing: border-box;
-}
+  }
 
-/* 🩸 Heading */
-h1 {
+  /* 🩸 Heading */
+  h1 {
     text-align: center;
     color: #b30000;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     font-size: 26px;
     font-weight: 600;
-}
+  }
 
-/* 📋 Notification List */
-.notification-list {
+  /* 📋 Notification List */
+  .notification-list {
     list-style: none;
     padding: 0;
     margin: 0;
-}
+  }
 
-.notification-item {
+  .notification-item {
     border-bottom: 1px solid #eee;
-    padding: 12px 10px;
+    padding: 15px 10px;
     transition: background 0.3s ease;
-}
+  }
 
-.notification-item:hover {
+  .notification-item:hover {
     background: #fafafa;
-}
+  }
 
-.notification-item.unread {
+  .notification-item.unread {
     background-color: #ffecec;
     border-left: 5px solid #b30000;
-}
+  }
 
-.message {
+  .message {
     font-size: 16px;
     color: #333;
     font-weight: 500;
-}
+  }
 
-.timestamp {
+  .timestamp {
     font-size: 13px;
     color: #777;
     margin-top: 5px;
-}
+  }
 
-.no-notifications {
+  .no-notifications {
     text-align: center;
     color: #555;
     font-size: 16px;
-}
+  }
 
-/* 📱 Responsive */
-@media (max-width: 600px) {
+  /* 📱 Responsive */
+  @media (max-width: 600px) {
     .notification-container {
-        padding: 20px 15px;
-        margin: 20px 10px;
+      padding: 35px 25px;
+      margin: 80px 10px;
     }
 
     h1 {
-        font-size: 22px;
+      font-size: 22px;
     }
-}
+  }
 </style>
 
 {% endblock %}
