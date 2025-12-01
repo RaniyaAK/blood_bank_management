@@ -39,6 +39,15 @@ from .models import (
 from django.http import JsonResponse
 
 
+from django.shortcuts import render
+from django.db.models import Sum
+import json
+from django.shortcuts import render
+from django.db.models import Sum
+import json
+from .models import HospitalBloodStock
+
+
 def home(request):
     return render(request, 'home.html')
 
@@ -641,8 +650,29 @@ def recipient_notifications(request):
         "notifications": notifications
     })
 
+# def received_history(request):
+#     return render(request, 'recipient/received_history.html')
+@login_required
 def received_history(request):
-    return render(request, 'recipient/received_history.html')
+    today = date.today()
+
+    # 🔥 Update all approved requests whose required date has arrived
+    RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Approved',
+        required_date__lte=today
+    ).update(status='Completed')
+
+    # 🔥 Fetch completed requests
+    completed_requests = RecipientBloodRequest.objects.filter(
+        recipient=request.user,
+        status='Completed'
+    ).order_by('-created_at')
+
+    return render(request, 'recipient/received_history.html', {
+        "recipient_completed_requests": completed_requests
+    })
+
 
 
 @login_required
@@ -782,15 +812,6 @@ def hospital_add_blood_stock(request):
     
     return render(request, 'hospital/hospital_add_blood_stock.html', {'form': form})
 
-
-
-from django.shortcuts import render
-from django.db.models import Sum
-import json
-from django.shortcuts import render
-from django.db.models import Sum
-import json
-from .models import HospitalBloodStock
 
 def hospital_blood_stock_chart(request):
     # Use request.user directly since HospitalBloodStock links to User
