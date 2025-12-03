@@ -362,6 +362,14 @@ def admin_notifications_mark_read(request):
         AdminNotification.objects.filter(is_read=False).update(is_read=True)
     return JsonResponse({"success": True})
 
+# @login_required
+# def admin_notifications_mark_read(request, notification_id):
+#     notification = get_object_or_404(AdminNotification, id=notification_id)
+#     notification.is_read = True
+#     notification.save()
+#     return redirect('admin_notifications')
+
+
 # ___________________________________________________________________________________________________________________
 
 
@@ -658,16 +666,26 @@ def recipient_details_edit(request):
 
 @login_required
 def recipient_notifications(request):
-    recipient_user = request.user
-    notifications = RecipientNotification.objects.filter(
-        recipient=recipient_user
-    ).order_by('-created_at')
+    notifications = RecipientNotification.objects.filter(recipient=request.user).order_by('-created_at')
+    unread_notifications = notifications.filter(is_read=False)
+    read_notifications = notifications.filter(is_read=True)
 
-    notifications.filter(is_read=False).update(is_read=True)
+    context = {
+        'unread_notifications': unread_notifications,
+        'read_notifications': read_notifications,
+        'unread_count': unread_notifications.count(),
+    }
+    return render(request, "recipient/recipient_notifications.html", context)
 
-    return render(request, "recipient/recipient_notifications.html", {
-        "notifications": notifications
-    })
+
+@login_required
+def recipient_notifications_mark_read(request):
+    if request.method == "POST":
+        # Use related_name if defined in your model
+        RecipientNotification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "fail"}, status=400)
+
 
 @login_required
 def received_history(request):
@@ -726,11 +744,6 @@ def recipient_blood_request_form(request):
 
     return render(request, 'recipient/recipient_blood_request_form.html', {'form': form})
 
-@login_required
-def recipient_notifications_mark_read(request):
-    if request.method == "POST":
-        request.user.recipientnotification_set.filter(is_read=False).update(is_read=True)
-    return JsonResponse({"success": True})
 
 
 @login_required
@@ -792,7 +805,6 @@ def recipient_blood_request_status(request):
     return render(request, "recipient/recipient_blood_request_status.html", {
         "blood_requests": blood_requests,
     })
-
 
 # ____________________________________________________________________________________________________________________
 
@@ -949,9 +961,16 @@ def hospital_blood_received_history(request):
 @login_required
 def approve_hospital_request(request, request_id):
     hospital_request = get_object_or_404(HospitalBloodRequest, id=request_id)
-
     hospital_request.status = 'Approved'
     hospital_request.save()
+
+    # Update stock when request is completed
+    stock, created = HospitalBloodStock.objects.get_or_create(
+        hospital=hospital_request.hospital,
+        blood_group=hospital_request.blood_group
+    )
+    stock.units = F('units') + hospital_request.units
+    stock.save()
 
     HospitalNotification.objects.create(
         hospital=hospital_request.hospital,
@@ -959,6 +978,7 @@ def approve_hospital_request(request, request_id):
     )
 
     return redirect('manage_requests')
+
 
 
 @login_required
@@ -999,7 +1019,7 @@ def hospital_blood_request_status(request):
 
     return render(request, "hospital/hospital_blood_request_status.html", {
         "blood_requests": blood_requests,
-        "today": today,   
+        
     })
 
 # ______________________________________________________________________________________________________________________________

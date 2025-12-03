@@ -13,23 +13,41 @@
 
     <h1>Recipient Notifications</h1>
 
-    {% if notifications %}
+    <!-- 🔹 Unread notifications -->
+    {% if unread_notifications %}
+      <div class="unread-header">Unread</div>
       <ul class="notification-list">
-        {% for note in notifications %}
-          <li class="notification-item {% if not note.is_read %}unread{% endif %}">
+        {% for note in unread_notifications %}
+          <li class="notification-item unread">
             <div class="message">{{ note.message }}</div>
             <div class="timestamp">{{ note.created_at|date:"M d, Y - h:i A" }}</div>
           </li>
         {% endfor %}
       </ul>
-    {% else %}
-      <p class="no-notifications">No notifications available.</p>
+      <hr class="notif-divider">
     {% endif %}
+
+    <!-- 🔹 Read notifications -->
+    {% if read_notifications %}
+      <ul class="notification-list">
+        {% for note in read_notifications %}
+          <li class="notification-item read">
+            <div class="message">{{ note.message }}</div>
+            <div class="timestamp">{{ note.created_at|date:"M d, Y - h:i A" }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <!-- 🔹 No notifications -->
+    {% if not unread_notifications and not read_notifications %}
+      <p class="no-notifications">No notifications yet.</p>
+    {% endif %}
+
   </div>
 </div>
 
 <style>
-  /* 🩸 General reset and scroll fix */
   html, body {
     margin: 0 !important;
     padding: 0 !important;
@@ -40,7 +58,6 @@
     font-family: "Poppins", sans-serif;
   }
 
-  /* 🔙 Back Arrow */
   .back-arrow {
     position: fixed;
     top: 20px;
@@ -58,7 +75,6 @@
     text-decoration: underline;
   }
 
-  /* 📦 Page Wrapper */
   .notification-page {
     width: 100%;
     display: flex;
@@ -66,7 +82,6 @@
     align-items: flex-start;
   }
 
-  /* 📬 White Notification Box */
   .notification-container {
     width: 90%;
     max-width: 700px;
@@ -78,7 +93,6 @@
     box-sizing: border-box;
   }
 
-  /* 🩸 Heading */
   h1 {
     text-align: center;
     color: #b30000;
@@ -87,11 +101,24 @@
     font-weight: 600;
   }
 
-  /* 📋 Notification List */
+  .unread-header {
+    font-size: 16px;
+    font-weight: 600;
+    color: #8B0000;
+    margin-bottom: 15px;
+  }
+
   .notification-list {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 0 20px 0;
+  }
+
+  .notif-divider {
+    border: none;
+    height: 2px;
+    background-color: #8B0000;
+    margin: 15px 0 15px 0;
   }
 
   .notification-item {
@@ -107,6 +134,11 @@
   .notification-item.unread {
     background-color: #ffecec;
     border-left: 5px solid #b30000;
+  }
+
+  .notification-item.read {
+    background-color: #f9f9f9;
+    color: #555;
   }
 
   .message {
@@ -127,17 +159,38 @@
     font-size: 16px;
   }
 
-  /* 📱 Responsive */
   @media (max-width: 600px) {
     .notification-container {
       padding: 35px 25px;
       margin: 80px 10px;
     }
-
-    h1 {
-      font-size: 22px;
-    }
   }
 </style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("{% url 'recipient_notifications_mark_read' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+            "Content-Type": "application/json",
+        },
+    }).then(res => res.json()).then(data => {
+        if(data.success){
+            // Optionally, remove unread styles or update count here
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+                item.classList.add('read');
+            });
+        }
+    });
+
+    function getCSRFToken() {
+        const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        return cookie ? cookie.split('=')[1] : '';
+    }
+});
+</script>
+
 
 {% endblock %}

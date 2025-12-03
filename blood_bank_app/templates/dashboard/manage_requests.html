@@ -21,6 +21,7 @@
     </thead>
     <tbody>
         {% for req in hospital_requests %}
+
         <tr>
             <td>{{ req.hospital.username }}</td>
             <td>{{ req.blood_group }}</td>
@@ -29,8 +30,6 @@
                 {{ req.urgency }}
             </td>
             <td>{{ req.required_date }}</td>
-
-            <!-- ✅ STATUS DISPLAY -->
             <td>
                 {% if req.status == 'Completed' %}
                     <span class="badge completed">Completed</span>
@@ -46,9 +45,7 @@
                     </span>
                 {% endif %}
             </td>
-
             <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-
             <td>
                 {% if req.status == 'Pending' %}
                     {% if req.required_date < today %}
@@ -61,6 +58,7 @@
                     <em>------</em>
                 {% endif %}
             </td>
+
         </tr>
         {% empty %}
         <tr><td colspan="8" class="text-center">No hospital requests found.</td></tr>
@@ -121,6 +119,8 @@
             <th>Recipient</th>
             <th>Blood Group</th>
             <th>Units</th>
+            <th>Urgency</th>
+
             <th>Required Date</th>
             <th>Status</th>
             <th>Requested On</th>
@@ -130,11 +130,14 @@
     <tbody>
         {% for req in recipient_requests %}
         <tr>
+
             <td>{{ req.recipient.username }}</td>
             <td>{{ req.blood_group }}</td>
             <td>{{ req.units }}</td>
-            <td>{{ req.required_date }}</td>
+            <td class="{% if req.urgency == 'High' %}urgency-high{% elif req.urgency == 'Medium' %}urgency-medium{% else %}urgency-low{% endif %}">
+                {{ req.urgency }}
 
+            <td>{{ req.required_date }}</td>
             <td>
                 {% if req.status == 'Completed' %}
                     <span class="badge completed">Completed</span>
@@ -150,9 +153,7 @@
                     </span>
                 {% endif %}
             </td>
-
             <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
-
             <td>
                 {% if req.status == 'Pending' %}
                     {% if req.required_date < today %}
@@ -165,6 +166,7 @@
                     <em>------</em>
                 {% endif %}
             </td>
+
         </tr>
         {% empty %}
         <tr><td colspan="7" class="text-center">No recipient requests found.</td></tr>
