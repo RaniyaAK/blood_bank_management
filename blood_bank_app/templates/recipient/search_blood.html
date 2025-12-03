@@ -8,7 +8,7 @@
 
     <div class="search-box">
         <form method="GET" action="">
-            <input type="text" name="q" placeholder="Search by blood group (e.g. A+, O-, B+)" value="{{ query|default:'' }}">
+            <input type="text" name="q" placeholder="Search by blood group" value="{{ query|default:'' }}">
             <button type="submit">Search</button>
         </form>
     </div>
@@ -26,8 +26,8 @@
             <tbody>
                 {% for blood in blood_stock %}
                 <tr>
-                    <td>{{ blood.bloodgroup }}</td>
-                    <td>{{ blood.unit }}</td>
+                    <td>{{ blood.blood_group }}</td>
+                    <td>{{ blood.units }}</td>
                     <td>{{ blood.added_at|date:"Y-m-d H:i" }}</td>
                 </tr>
                 {% endfor %}

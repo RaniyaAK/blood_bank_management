@@ -710,7 +710,7 @@ def search_blood(request):
     blood_stock = BloodStock.objects.all().order_by('-added_at')
 
     if query:
-        blood_stock = blood_stock.filter(bloodgroup__icontains=query)
+        blood_stock = blood_stock.filter(blood_group__icontains=query)
 
     return render(request, 'recipient/search_blood.html', {
         'blood_stock': blood_stock,
