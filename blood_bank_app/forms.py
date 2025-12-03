@@ -114,7 +114,6 @@ class HospitalDetailsForm(forms.ModelForm):
         }
 
 
-# ✅ UPDATED DonorRequestAppointmentForm
 class DonorRequestAppointmentForm(forms.ModelForm):
     class Meta:
         model = DonorRequestAppointment
@@ -126,7 +125,6 @@ class DonorRequestAppointmentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # ✅ Prevent user from choosing a date before today in the browser
         if 'preferred_date' in self.fields:
             self.fields['preferred_date'].widget.attrs['min'] = date.today().isoformat()
 
@@ -177,7 +175,6 @@ class DonorEligibilityTestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # ⛔ Prevent choosing past dates in browser
         if 'required_date' in self.fields:
             self.fields['required_date'].widget.attrs['min'] = date.today().isoformat()
 

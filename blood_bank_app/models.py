@@ -125,7 +125,6 @@ class DonorEligibilityTest(models.Model):
     weight = models.FloatField(help_text="Weight must be at least 50 kg.")
     last_donation_date = models.DateField(null=True, blank=True, help_text="Leave blank if this is your first donation.")
 
-    # Basic health questions
     has_disease = models.BooleanField(default=False, help_text="Do you currently have any infectious or chronic disease?")
     on_medication = models.BooleanField(default=False, help_text="Are you currently on any medication?")
     had_surgery_recently = models.BooleanField(default=False, help_text="Have you undergone any surgery recently?")

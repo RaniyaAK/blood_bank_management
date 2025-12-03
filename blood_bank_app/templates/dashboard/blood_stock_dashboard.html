@@ -1,11 +1,11 @@
 {% extends 'dashboard/admin_base.html' %}
 
-{% block title %}Manage Users{% endblock %}
-{% block page_title %}Manage Users{% endblock %}
+{% block title %}Add Blood Stock{% endblock %}
+{% block page_title %}Add Blood Stock{% endblock %}
 
 {% block content_admin %}
 
-<!-- Display messages -->
+<!-- Messages -->
 {% if messages %}
     {% for message in messages %}
         <p class="message">{{ message }}</p>
@@ -13,35 +13,41 @@
 {% endif %}
 
 <div class="section">
+    <h3>Add Blood Stock</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.blood_group.label_tag }}
+            {{ form.blood_group }}
+        </div>
+        <div class="form-group">
+            {{ form.units.label_tag }}
+            {{ form.units }}
+        </div>
+        <button type="submit" class="btn-approve">Add Stock</button>
+    </form>
+</div>
+
+<div class="section">
+    <h3>Current Blood Stock</h3>
     <table class="styled-table">
         <thead>
             <tr>
                 <th>#</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Date Joined</th>
-                <th>Actions</th>
+                <th>Blood Group</th>
+                <th>Units</th>
             </tr>
         </thead>
         <tbody>
-            {% for user in users %}
+            {% for stock in blood_stock %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.first_name }}</td>
-                <td>{{ user.last_name }}</td>
-                <td>{{ user.date_joined|date:"Y-m-d H:i" }}</td>
-                <td>
-                    <a href="{% url 'edit_user' user.id %}" class="btn-approve">Edit</a>
-                    <a href="{% url 'delete_user' user.id %}" class="btn-reject">Delete</a>
-                </td>
+                <td>{{ stock.blood_group }}</td>
+                <td>{{ stock.units }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center">No users found.</td>
+                <td colspan="3" class="text-center">No blood stock available.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -24,6 +24,8 @@ urlpatterns = [
     path('dashboard/admin_notifications/', views.admin_notifications, name='admin_notifications'),
     path('dashboard/manage_requests/', views.manage_requests, name='manage_requests'),
 
+
+
 # hospital
     path('hospital/', views.hospital, name='hospital'),
     path('hospital_registration_form/', views.hospital_details_form, name='hospital_details_form'),

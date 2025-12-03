@@ -3,11 +3,10 @@ from django.contrib.auth import authenticate, login, logout,login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth.models import User
-from django.contrib import messages
 from django.urls import reverse
 from django.db.models import Sum
 from django.http import JsonResponse
+from django.db.models import F
 
 from .forms import HospitalBloodRequestForm
 from .forms import LoginForm, UserForm
@@ -37,18 +36,7 @@ from .models import (
     HospitalNotification,
     RecipientNotification
 )
-from django.db.models import F
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import BloodStockForm
-from .models import HospitalBloodStock
 
-from django.db.models import Sum
-import json
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import HospitalBloodStock
 
 def home(request):
     return render(request, 'home.html')
@@ -300,15 +288,24 @@ def admin_dashboard(request):
 
 @login_required
 def blood_stock_dashboard(request):
-    blood_stock = BloodStock.objects.all().order_by('-added_at')
+    if request.method == 'POST':
+        form = BloodStockForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('blood_stock_dashboard')  
+    else:
+        form = BloodStockForm()
 
+    blood_stock = BloodStock.objects.all().order_by('-added_at')
     unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
 
     context = {
+        'form': form,  
         'blood_stock': blood_stock,
-        'unread_notifications_count': unread_notifications_count,  # ✅ Pass to template
+        'unread_notifications_count': unread_notifications_count,  
     }
     return render(request, 'dashboard/blood_stock_dashboard.html', context)
+
 
 
 @login_required
@@ -1045,4 +1042,7 @@ def manage_requests(request):
     }
 
     return render(request, 'dashboard/manage_requests.html', context)
+
+
+
 
