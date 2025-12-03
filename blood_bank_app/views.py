@@ -777,18 +777,39 @@ def approve_recipient_request(request, request_id):
 
     return redirect('manage_requests')
 
+from django.db import transaction
 
 @login_required
 def recipient_blood_request_status(request):
-    recipient = get_object_or_404(RecipientDetails, user=request.user)
     today = date.today()
-
-    RecipientBloodRequest.objects.filter(
+    approved_requests = RecipientBloodRequest.objects.filter(
         recipient=request.user,
         status='Approved',
         required_date__lte=today
-    ).update(status='Completed')
+    )
 
+    for req in approved_requests:
+        try:
+            with transaction.atomic():
+                # Lock the stock row until the transaction completes
+                stock = BloodStock.objects.select_for_update().get(blood_group=req.blood_group)
+
+                if stock.units >= req.units:
+                    stock.units -= req.units  # decrease stock safely
+                    stock.save()
+
+                    req.status = 'Completed'
+                    req.save()
+                else:
+                    messages.error(
+                        request,
+                        f"Not enough {req.blood_group} blood to complete request ({req.units} units)."
+                    )
+
+        except BloodStock.DoesNotExist:
+            messages.error(request, f"No stock found for {req.blood_group}")
+
+    # Expire pending requests
     RecipientBloodRequest.objects.filter(
         recipient=request.user,
         status='Pending',
