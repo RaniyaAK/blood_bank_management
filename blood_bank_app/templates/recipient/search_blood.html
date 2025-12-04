@@ -3,24 +3,28 @@
 
 {% block content %}
 
-<div class="main-content">
-    <h1>Search Blood Availability</h1>
+<a href="javascript:history.back()" class="back-arrow">&#8592; Back</a>
 
-    <div class="search-box">
-        <form method="GET" action="">
-            <input type="text" name="q" placeholder="Search by blood group" value="{{ query|default:'' }}">
-            <button type="submit">Search</button>
-        </form>
-    </div>
+<div class="page">
+    <div class="container-box">
+        <h1>Search Blood Availability</h1>
 
-    {% if blood_stock %}
-    <div class="section">
-        <table>
+        <div class="search-box">
+            <form method="GET" action="">
+                <div class="input-wrapper">
+                    <input type="text" name="q" placeholder="Blood group" value="{{ query|default:'' }}">
+                    <button type="submit" class="search-btn">🔍</button>
+                </div>
+            </form>
+        </div>
+
+        {% if blood_stock %}
+        <table class="blood-table">
             <thead>
                 <tr>
                     <th>Blood Group</th>
                     <th>Units Available</th>
-                    <th>Added Date</th>
+                    <!-- <th>Added Date</th> -->
                 </tr>
             </thead>
             <tbody>
@@ -28,110 +32,135 @@
                 <tr>
                     <td>{{ blood.blood_group }}</td>
                     <td>{{ blood.units }}</td>
-                    <td>{{ blood.added_at|date:"Y-m-d H:i" }}</td>
+                    <!-- <td>{{ blood.added_at|date:"Y-m-d H:i" }}</td> -->
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        {% else %}
+            <p class="no-result">No matching blood found.</p>
+        {% endif %}
+
     </div>
-    {% else %}
-        <p>No matching blood found.</p>
-    {% endif %}
 </div>
 
 <style>
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #FAFAFA;
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: linear-gradient(180deg, #5c0000 0%, #8b0000 100%);
+    font-family: "Poppins", sans-serif;
+    min-height: 100vh;
 }
 
-.main-content {
-    margin-left: 220px;
-    padding: 140px 40px 40px;
+.back-arrow {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    z-index: 10000;
+}
+
+.back-arrow:hover { color: #f1f1f1; }
+
+.page {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
+    padding-top: 40px;
 }
 
-.main-content h1 {
-    color: #8B0000;
-    font-size: 28px;
+.container-box {
+    width: 90%;
+    max-width: 600px;
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 14px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+h1 {
+    color: #b30000;
     margin-bottom: 20px;
+    font-size: 26px;
+    font-weight: 600;
 }
 
 .search-box {
     width: 100%;
-    max-width: 600px;
-    margin-bottom: 25px;
+    margin: 0 auto 25px auto;
 }
 
-.search-box form {
+.input-wrapper {
     display: flex;
+    width: 100%;
+    border-radius: 50px;
+    overflow: hidden;
+    border: 1px solid #ccc;
 }
 
-.search-box input {
+.input-wrapper input {
     flex: 1;
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px 0 0 8px;
+    padding: 10px 15px;
+    border: none;
     outline: none;
     font-size: 15px;
+    border-radius: 50px 0 0 50px; /* rounded left side */
 }
 
-.search-box input:focus {
-    border-color: #8B0000;
+.input-wrapper input::placeholder {
+    color: #999;
 }
 
-.search-box button {
-    background-color: #8B0000;
-    color: white;
+.search-btn {
+    flex-shrink: 0;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
     border: none;
-    padding: 10px 20px;
-    border-radius: 0 8px 8px 0;
+    background-color: #8B0000;
+    color: #fff;
+    font-size: 18px;
     cursor: pointer;
-    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: background-color 0.3s;
 }
 
-.search-box button:hover {
+.search-btn:hover {
     background-color: #a51a1a;
 }
 
-/* Table */
-.section {
-    width: 100%;
-    max-width: 900px;
-    background: white;
-    border-radius: 12px;
-    padding: 25px 35px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-table {
+.blood-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
 }
 
-th, td {
+.blood-table th, .blood-table td {
     border: 1px solid #ddd;
-    padding: 12px;
+    padding: 10px;
     text-align: center;
     font-size: 15px;
 }
 
-th {
-    background-color: #8B0000;
-    color: white;
+.blood-table th {
+    background-color: #b30000;
+    color: #fff;
 }
 
-tr:nth-child(even) { background-color: #f9f9f9; }
-tr:hover { background-color: #eef4ff; }
+.blood-table tr:nth-child(even) { background-color: #f9f9f9; }
+.blood-table tr:hover { background-color: #eef4ff; }
 
-p {
+.no-result {
+    margin-top: 10px;
+    font-size: 16px;
     color: #555;
-    text-align: center;
 }
 </style>
 
