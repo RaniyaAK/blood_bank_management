@@ -82,7 +82,7 @@ class RecipientDetails(models.Model):
     phone_number = models.CharField(max_length=15, validators=[donor_recipient_phone_validator])
     email = models.EmailField(unique=True, null=True, blank=True)
     address = models.TextField()
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)  # ✅ Added choices
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)  
     dob = models.DateField()
     blood_group = models.CharField(max_length=5)
     photo = models.ImageField(upload_to='recipient_photos/')
@@ -102,7 +102,7 @@ class DonorRequestAppointment(models.Model):
     donor = models.ForeignKey(User, on_delete=models.CASCADE)
     preferred_date = models.DateField()
     preferred_time = models.TimeField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ Added
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending') 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -170,7 +170,7 @@ class HospitalBloodRequest(models.Model):
     units = models.PositiveIntegerField()
     required_date = models.DateField()
     urgency = models.CharField(max_length=10, choices=URGENCY_LEVEL_CHOICES)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ Added
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending') 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

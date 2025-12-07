@@ -586,7 +586,6 @@ def donor_notifications(request):
 def donation_history(request):
     return render(request, 'donor/donation_history.html')
 
-#  Donor Requests (No date restriction)
 @login_required
 def approve_donor_request(request, request_id):
     donor_request = get_object_or_404(DonorRequestAppointment, id=request_id)
@@ -678,7 +677,6 @@ def recipient_notifications(request):
 @login_required
 def recipient_notifications_mark_read(request):
     if request.method == "POST":
-        # Use related_name if defined in your model
         RecipientNotification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
         return JsonResponse({"status": "success"})
     return JsonResponse({"status": "fail"}, status=400)
@@ -696,7 +694,7 @@ def received_history(request):
 
     for req in approved_requests:
         req.status = 'Completed'
-        req.completed_date = today  # Save completed date
+        req.completed_date = today  
         req.save()
 
     completed_requests = RecipientBloodRequest.objects.filter(
