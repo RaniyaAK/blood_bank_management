@@ -688,11 +688,16 @@ def recipient_notifications_mark_read(request):
 def received_history(request):
     today = date.today()
 
-    RecipientBloodRequest.objects.filter(
+    approved_requests = RecipientBloodRequest.objects.filter(
         recipient=request.user,
         status='Approved',
         required_date__lte=today
-    ).update(status='Completed')
+    )
+
+    for req in approved_requests:
+        req.status = 'Completed'
+        req.completed_date = today  # Save completed date
+        req.save()
 
     completed_requests = RecipientBloodRequest.objects.filter(
         recipient=request.user,
@@ -702,6 +707,7 @@ def received_history(request):
     return render(request, 'recipient/received_history.html', {
         "recipient_completed_requests": completed_requests
     })
+
 
 
 @login_required
@@ -791,11 +797,10 @@ def recipient_blood_request_status(request):
     for req in approved_requests:
         try:
             with transaction.atomic():
-                # Lock the stock row until the transaction completes
                 stock = BloodStock.objects.select_for_update().get(blood_group=req.blood_group)
 
                 if stock.units >= req.units:
-                    stock.units -= req.units  # decrease stock safely
+                    stock.units -= req.units  
                     stock.save()
 
                     req.status = 'Completed'
