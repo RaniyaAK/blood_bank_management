@@ -16,8 +16,8 @@ donor_recipient_phone_validator = RegexValidator(
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     ROLE_CHOICES = (
-        ('hospital', 'Hospital'),
         ('donor', 'Donor'),
+        ('hospital', 'Hospital'),
         ('recipient', 'Recipient'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='recipient')

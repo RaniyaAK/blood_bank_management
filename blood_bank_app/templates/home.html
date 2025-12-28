@@ -1,56 +1,158 @@
-{% extends 'master.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HemoFlow Blood Bank</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+/* ---------- GLOBAL ---------- */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color:#FAFAFA; color:#2e2828; }
+a { text-decoration:none; color:inherit; }
+.container { max-width:1200px; margin:0 auto; padding:0 20px; }
 
-{% block title %}Admin Dashboard{% endblock %}
+/* ---------- NAVBAR ---------- */
+nav { background-color:#ab0909; color:#fff; position:sticky; top:0; z-index:100; }
+nav .nav-container { display:flex; justify-content:space-between; align-items:center; padding:15px 0; }
+nav .logo { font-size:1.8rem; font-weight:bold; }
+nav ul { display:flex; list-style:none; gap:25px; }
+nav ul li:hover a { text-decoration:underline; }
 
-{% block content %}
-<div class="dashboard-content">
-    <h1>Home Page</h1>
-    <a href="{% url 'login' %}" class="logout-btn">Login</a>
-</div>
-
-<!-- <style>
-
-body, html {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: center; /* horizontal center */
-    align-items: center;     /* vertical center */
-    background-color: #f0f0f0; /* optional page background */
-    font-family: Arial, sans-serif;
+/* ---------- HERO ---------- */
+.hero {
+  background-color:#c2c2c2; 
+  padding:80px 20px;
+  color:#333; 
+  text-align:center;
 }
-
-/* Content */
-.dashboard-content {
-    text-align: center;
+.hero h1 { font-size:2.6rem; margin-bottom:18px; font-weight:600; }
+.hero p { font-size:1.1rem; margin-bottom:25px; line-height:1.6; max-width:700px; margin-left:auto; margin-right:auto; }
+.hero-btn {
+  background-color:#ab0909; 
+  color:#fff;
+  padding:14px 28px;
+  font-weight:bold;
+  border-radius:8px;
+  transition:0.3s;
 }
+.hero-btn:hover { background-color:#8B0000; }
 
-/* Title */
-.dashboard-content h1 {
-   
-    margin-bottom: 50px;
-    font-size: 36px;
-}
+/* ---------- SECTIONS ---------- */
+section { padding:70px 20px; }
 
-/* Paragraph */
-.dashboard-content p {
-    font-size: 20px;
-    margin-bottom: 30px;
-}
+/* About Section */
+.about { text-align:center; background-color:#FAFAFA; }
+.about h2 { font-size:1.9rem; margin-bottom:18px; color:#ab0909; }
+.about p { max-width:700px; margin:0 auto; font-size:1rem; line-height:1.7; color:#2e2828; }
 
-/* Logout button */
-.logout-btn {
-    padding: 12px 25px;
-    background-color: rgb(190, 19, 190);
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    border-radius: 6px;
-    transition: background-color 0.3s ease-in-out;
+/* Services Section */
+.services { text-align:center; background-color:#f5f5f5; }
+.services h2 { font-size:1.9rem; margin-bottom:18px; color:#ab0909; }
+.services-cards {
+  display:flex; flex-wrap:wrap; gap:25px; justify-content:center; margin-top:35px;
 }
+.services-cards .card {
+  background-color:#FAFAFA; padding:25px; border-radius:12px; width:240px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1); transition: transform 0.25s, box-shadow 0.25s;
+}
+.services-cards .card:hover { transform: translateY(-6px); box-shadow:0 6px 15px rgba(0,0,0,0.15); }
+.card i { font-size:1.8rem; color:#ab0909; margin-bottom:12px; }
+.card h3 { margin-bottom:8px; color:#2e2828; font-size:1.1rem; }
+.card p { font-size:0.95rem; color:#2e2828; }
 
-.logout-btn:hover {
-    background-color: rgb(220, 50, 220);
+/* CALL TO ACTION */
+.cta { text-align:center; background-color:#ab0909; color:#fff; padding:50px 20px; }
+.cta h2 { font-size:1.9rem; margin-bottom:18px; }
+.cta p { max-width:700px; margin:0 auto 20px; font-size:1rem; line-height:1.6; color:#fff; }
+.cta a {
+  background-color:#FAFAFA;
+  color:#ab0909;
+  padding:14px 28px;
+  border-radius:8px;
+  font-weight:bold;
+  transition:0.3s;
 }
-</style> -->
-{% endblock %}
+.cta a:hover { background-color:#f0f0f0; }
+
+/* FOOTER */
+footer { background-color:#ab0909; color:#fff; text-align:center; padding:35px 20px 20px; }
+
+/* RESPONSIVE */
+@media (max-width:768px){
+  nav .nav-container { flex-direction:column; gap:12px; }
+  .services-cards { flex-direction:column; align-items:center; }
+  .hero h1 { font-size:2.2rem; }
+  .hero p { font-size:1rem; }
+  .cta h2 { font-size:1.6rem; }
+  .cta p { font-size:0.95rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="container nav-container">
+    <div class="logo">HemoFlow</div>
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="/login">Login</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <h1>Be a Lifesaver Today</h1>
+  <p>Step forward and make a difference. Your blood donation can give someone a second chance at life. Join HemoFlow and save lives with a single act of kindness.</p>
+  <a href="/register" class="hero-btn">Register to Donate</a>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <h2>About HemoFlow Blood Bank</h2>
+  <p>
+    HemoFlow Blood Bank is committed to providing safe and timely blood to hospitals and patients. 
+    We aim to bridge the gap between donors and recipients. Every donor is a hero, and every donation counts.
+  </p>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <h2>Our Services</h2>
+  <div class="services-cards">
+    <div class="card">
+      <i class="fa-solid fa-user-plus"></i>
+      <h3>Donor Registration</h3>
+      <p>Register as a donor on HemoFlow to help patients in need whenever blood is required.</p>
+    </div>
+    <div class="card">
+      <i class="fa-solid fa-hospital"></i>
+      <h3>Hospital Support</h3>
+      <p>Provide timely blood supply to hospitals and patients in emergencies.</p>
+    </div>
+    <div class="card">
+      <i class="fa-solid fa-droplet"></i>
+      <h3>Blood Requests</h3>
+      <p>Patients and hospitals can request specific blood types directly from our donor network.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CALL TO ACTION -->
+<section class="cta">
+  <h2>Connect With HemoFlow</h2>
+  <p>Already decided to donate or want to learn more? Log in to manage your donor profile, view blood requests, and stay updated with HemoFlow activities.</p>
+  <a href="/login">Login</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  &copy; 2025 HemoFlow Blood Bank | All Rights Reserved
+</footer>
+
+</body>
+</html>
