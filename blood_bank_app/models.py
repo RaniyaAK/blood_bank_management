@@ -176,15 +176,17 @@ class HospitalBloodRequest(models.Model):
     def __str__(self):
         return f"Request by {self.hospital.username} - {self.blood_group} ({self.units} units)"
 
-
 class AdminNotification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) 
+    role = models.CharField(max_length=20, blank=True, null=True)  # New field to store role
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Admin Notification for {self.user.username if self.user else 'admin'} - {self.message[:50]}"
+        role_display = self.role.upper() if self.role else "SYSTEM"
+        user_display = self.user.username if self.user else "admin"
+        return f"{role_display} {user_display} - {self.message[:50]}"
 
 
 class RecipientBloodRequest(models.Model):

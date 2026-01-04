@@ -5,39 +5,51 @@
 
 {% block content_admin %}
 
-<h3 class="section-title"> Add Blood Stock</h3>
+<div class="form-container">
+    <div class="admin-box">
+        <h3 class="section-title">Add Blood Stock</h3>
 
-<div class="admin-box">
-    <form method="post">
-        {% csrf_token %}
+        <form method="post">
+            {% csrf_token %}
 
-        <div class="form-group">
-            {{ form.blood_group.label_tag }}
-            {{ form.blood_group }}
-        </div>
+            <div class="form-group">
+                {{ form.blood_group.label_tag }}
+                {{ form.blood_group }}
+            </div>
 
-        <div class="form-group">
-            {{ form.units.label_tag }}
-            {{ form.units }}
-        </div>
+            <div class="form-group">
+                {{ form.units.label_tag }}
+                {{ form.units }}
+            </div>
 
-        <div class="btn-right">
-            <!-- Cancel Button -->
-            <a href="{% url 'blood_stock_dashboard' %}" class="btn-cancel">Cancel</a>
+            <div class="btn-right">
+                <!-- Cancel Button -->
+                <a href="{% url 'blood_stock_dashboard' %}" class="btn-cancel">Cancel</a>
 
-            <!-- Add Stock Button -->
-            <button type="submit" class="btn-add">Add Stock</button>
-        </div>
-    </form>
+                <!-- Add Stock Button -->
+                <button type="submit" class="btn-add">Add Stock</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <style>
+/* Center the form horizontally and vertically */
+.form-container {
+    display: flex;
+    justify-content: center;  /* center horizontally */
+    align-items: center;      /* center vertically */
+    min-height: 70vh;         /* vertical spacing */
+    flex-direction: column;   /* stack heading and form vertically */
+}
+
 /* Section title */
 .section-title {
     color: #8B0000;
-    margin: 20px 0 12px;
-    font-size: 18px;
+    margin: 0 0 20px;
+    font-size: 22px;
     font-weight: 600;
+    text-align: center;      /* center the heading */
 }
 
 /* Box */
@@ -47,6 +59,7 @@
     border: 1px solid #f1cfcf;
     border-radius: 8px;
     padding: 22px;
+    width: 100%;
 }
 
 /* Form group */
