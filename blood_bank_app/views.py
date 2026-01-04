@@ -285,26 +285,44 @@ def admin_dashboard(request):
     }
     return render(request, 'dashboard/admin_dashboard.html', context)
 
-
 @login_required
 def blood_stock_dashboard(request):
+    """Admin view: show stock + add blood (combine units if already exists)."""
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
+
     if request.method == 'POST':
         form = BloodStockForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('blood_stock_dashboard')  
+            blood_group = form.cleaned_data['blood_group']
+            units = form.cleaned_data['units']
+
+            # Check if this blood group already exists
+            stock, created = BloodStock.objects.get_or_create(
+                blood_group=blood_group
+            )
+
+            if not created:
+                # Already exists → add units
+                stock.units += units
+            else:
+                # New stock → set units
+                stock.units = units
+
+            stock.save()
+
+            messages.success(request, f"{units} units of {blood_group} added successfully!")
+            return redirect('blood_stock_dashboard')
+
     else:
         form = BloodStockForm()
 
-    blood_stock = BloodStock.objects.all().order_by('-added_at')
-    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
+    blood_stock = BloodStock.objects.all().order_by('blood_group')  # ordered by group
 
-    context = {
-        'form': form,  
+    return render(request, 'dashboard/blood_stock_dashboard.html', {
+        'form': form,
         'blood_stock': blood_stock,
-        'unread_notifications_count': unread_notifications_count,  
-    }
-    return render(request, 'dashboard/blood_stock_dashboard.html', context)
+        'unread_notifications_count': unread_notifications_count,
+    })
 
 
 
@@ -1068,25 +1086,32 @@ def manage_requests(request):
     return render(request, 'dashboard/manage_requests.html', context)
 
 
-
-
-@login_required
-def blood_stock_dashboard(request):
-    blood_stock = BloodStock.objects.all().order_by('-added_at')
-    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
-
-    return render(request, 'dashboard/blood_stock_dashboard.html', {
-        'blood_stock': blood_stock,
-        'unread_notifications_count': unread_notifications_count,
-    })
+from django.db.models import F
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import BloodStockForm
+from .models import BloodStock, AdminNotification
 
 @login_required
 def admin_add_blood_stock(request):
     if request.method == 'POST':
         form = BloodStockForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Blood stock added successfully.")
+            blood_group = form.cleaned_data['blood_group']
+            units = form.cleaned_data['units']
+
+            # Check if blood group already exists
+            stock, created = BloodStock.objects.get_or_create(
+                blood_group=blood_group,
+                defaults={'units': units}
+            )
+
+            if not created:
+                # If it exists, increment the units
+                BloodStock.objects.filter(id=stock.id).update(units=F('units') + units)
+
+            messages.success(request, f"{units} units of {blood_group} added successfully.")
             return redirect('blood_stock_dashboard')
     else:
         form = BloodStockForm()
