@@ -5,7 +5,7 @@
 
 {% block content_admin %}
 
-<h3 class="section-title">🩸 Add Blood Stock</h3>
+<h3 class="section-title"> Add Blood Stock</h3>
 
 <div class="admin-box">
     <form method="post">
@@ -22,7 +22,11 @@
         </div>
 
         <div class="btn-right">
-            <button type="submit" class="btn-approve">Add Stock</button>
+            <!-- Cancel Button -->
+            <a href="{% url 'blood_stock_dashboard' %}" class="btn-cancel">Cancel</a>
+
+            <!-- Add Stock Button -->
+            <button type="submit" class="btn-add">Add Stock</button>
         </div>
     </form>
 </div>
@@ -73,21 +77,41 @@
 .btn-right {
     text-align: right;
     margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px; /* space between buttons */
 }
 
-/* Button */
-.btn-approve {
-    background-color: #28a745;
+/* Add Stock Button in Red */
+.btn-add {
+    background-color: #b30000; /* red */
     color: #fff;
     padding: 8px 18px;
     border-radius: 6px;
     border: none;
     font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s;
 }
 
-.btn-approve:hover {
-    background-color: #218838;
+.btn-add:hover {
+    background-color: #8b0000;
+}
+
+/* Cancel Button */
+.btn-cancel {
+    display: inline-block;
+    background-color: #ccc; /* grey */
+    color: #333;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background-color: #999;
 }
 </style>
 

@@ -12,18 +12,10 @@
     {% endfor %}
 {% endif %}
 
-<div class="header-row">
-    <h3 class="section-title">Current Blood Stock</h3>
+<!-- Heading -->
+<h3 class="section-title">Current Blood Stock</h3>
 
-    <!-- ➕ Add button -->
-    <a href="{% url 'admin_add_blood_stock' %}" class="btn-add">
-        + Add Blood Stock
-    </a>
-</div>
-
-<!-- Space after button -->
-<div class="table-space"></div>
-
+<!-- Table -->
 <table class="styled-table">
     <thead>
         <tr>
@@ -47,53 +39,71 @@
     </tbody>
 </table>
 
-<style>
-/* Header */
-.header-row {
-    margin-bottom: 10px;
-}
+<!-- Centered Add Button Below Table -->
+<div class="button-row">
+    <a href="{% url 'admin_add_blood_stock' %}" class="btn-add">
+        + Add Blood Stock
+    </a>
+</div>
 
+<style>
 /* Section title */
 .section-title {
     color: #8B0000;
-    font-size: 18px;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+/* Button Row (centered below table) */
+.button-row {
+    margin-top: 20px;  /* space after table */
+    text-align: center; /* center the button */
 }
 
 /* Red Add Button */
 .btn-add {
+    display: inline-block;
     background-color: #b30000;
     color: #fff;
-    padding: 8px 14px;
+    padding: 8px 16px;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 600;
-    float: right;
-    margin-top: 8px;
+    transition: background 0.2s;
 }
 
 .btn-add:hover {
     background-color: #8b0000;
 }
 
-/* Space before table */
-.table-space {
-    clear: both;
-    height: 20px;
+/* Table Styling */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* Table */
 .styled-table thead th {
     background-color: #8B0000;
     color: #fff;
     text-transform: uppercase;
     font-size: 14px;
+    padding: 10px;
+    text-align: left;
+}
+
+.styled-table tbody td {
+    padding: 10px;
 }
 
 .styled-table tbody tr:nth-child(even) {
- background-color: #f9f9f9; }
+    background-color: #f9f9f9;
+}
 .styled-table tbody tr:nth-child(odd) {
- background-color: #ffffff; }
-.styled-table tbody tr:hover { background-color: #ffe6e6; }
+    background-color: #ffffff;
+}
+.styled-table tbody tr:hover {
+    background-color: #ffe6e6;
+}
 
 /* Messages */
 .admin-message.success {
@@ -101,7 +111,7 @@
     color: #155724;
     padding: 10px;
     border-radius: 6px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 </style>
 
