@@ -1070,3 +1070,30 @@ def manage_requests(request):
 
 
 
+@login_required
+def blood_stock_dashboard(request):
+    blood_stock = BloodStock.objects.all().order_by('-added_at')
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
+
+    return render(request, 'dashboard/blood_stock_dashboard.html', {
+        'blood_stock': blood_stock,
+        'unread_notifications_count': unread_notifications_count,
+    })
+
+@login_required
+def admin_add_blood_stock(request):
+    if request.method == 'POST':
+        form = BloodStockForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Blood stock added successfully.")
+            return redirect('blood_stock_dashboard')
+    else:
+        form = BloodStockForm()
+
+    unread_notifications_count = AdminNotification.objects.filter(is_read=False).count()
+
+    return render(request, 'dashboard/admin_add_blood_stock.html', {
+        'form': form,
+        'unread_notifications_count': unread_notifications_count,
+    })

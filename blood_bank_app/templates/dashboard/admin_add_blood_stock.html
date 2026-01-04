@@ -1,0 +1,94 @@
+{% extends 'dashboard/admin_base.html' %}
+
+{% block title %}Add Blood Stock{% endblock %}
+{% block page_title %}Add Blood Stock{% endblock %}
+
+{% block content_admin %}
+
+<h3 class="section-title">🩸 Add Blood Stock</h3>
+
+<div class="admin-box">
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.blood_group.label_tag }}
+            {{ form.blood_group }}
+        </div>
+
+        <div class="form-group">
+            {{ form.units.label_tag }}
+            {{ form.units }}
+        </div>
+
+        <div class="btn-right">
+            <button type="submit" class="btn-approve">Add Stock</button>
+        </div>
+    </form>
+</div>
+
+<style>
+/* Section title */
+.section-title {
+    color: #8B0000;
+    margin: 20px 0 12px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Box */
+.admin-box {
+    max-width: 460px;
+    background: #ffffff;
+    border: 1px solid #f1cfcf;
+    border-radius: 8px;
+    padding: 22px;
+}
+
+/* Form group */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Equal-size inputs */
+.form-group select,
+.form-group input {
+    width: 100%;
+    height: 40px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Button alignment */
+.btn-right {
+    text-align: right;
+    margin-top: 10px;
+}
+
+/* Button */
+.btn-approve {
+    background-color: #28a745;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-approve:hover {
+    background-color: #218838;
+}
+</style>
+
+{% endblock %}

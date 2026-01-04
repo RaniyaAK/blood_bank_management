@@ -82,6 +82,10 @@ urlpatterns = [
 
     path('dashboard/admin_notifications/mark-read/', views.admin_notifications_mark_read, name='admin_notifications_mark_read'),
 
+    path('dashboard/admin/blood-stock_dashboard/',views.blood_stock_dashboard,name='blood_stock_dashboard'),
+
+    path('dashboard/admin/add-blood-stock/',views.admin_add_blood_stock,name='admin_add_blood_stock'),
+
 ]
 
 if settings.DEBUG:
